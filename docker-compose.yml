@@ -50,7 +50,8 @@ services:
       # or an inbound message arrives — no QR re-scan needed.
       # Default: 2 hours (7200000 ms). Reduce if RAM is constrained.
       - SESSION_IDLE_TIMEOUT_MS=7200000
-      - FORCE_HTTPS=true
+      - FORCE_HTTPS=${FORCE_HTTPS:-false}
+      - ALLOW_INSECURE_COOKIES=${ALLOW_INSECURE_COOKIES:-true}
       # MAX_CONCURRENT_WHATSAPP_SESSIONS is intentionally NOT set here.
       # Set it in your .env file using the sizing guide in .env.example:
       #   (total_RAM_GB - 1.5) × 3   e.g. 4GB server → 7, 8GB server → 19
