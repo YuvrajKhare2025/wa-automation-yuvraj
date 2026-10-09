@@ -96,22 +96,32 @@ function createApp() {
         'http://127.0.0.1:3000',
         'http://127.0.0.1:5000'
     ];
+    const allowAllOrigins = (process.env.ALLOWED_ORIGINS || '').trim() === '*';
     const envOrigins = (process.env.ALLOWED_ORIGINS || '')
         .split(',')
         .map(s => s.trim())
         .filter(s => s && s !== '*');
     const allowedOriginsList = Array.from(new Set([...defaultAllowedOrigins, ...envOrigins]));
 
-    function isOriginAllowed(origin) {
+    function isOriginAllowed(origin, req = null) {
         if (!origin) return true; // Same-origin, direct server-to-server, or native calls
+        if (allowAllOrigins) return true;
         const trimmed = origin.trim().toLowerCase();
         if (allowedOriginsList.some(o => o.toLowerCase() === trimmed)) return true;
         try {
             const parsed = new URL(trimmed);
             const host = parsed.hostname.toLowerCase();
+            // Same-origin check: if browser Origin host matches server's Host header
+            if (req) {
+                const reqHost = (req.get('host') || '').toLowerCase();
+                const reqHostname = (req.hostname || '').toLowerCase();
+                if (parsed.host.toLowerCase() === reqHost || host === reqHostname) return true;
+            }
             if (host === 'workpilot.co.in' || host.endsWith('.workpilot.co.in')) return true;
             if (host === 'workpilots.dpdns.org') return true;
             if (host === 'localhost' || host === '127.0.0.1') return true;
+            // Direct IP address access (IPv4)
+            if (/^(?:\d{1,3}\.){3}\d{1,3}$/.test(host)) return true;
         } catch (e) {
             return false;
         }
@@ -121,6 +131,12 @@ function createApp() {
     app.use(cors({
         origin: (origin, callback) => {
             if (isOriginAllowed(origin)) return callback(null, true);
+            try {
+                const parsed = new URL(origin);
+                if (/^(?:\d{1,3}\.){3}\d{1,3}$/.test(parsed.hostname.toLowerCase())) {
+                    return callback(null, true);
+                }
+            } catch (_) {}
             return callback(null, false);
         },
         credentials: true,
@@ -130,10 +146,9 @@ function createApp() {
     }));
 
     // Strict Cross-Origin Enforcement Middleware for API endpoints:
-    // Any browser-initiated request from an untrusted origin is rejected with 403 Forbidden.
     app.use('/api', (req, res, next) => {
         const origin = req.headers.origin;
-        if (origin && !isOriginAllowed(origin)) {
+        if (origin && !isOriginAllowed(origin, req)) {
             return res.status(403).json({
                 success: false,
                 error: 'Cross-origin request blocked: origin not allowed by CORS policy.'
