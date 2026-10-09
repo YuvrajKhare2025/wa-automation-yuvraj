@@ -16,11 +16,28 @@ services:
       - wa-auth:/app/.wwebjs_auth
       - wa-cache:/app/.wwebjs_cache
 
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-wa_secure_db_pass_2026}
+      POSTGRES_DB: ${DB_NAME:-whatsapp_automation}
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-whatsapp_automation}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   app:
     build: .
     depends_on:
       fix-perms:
         condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
     init: true
     env_file:
@@ -53,3 +70,4 @@ volumes:
   wa-data:
   wa-auth:
   wa-cache:
+  pg-data:
