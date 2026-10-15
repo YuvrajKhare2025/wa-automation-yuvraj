@@ -137,12 +137,17 @@ async function safeReply(client, phone, responseText, msg, productToSend = null)
                     caption = caption.slice(0, 1000);
                 }
 
+                let sent = false;
                 if (msg) {
                     try {
                         await msg.reply(media, undefined, { caption });
+                        sent = true;
                     } catch (replyErr) {
-                        if (client && msg.from) {
-                            await client.sendMessage(msg.from, media, { caption });
+                        console.warn('   ⚠️ msg.reply(media) failed, falling back to client.sendMessage:', replyErr.message?.split('\n')[0]);
+                        if (client) {
+                            const target = msg.from || (phone.includes('@') ? phone : `${phone}@c.us`);
+                            await client.sendMessage(target, media, { caption });
+                            sent = true;
                         } else {
                             throw replyErr;
                         }
@@ -150,17 +155,20 @@ async function safeReply(client, phone, responseText, msg, productToSend = null)
                 } else if (client) {
                     const chatId = phone.includes('@') ? phone : `${phone}@c.us`;
                     await client.sendMessage(chatId, media, { caption });
+                    sent = true;
                 }
 
-                mediaSent = true;
-                console.log(`📸 Product image (${productToSend.name || productToSend.id}) delivered via WhatsApp.`);
+                if (sent) {
+                    mediaSent = true;
+                    console.log(`📸 Product image (${productToSend.name || productToSend.id}) delivered via WhatsApp.`);
 
-                if (followUp) {
-                    if (msg) {
-                        await msg.reply(followUp);
-                    } else if (client) {
-                        const chatId = phone.includes('@') ? phone : `${phone}@c.us`;
-                        await client.sendMessage(chatId, followUp);
+                    if (followUp) {
+                        if (msg) {
+                            await msg.reply(followUp);
+                        } else if (client) {
+                            const chatId = phone.includes('@') ? phone : `${phone}@c.us`;
+                            await client.sendMessage(chatId, followUp);
+                        }
                     }
                 }
             } catch (mediaErr) {

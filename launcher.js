@@ -22,6 +22,13 @@
  */
 const { spawn } = require('child_process');
 
+try {
+    const patchWWebJS = require('./scripts/patch-wwebjs');
+    patchWWebJS();
+} catch (e) {
+    console.warn('⚠️ [Launcher] patchWWebJS warning:', e.message);
+}
+
 let restartCount  = 0;
 let lastStartTime = Date.now();
 let currentChild  = null;

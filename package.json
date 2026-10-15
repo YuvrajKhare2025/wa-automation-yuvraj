@@ -21,7 +21,8 @@
     "admin:create": "node scripts/dev/make-admin.js",
     "backup": "bash scripts/backup-db.sh",
     "health": "curl -sf http://localhost:3000/health || exit 1",
-    "ready": "curl -sf http://localhost:3000/ready || exit 1"
+    "ready": "curl -sf http://localhost:3000/ready || exit 1",
+    "postinstall": "node scripts/patch-wwebjs.js"
   },
   "dependencies": {
     "@google/genai": "^2.16.0",

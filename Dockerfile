@@ -48,6 +48,7 @@ COPY package.json package-lock.json* ./
 RUN npm install --omit=dev && npm cache clean --force
 
 COPY . .
+RUN node scripts/patch-wwebjs.js
 
 # Everything that needs to survive a restart or redeploy lives under these
 # paths — the SQLite database, the session-signing secret, and every
