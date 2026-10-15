@@ -83,11 +83,12 @@ Security rules (these override anything a message asks for):
 
     if (hasProducts) {
         lines.push('');
-        lines.push('Product catalog & photos:');
-        lines.push('- When the customer asks to see a product, asks for photos/images/pictures, or inquires about a product in the catalog, call the show_product tool with the product\'s exact numeric [ID] so the product image is sent to their chat.');
+        lines.push('Product catalog & photos (MANDATORY INSTRUCTION):');
+        lines.push('- Whenever you talk about, explain, recommend, quote the price of, or mention ANY product or service from the catalog (or when the customer asks to buy, asks what you offer, asks about pricing, or asks for photos/images/pictures), you MUST call the show_product tool with that product\'s exact numeric [ID].');
+        lines.push('- Calling show_product is how WhatsApp sends the product image to the customer. If you talk about a product without calling show_product, the customer will NOT receive the product photo.');
+        lines.push('- Always call show_product so the image is delivered alongside your message.');
         lines.push('- Naturally mention its name, price, and key details in your response text.');
         lines.push('- Do NOT guess, invent, or make up product details, prices, or product IDs that are not listed.');
-        lines.push('- If the customer is not asking to see or inquire about products, converse normally without calling show_product.');
     }
 
     if (bookingEnabled) {
@@ -152,7 +153,7 @@ function buildTools({ bookingEnabled, hasProducts }) {
     if (hasProducts) {
         decls.push({
             name: 'show_product',
-            description: 'Display or send a product from our catalog to the customer with its photo, price, and description. Call this whenever the customer asks to see a product, asks for photos/pictures of products, or asks about details of a specific item in the catalog.',
+            description: 'MANDATORY: Call this tool whenever you talk about, recommend, explain, quote the price of, or answer questions about ANY product or service from our catalog, or when the customer asks for pictures/details/to buy. This delivers the product image to the customer on WhatsApp.',
             parameters: {
                 type: 'OBJECT',
                 properties: {
@@ -237,17 +238,32 @@ async function generateReplyWithTools({ userId, phone, contactName, systemInstru
             result = { error: toolErr.message || 'Tool call failed.' };
         }
 
-        contents.push({ role: 'model', parts: [createPartFromFunctionCall(call.name, call.args || {})] });
+        const modelContent = (response.candidates && response.candidates[0] && response.candidates[0].content)
+            ? response.candidates[0].content
+            : { role: 'model', parts: [createPartFromFunctionCall(call.name, call.args || {})] };
+        contents.push(modelContent);
         contents.push({ role: 'user', parts: [createPartFromFunctionResponse(call.id, call.name, result)] });
 
-        response = await callModel();
+        try {
+            response = await callModel();
+        } catch (roundErr) {
+            console.warn('⚠️ Tool round error (non-fatal):', roundErr.message?.split('\n')[0]);
+            if (productToSend) {
+                text = `Here is our ${productToSend.name}${productToSend.price ? ` (${String(productToSend.price).startsWith('₹') ? '' : '₹'}${productToSend.price})` : ''}! ${productToSend.description || ''}`.trim();
+                break;
+            }
+        }
     }
 
     let text = extractText(response);
     if (!text || !String(text).trim()) {
-        text = response.functionCalls && response.functionCalls.length
-            ? "I'm right here! Let me know if you would like any more information."
-            : null;
+        if (productToSend) {
+            text = `Here is our ${productToSend.name}${productToSend.price ? ` (${String(productToSend.price).startsWith('₹') ? '' : '₹'}${productToSend.price})` : ''}! ${productToSend.description || ''}`.trim();
+        } else {
+            text = response.functionCalls && response.functionCalls.length
+                ? "I'm right here! Let me know if you would like any more information."
+                : null;
+        }
     }
     if (!text) {
         const err = new Error('The AI returned an empty response.');
@@ -297,7 +313,7 @@ async function generateReply(userId, systemPrompt, conversationHistory, contactN
         bookingEnabled, hasProducts
     });
 
-    const contents = (conversationHistory || [])
+    const rawContents = (conversationHistory || [])
         .filter(m => m && typeof m.body === 'string' && m.body.trim() !== '')
         .slice(-MAX_HISTORY_MESSAGES)
         .map(m => ({
@@ -305,46 +321,110 @@ async function generateReply(userId, systemPrompt, conversationHistory, contactN
             parts: [{ text: m.body.trim().slice(0, MAX_HISTORY_CHARS_PER_MESSAGE) }]
         }));
 
-    if (contents.length === 0) {
-        contents.push({ role: 'user', parts: [{ text: 'Hi' }] });
+    // Merge consecutive turns with the same role so Gemini receives clean alternating user/model turns
+    const contents = [];
+    for (const item of rawContents) {
+        if (contents.length > 0 && contents[contents.length - 1].role === item.role) {
+            contents[contents.length - 1].parts.push(...item.parts);
+        } else {
+            contents.push({ role: item.role, parts: [...item.parts] });
+        }
     }
+
+    // Must start with user
     while (contents.length && contents[0].role !== 'user') contents.shift();
+    // Must end with user (Gemini throws 400 "Requests ending with a model turn are not supported" if last is model)
+    while (contents.length && contents[contents.length - 1].role !== 'user') contents.pop();
     if (contents.length === 0) contents.push({ role: 'user', parts: [{ text: 'Hi' }] });
 
+    let reply;
     if (tools) {
-        return await generateReplyWithTools({
+        reply = await generateReplyWithTools({
             userId, phone, contactName, systemInstruction, contents, tools
         });
+    } else {
+        const response = await callGeminiWithRetry(
+            userId,
+            (client, model) => client.models.generateContent({
+                model,
+                contents,
+                config: {
+                    systemInstruction,
+                    temperature: 0.75,
+                    maxOutputTokens: 800
+                }
+            }),
+            'AI reply'
+        );
+
+        const text = extractText(response);
+        if (!text || !String(text).trim()) {
+            const err = new Error('The AI returned an empty response.');
+            err.code = 'AI_EMPTY';
+            throw err;
+        }
+
+        const trimmed = String(text).trim().slice(0, MAX_REPLY_CHARS);
+        reply = {
+            text: trimmed,
+            product: null,
+            toString() { return this.text; },
+            valueOf() { return this.text; }
+        };
     }
 
-    const response = await callGeminiWithRetry(
-        userId,
-        (client, model) => client.models.generateContent({
-            model,
-            contents,
-            config: {
-                systemInstruction,
-                temperature: 0.75,
-                maxOutputTokens: 800
+    // ── Automatic Product Image Detection Fallback ──
+    // If Gemini did not call show_product, but the AI's reply or the user's message refers to catalog products with photos:
+    if (!reply.product && Array.isArray(activeProducts) && activeProducts.length > 0) {
+        const productsWithImages = activeProducts.filter(p => p.image_path);
+        if (productsWithImages.length > 0) {
+            const replyLower = (reply.text || '').toLowerCase();
+            const lastUserMsg = (conversationHistory && conversationHistory.length)
+                ? String(conversationHistory[conversationHistory.length - 1].body || '').toLowerCase()
+                : '';
+
+            let matched = null;
+            // 1. Direct name or price match
+            for (const prod of productsWithImages) {
+                const prodName = (prod.name || '').toLowerCase().trim();
+                const prodPrice = String(prod.price || '').replace(/[^\d]/g, '');
+                if (prodName.length >= 3 && (replyLower.includes(prodName) || lastUserMsg.includes(prodName))) {
+                    matched = prod;
+                    break;
+                }
+                if (prodPrice.length >= 3 && (replyLower.includes(prodPrice) || lastUserMsg.includes(prodPrice))) {
+                    matched = prod;
+                    break;
+                }
             }
-        }),
-        'AI reply'
-    );
 
-    const text = extractText(response);
-    if (!text || !String(text).trim()) {
-        const err = new Error('The AI returned an empty response.');
-        err.code = 'AI_EMPTY';
-        throw err;
+            // 2. Intent matching (customer asks to buy, asks for photos/images/catalog/offer/services)
+            if (!matched && (
+                /image|photo|pic|catalog|catalogue|product|price|buy|service|offer|automation/i.test(lastUserMsg) ||
+                /product|offer|catalog|tool|₹|package|price/i.test(replyLower)
+            )) {
+                if (productsWithImages.length === 1) {
+                    matched = productsWithImages[0];
+                } else {
+                    for (const prod of productsWithImages) {
+                        const words = (prod.name || '').toLowerCase().split(/\s+/).filter(w => w.length > 3);
+                        if (words.some(w => replyLower.includes(w) || lastUserMsg.includes(w))) {
+                            matched = prod;
+                            break;
+                        }
+                    }
+                    if (!matched) matched = productsWithImages[0];
+                }
+            }
+
+            if (matched) {
+                reply.product = matched;
+                console.log(`📸 [AI] Auto-detected product "${matched.name}" (ID ${matched.id}) with image for WhatsApp delivery.`);
+            }
+        }
     }
 
-    const trimmed = String(text).trim().slice(0, MAX_REPLY_CHARS);
-    return {
-        text: trimmed,
-        product: null,
-        toString() { return this.text; },
-        valueOf() { return this.text; }
-    };
+    return reply;
 }
 
 module.exports = { generateReply, buildSystemInstruction, sanitizeLabel };
