@@ -1375,6 +1375,7 @@ async function deleteProductRow(id) {
         if (btn) btn.disabled = false;
     }
 }
+window.deleteProductRow = deleteProductRow;
 
 function renderBusinessProfile(profile) {
     const container = document.getElementById('businessProfileResult');
@@ -1684,20 +1685,24 @@ function quickSelectNext(n) {
 
 async function deleteContact(id) {
     if (!confirm('Are you sure you want to delete this contact?')) return;
-    const btn = document.querySelector(`[data-action="delete-contact"][data-id="${id}"]`);
+    const numId = parseInt(id, 10);
+    const btn = document.querySelector(`[data-action="delete-contact"][data-id="${numId}"]`);
     if (btn) btn.disabled = true;
 
     try {
-        await api(`/api/contacts/${id}`, { method: 'DELETE' });
-        SELECTED_CONTACTS.delete(Number(id));
+        await api(`/api/contacts/${numId}`, { method: 'DELETE' });
+        SELECTED_CONTACTS.delete(numId);
         updateSelectionBar();
         showToast('Contact deleted successfully', 'success');
+        const row = btn ? btn.closest('tr') : null;
+        if (row) row.remove();
         await loadContacts();
     } catch (err) {
         showToast(err.message || 'Failed to delete contact', 'error');
         if (btn) btn.disabled = false;
     }
 }
+window.deleteContact = deleteContact;
 
 // ─── CSV import ─────────────────────────────────────────────
 function downloadCsvTemplate() {
@@ -2508,11 +2513,29 @@ document.addEventListener('DOMContentLoaded', async () => {
             const btn = e.target.closest('[data-action="delete-contact"]');
             if (!btn) return;
             const id = parseInt(btn.dataset.id, 10);
-            deleteContact(id);
+            if (!isNaN(id)) deleteContact(id);
         });
     };
-    bindContactsDelegation(document.getElementById('contactsTableBody'));
+    bindContactsDelegation(document.getElementById('contactsBody'));
     bindContactsDelegation(document.getElementById('contactsTable'));
+    bindContactsDelegation(document.getElementById('contactsTableBody'));
+    bindContactsDelegation(document.getElementById('contacts'));
+
+    // Universal action buttons delegation fallback
+    document.addEventListener('click', (e) => {
+        const contactDeleteBtn = e.target.closest('[data-action="delete-contact"]');
+        if (contactDeleteBtn) {
+            const id = parseInt(contactDeleteBtn.dataset.id, 10);
+            if (!isNaN(id)) deleteContact(id);
+            return;
+        }
+        const productDeleteBtn = e.target.closest('[data-action="delete-product"]');
+        if (productDeleteBtn) {
+            const id = parseInt(productDeleteBtn.dataset.id, 10);
+            if (!isNaN(id)) deleteProductRow(id);
+            return;
+        }
+    });
 
     // 4. Chatbot Rules List
     document.getElementById('rulesList')?.addEventListener('click', (e) => {

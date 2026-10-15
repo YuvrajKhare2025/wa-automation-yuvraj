@@ -107,7 +107,12 @@ function isNonFatalRejection(err) {
         msg.includes('Protocol error') ||
         msg.includes('Session closed') ||
         msg.includes('Evaluation failed') ||
-        msg.includes('Cannot find context with specified id')
+        msg.includes('Cannot find context with specified id') ||
+        msg.includes('EBUSY') ||
+        msg.includes('resource busy or locked') ||
+        msg.includes('lockfile') ||
+        msg.includes('LocalAuth') ||
+        msg.includes('EPERM')
     );
 }
 
