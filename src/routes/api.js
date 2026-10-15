@@ -19,7 +19,7 @@ const {
 
 const multer = require('multer');
 const {
-    saveProductImage, getProductImageAbsolutePath, deleteProductImage,
+    saveProductImage, getProductImageAbsolutePath, restoreProductImageIfMissing, deleteProductImage,
     getMimeType, isSafeFilename, MAX_IMAGE_SIZE_BYTES
 } = require('../services/product-storage');
 
@@ -761,7 +761,10 @@ router.get('/products/images/:filename', asyncHandler(async (req, res) => {
         return res.status(400).json({ success: false, error: 'Invalid image filename' });
     }
 
-    const absPath = getProductImageAbsolutePath(filename);
+    let absPath = getProductImageAbsolutePath(filename);
+    if (!absPath) {
+        absPath = await restoreProductImageIfMissing(filename);
+    }
     if (!absPath) {
         return res.status(404).json({ success: false, error: 'Image not found' });
     }
@@ -819,14 +822,17 @@ function validateProductUrl(value) {
     return parsed.toString();
 }
 
-function validateProductImageRef(imagePath) {
+async function validateProductImageRef(imagePath) {
     if (!imagePath) return '';
     const clean = String(imagePath).trim();
     if (!clean) return '';
     if (!isSafeFilename(clean)) {
         throw new ValidationError('Invalid product image reference.', 'image_path');
     }
-    const absPath = getProductImageAbsolutePath(clean);
+    let absPath = getProductImageAbsolutePath(clean);
+    if (!absPath) {
+        absPath = await restoreProductImageIfMissing(clean);
+    }
     if (!absPath) {
         throw new ValidationError('Referenced product image does not exist on server.', 'image_path');
     }
@@ -845,7 +851,7 @@ router.post('/products', writeLimiter, requireDurableWrite, asyncHandler(async (
         });
     }
 
-    const image_path = validateProductImageRef(body.image_path);
+    const image_path = await validateProductImageRef(body.image_path);
 
     const product = await createProduct(req.user.id, {
         name,
@@ -871,7 +877,7 @@ router.put('/products/:id', writeLimiter, requireDurableWrite, asyncHandler(asyn
     if (body.price !== undefined)       fields.price = optionalString(body.price, 'price', LIMITS.PRODUCT_PRICE);
     if (body.category !== undefined)    fields.category = optionalString(body.category, 'category', LIMITS.PRODUCT_CATEGORY);
     if (body.url !== undefined)         fields.url = validateProductUrl(body.url);
-    if (body.image_path !== undefined)  fields.image_path = validateProductImageRef(body.image_path);
+    if (body.image_path !== undefined)  fields.image_path = await validateProductImageRef(body.image_path);
     if (body.is_active !== undefined)   fields.is_active = (body.is_active === true || body.is_active === 1 || body.is_active === '1') ? 1 : 0;
 
     const updated = await updateProduct(req.user.id, id, fields);

@@ -915,8 +915,11 @@ async function sendProductMediaMessage(userId, phone, productIdOrData, caption =
         throw err;
     }
 
-    const { getImageFilePath } = require('./product-storage');
-    const filePath = getImageFilePath(product.image_path);
+    const { getImageFilePath, restoreProductImageIfMissing } = require('./product-storage');
+    let filePath = getImageFilePath(product.image_path);
+    if (!filePath || !fs.existsSync(filePath)) {
+        filePath = await restoreProductImageIfMissing(product.image_path);
+    }
     if (!filePath || !fs.existsSync(filePath)) {
         const err = new Error('Product image file not found on disk');
         err.status = 404;

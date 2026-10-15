@@ -21,7 +21,9 @@ opencode.json
 # commit, anyone with it could forge a valid session for ANY account,
 # including admin. Ignore the whole data/ folder, not just *.db, so nothing
 # added under it in the future gets missed the way this one nearly was.)
-data/
+data/*
+!data/product_images/
+!data/product_images/**
 *.sqlite
 *.db
 

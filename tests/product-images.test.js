@@ -7,6 +7,7 @@ const {
     saveProductImage,
     deleteImageFile,
     getImageFilePath,
+    restoreProductImageIfMissing,
     isSafeFilename,
     MAX_IMAGE_SIZE_BYTES
 } = require('../src/services/product-storage');
@@ -106,6 +107,17 @@ describe('Product Images Feature Test Suite', () => {
             const deleted = await deleteImageFile(filename);
             expect(deleted).toBe(true);
             expect(fs.existsSync(filePath)).toBe(false);
+        });
+
+        test('restoreProductImageIfMissing validates filename and returns path if already on disk', async () => {
+            expect(await restoreProductImageIfMissing('../bad.png')).toBeNull();
+            expect(await restoreProductImageIfMissing('')).toBeNull();
+
+            const filename = await saveProductImage(99, samplePng);
+            const restoredPath = await restoreProductImageIfMissing(filename);
+            expect(restoredPath).toBeTruthy();
+            expect(fs.existsSync(restoredPath)).toBe(true);
+            await deleteImageFile(filename);
         });
     });
 

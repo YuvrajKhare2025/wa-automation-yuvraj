@@ -155,12 +155,50 @@ function getMimeType(filename) {
     return 'application/octet-stream';
 }
 
+/**
+ * Ensures the product image exists on disk by restoring from database if missing.
+ * Returns the absolute path if available on disk or successfully restored, else null.
+ */
+async function restoreProductImageIfMissing(filename) {
+    if (!isSafeFilename(filename)) return null;
+
+    const base = path.basename(filename.trim());
+    const fullPath = path.join(PRODUCT_UPLOADS_DIR, base);
+
+    try {
+        if (fs.existsSync(fullPath)) {
+            const stat = fs.statSync(fullPath);
+            if (stat.isFile() && stat.size > 0) return fullPath;
+        }
+    } catch (_) {}
+
+    // Attempt restoration from database image_data column
+    try {
+        const { queryGet } = require('./db-pool');
+        const row = await queryGet(
+            "SELECT image_data FROM products WHERE image_path = $1 AND image_data IS NOT NULL AND image_data != '' LIMIT 1",
+            [base]
+        );
+        if (row && row.image_data) {
+            ensureUploadsDir();
+            const buffer = Buffer.from(row.image_data, 'base64');
+            await fs.promises.writeFile(fullPath, buffer, { mode: 0o644 });
+            console.log(` Restored product image on disk from database: ${base}`);
+            return fullPath;
+        }
+    } catch (e) {
+        console.warn('⚠️ Could not restore product image from database:', e.message);
+    }
+    return null;
+}
+
 module.exports = {
     validateImageBuffer,
     saveProductImage,
     isSafeFilename,
     getProductImageAbsolutePath,
     getImageFilePath: getProductImageAbsolutePath,
+    restoreProductImageIfMissing,
     deleteProductImage,
     deleteImageFile: deleteProductImage,
     getMimeType,

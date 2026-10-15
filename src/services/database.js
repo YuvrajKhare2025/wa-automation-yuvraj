@@ -861,23 +861,50 @@ async function searchProducts(userId, queryText) {
     );
 }
 
-async function createProduct(userId, { name, description = '', price = '', category = '', url = '', image_path = '' }) {
+async function createProduct(userId, { name, description = '', price = '', category = '', url = '', image_path = '', image_data = '' }) {
+    let finalImageData = image_data || '';
+    if (image_path && !finalImageData) {
+        try {
+            const { getProductImageAbsolutePath } = require('./product-storage');
+            const fullPath = getProductImageAbsolutePath(image_path);
+            if (fullPath && fs.existsSync(fullPath)) {
+                finalImageData = fs.readFileSync(fullPath).toString('base64');
+            }
+        } catch (_) {}
+    }
+
     const res = await query(
-        `INSERT INTO products (user_id, name, description, price, category, url, image_path)
-         VALUES ($1, $2, $3, $4, $5, $6, $7)
+        `INSERT INTO products (user_id, name, description, price, category, url, image_path, image_data)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
          RETURNING *`,
-        [userId, name, description, price, category, url, image_path || '']
+        [userId, name, description, price, category, url, image_path || '', finalImageData]
     );
     return res.rows[0];
 }
 
 async function updateProduct(userId, id, fields) {
-    const allowed = ['name', 'description', 'price', 'category', 'url', 'image_path', 'is_active'];
+    const allowed = ['name', 'description', 'price', 'category', 'url', 'image_path', 'image_data', 'is_active'];
+    const updatedFields = { ...fields };
+
+    if (updatedFields.image_path !== undefined && updatedFields.image_data === undefined) {
+        if (!updatedFields.image_path) {
+            updatedFields.image_data = '';
+        } else {
+            try {
+                const { getProductImageAbsolutePath } = require('./product-storage');
+                const fullPath = getProductImageAbsolutePath(updatedFields.image_path);
+                if (fullPath && fs.existsSync(fullPath)) {
+                    updatedFields.image_data = fs.readFileSync(fullPath).toString('base64');
+                }
+            } catch (_) {}
+        }
+    }
+
     const sets = [];
     const params = [];
     let idx = 1;
 
-    for (const [key, value] of Object.entries(fields)) {
+    for (const [key, value] of Object.entries(updatedFields)) {
         if (allowed.includes(key)) {
             sets.push(`${key} = $${idx++}`);
             params.push(key === 'is_active' ? (value ? 1 : 0) : (value ?? ''));

@@ -7,7 +7,7 @@ const { generateReply } = require('./ai');
 const { scheduleAutoAnalysis } = require('./lead-analyzer');
 const { safeRegexTest } = require('../utils/validate');
 const { conversationQueue } = require('../utils/conversation-queue');
-const { getImageFilePath } = require('./product-storage');
+const { getImageFilePath, restoreProductImageIfMissing } = require('./product-storage');
 
 // ─── Anti-Ban Rate Limiting ─────────────────────────────────
 const userRateLimits = new Map();
@@ -120,7 +120,10 @@ async function safeReply(client, phone, responseText, msg, productToSend = null)
     // If a product with an image was selected, deliver media message
     let mediaSent = false;
     if (productToSend && productToSend.image_path) {
-        const filePath = getImageFilePath(productToSend.image_path);
+        let filePath = getImageFilePath(productToSend.image_path);
+        if (!filePath || !fs.existsSync(filePath)) {
+            filePath = await restoreProductImageIfMissing(productToSend.image_path);
+        }
         if (filePath && fs.existsSync(filePath)) {
             try {
                 const { MessageMedia } = require('whatsapp-web.js');
