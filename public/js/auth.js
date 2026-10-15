@@ -73,7 +73,11 @@ function initLoginForm() {
             if (!res.ok || !json.success) {
                 throw new Error(json.error || 'Could not log in.');
             }
-            window.location.href = '/app';
+            if (json.data && json.data.role === 'admin') {
+                window.location.href = '/admin';
+            } else {
+                window.location.href = '/app';
+            }
         } catch (err) {
             showFormError(err.message || 'Could not log in. Please try again.');
             setSubmitting(btn, false);

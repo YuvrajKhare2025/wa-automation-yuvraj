@@ -1,4 +1,4 @@
-const { Client, LocalAuth } = require('whatsapp-web.js');
+const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const qrcode = require('qrcode');
 const fs     = require('fs');
 const path   = require('path');
@@ -884,6 +884,50 @@ async function sendTextMessage(userId, phone, text) {
     return await s.client.sendMessage(`${digits}@c.us`, String(text));
 }
 
+/**
+ * Sends a product image message with an optional caption on behalf of an account.
+ * Validates connection state, phone format, product ownership, and image file existence.
+ */
+async function sendProductMediaMessage(userId, phone, productIdOrData, caption = '') {
+    const s = getSession(Number(userId), false);
+    if (!s || !s.isConnected || !s.client) {
+        const err = new Error('WhatsApp client is not connected');
+        err.code = 'WA_NOT_CONNECTED';
+        err.status = 409;
+        throw err;
+    }
+    const digits = String(phone).replace(/\D/g, '');
+    if (digits.length < 7 || digits.length > 15) {
+        const err = new Error('Invalid destination phone number');
+        err.status = 400;
+        throw err;
+    }
+
+    let product = productIdOrData;
+    if (typeof productIdOrData === 'number' || typeof productIdOrData === 'string') {
+        const { getProductById } = require('./database');
+        product = await getProductById(Number(userId), productIdOrData);
+    }
+
+    if (!product || !product.image_path) {
+        const err = new Error('Product not found or has no image');
+        err.status = 404;
+        throw err;
+    }
+
+    const { getImageFilePath } = require('./product-storage');
+    const filePath = getImageFilePath(product.image_path);
+    if (!filePath || !fs.existsSync(filePath)) {
+        const err = new Error('Product image file not found on disk');
+        err.status = 404;
+        throw err;
+    }
+
+    const media = MessageMedia.fromFilePath(filePath);
+    const chatId = `${digits}@c.us`;
+    return await s.client.sendMessage(chatId, media, { caption: String(caption || '') });
+}
+
 module.exports = {
     initWhatsAppClient,
     destroyClientForUser,
@@ -893,6 +937,7 @@ module.exports = {
     getStatus,
     getSessionMetrics,
     sendTextMessage,
+    sendProductMediaMessage,
     authDataPath,
     MAX_CONCURRENT_SESSIONS,
     MAX_SSE_CLIENTS_PER_USER,

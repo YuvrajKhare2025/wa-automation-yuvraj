@@ -90,6 +90,7 @@ CREATE TABLE IF NOT EXISTS products (
     price TEXT DEFAULT '',
     category TEXT DEFAULT '',
     url TEXT DEFAULT '',
+    image_path TEXT DEFAULT '',
     is_active INTEGER DEFAULT 1,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP

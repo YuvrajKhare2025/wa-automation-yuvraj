@@ -8,101 +8,193 @@ const API = '';
 let currentSection = 'dashboard';
 let CURRENT_USER = null;
 let CURRENT_ACCESS_TOKEN = null;
+let _refreshPromise = null;
 
 async function refreshSession() {
-    try {
-        const res = await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' });
-        if (res.ok) {
-            const data = await res.json();
-            if (data.accessToken) {
-                CURRENT_ACCESS_TOKEN = data.accessToken;
-                return true;
+    if (_refreshPromise) {
+        return _refreshPromise;
+    }
+    _refreshPromise = (async () => {
+        try {
+            console.debug('[Auth] Initiating session refresh...');
+            const res = await fetch('/api/auth/refresh', {
+                method: 'POST',
+                credentials: 'include'
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.accessToken) {
+                    CURRENT_ACCESS_TOKEN = data.accessToken;
+                    console.debug('[Auth] Session refreshed successfully.');
+                    return { success: true };
+                }
             }
+            if (res.status === 401 || res.status === 403) {
+                console.warn(`[Auth] Session invalid or expired on server (HTTP ${res.status}).`);
+                return { success: false, isAuthFailure: true, status: res.status };
+            }
+            console.warn(`[Auth] Transient error during session refresh (HTTP ${res.status}). Session preserved.`);
+            return { success: false, isAuthFailure: false, status: res.status };
+        } catch (e) {
+            console.warn('[Auth] Session refresh network error:', e.message);
+            return { success: false, isAuthFailure: false, error: e.message };
+        } finally {
+            _refreshPromise = null;
         }
-    } catch (e) {}
-    return false;
+    })();
+    return _refreshPromise;
+}
+
+function updateTopBarUserInfo(user) {
+    if (!user) return;
+    const nameEl   = document.getElementById('topbarUserName');
+    const avatarEl = document.getElementById('topbarAvatar');
+    const adminNav = document.getElementById('nav-admin');
+    const label = user.business_name || user.owner_name || user.email || 'Account';
+    if (nameEl)   nameEl.textContent = label;
+    if (avatarEl) avatarEl.textContent = label.slice(0, 2).toUpperCase();
+    if (adminNav) adminNav.style.display = user.role === 'admin' ? '' : 'none';
 }
 
 // ─── Auth gate ──────────────────────────────────────────────
-// Every page under /app requires a logged-in session. If the cookie is
-// missing/expired the API returns 401 and we bounce to the login page.
+// Every page under /app requires a logged-in session. If the session is
+// definitively expired (401), we bounce to login. Temporary network errors
+// or 5xx server issues never force a false logout.
 async function checkAuth() {
     try {
         if (!CURRENT_ACCESS_TOKEN) {
-            const ok = await refreshSession();
-            if (!ok) {
-                window.location.href = '/login';
+            const refreshRes = await refreshSession();
+            if (!refreshRes.success) {
+                if (refreshRes.isAuthFailure) {
+                    console.warn('[Auth] checkAuth failed with definitive auth failure. Redirecting to login.');
+                    window.location.href = '/login';
+                } else {
+                    console.warn('[Auth] checkAuth encountered network/server issue. Retaining current page state.');
+                }
                 return false;
             }
         }
-        const res = await fetch('/api/auth/me', {
-            headers: { 'Authorization': `Bearer ${CURRENT_ACCESS_TOKEN}` }
-        });
+        let res;
+        try {
+            res = await fetch('/api/auth/me', {
+                headers: { 'Authorization': `Bearer ${CURRENT_ACCESS_TOKEN}` }
+            });
+        } catch (netErr) {
+            console.warn('[Auth] Network error reaching /api/auth/me:', netErr.message);
+            return false;
+        }
+
+        if (res.status === 401 || res.status === 403) {
+            console.debug('[Auth] Access token expired on checkAuth. Refreshing...');
+            const refreshRes = await refreshSession();
+            if (refreshRes.success) {
+                try {
+                    res = await fetch('/api/auth/me', {
+                        headers: { 'Authorization': `Bearer ${CURRENT_ACCESS_TOKEN}` }
+                    });
+                } catch (netErr) {
+                    return false;
+                }
+            } else if (refreshRes.isAuthFailure) {
+                console.warn('[Auth] Refresh rejected on checkAuth. Redirecting to login.');
+                window.location.href = '/login';
+                return false;
+            } else {
+                return false;
+            }
+        }
+
         if (!res.ok) {
-            window.location.href = '/login';
+            console.warn('[Auth] /api/auth/me returned status:', res.status);
             return false;
         }
         const json = await res.json();
         CURRENT_USER = json.data;
-
-        const nameEl   = document.getElementById('topbarUserName');
-        const avatarEl = document.getElementById('topbarAvatar');
-        const adminNav = document.getElementById('nav-admin');
-        const label = CURRENT_USER.business_name || CURRENT_USER.owner_name || CURRENT_USER.email;
-        if (nameEl)   nameEl.textContent = label;
-        if (avatarEl) avatarEl.textContent = label.slice(0, 2).toUpperCase();
-        if (adminNav) adminNav.style.display = CURRENT_USER.role === 'admin' ? '' : 'none';
-
+        updateTopBarUserInfo(CURRENT_USER);
         return true;
     } catch (err) {
-        window.location.href = '/login';
+        console.warn('[Auth] checkAuth error:', err.message);
         return false;
     }
 }
 
 async function logout() {
     try { await fetch('/api/auth/logout', { method: 'POST' }); } catch (e) {}
+    CURRENT_ACCESS_TOKEN = null;
+    CURRENT_USER = null;
     window.location.href = '/login';
 }
 
 // ─── API Client ─────────────────────────────────────────────
 async function api(endpoint, options = {}) {
+    let headers = { 'Content-Type': 'application/json', ...options.headers };
+    if (CURRENT_ACCESS_TOKEN) {
+        headers['Authorization'] = `Bearer ${CURRENT_ACCESS_TOKEN}`;
+    }
+    
+    let res;
     try {
-        let headers = { 'Content-Type': 'application/json', ...options.headers };
-        if (CURRENT_ACCESS_TOKEN) {
-            headers['Authorization'] = `Bearer ${CURRENT_ACCESS_TOKEN}`;
-        }
-        
-        let res = await fetch(`${API}${endpoint}`, {
+        res = await fetch(`${API}${endpoint}`, {
             ...options,
             headers
         });
-        
-        if (res.status === 401) {
-            const ok = await refreshSession();
-            if (ok) {
-                headers['Authorization'] = `Bearer ${CURRENT_ACCESS_TOKEN}`;
+    } catch (netErr) {
+        console.warn(`[API] Network failure on ${endpoint}:`, netErr.message);
+        throw new Error('Network connection error. Please verify your connection.');
+    }
+    
+    if (res.status === 401) {
+        console.debug(`[API] 401 received for ${endpoint}. Refreshing session...`);
+        const refreshRes = await refreshSession();
+        if (refreshRes.success) {
+            headers['Authorization'] = `Bearer ${CURRENT_ACCESS_TOKEN}`;
+            try {
                 res = await fetch(`${API}${endpoint}`, {
                     ...options,
                     headers
                 });
-            } else {
-                window.location.href = '/login';
-                throw new Error('Not authenticated');
+            } catch (retryNetErr) {
+                throw new Error('Network error during request retry.');
             }
+        } else if (refreshRes.isAuthFailure) {
+            console.warn(`[API] Session invalid on ${endpoint}. Redirecting to login.`);
+            window.location.href = '/login';
+            throw new Error('Session expired. Please log in again.');
+        } else {
+            console.warn(`[API] Transient failure refreshing session on ${endpoint}. Preserving session.`);
+            throw new Error('Temporary server issue. Please try again in a moment.');
         }
-        const data = await res.json();
-        if (!data.success) throw new Error(data.error || 'API request failed');
-        return data.data;
-    } catch (err) {
-        console.error(`API Error [${endpoint}]:`, err);
-        throw err;
     }
+
+    if (res.status === 401) {
+        console.warn(`[API] 401 persisted after refresh on ${endpoint}. Session rejected.`);
+        window.location.href = '/login';
+        throw new Error('Authentication required.');
+    }
+
+    let data;
+    try {
+        data = await res.json();
+    } catch (jsonErr) {
+        if (!res.ok) throw new Error(`Server error (${res.status})`);
+        throw jsonErr;
+    }
+    if (!data.success) throw new Error(data.error || 'API request failed');
+    return data.data;
 }
+
+// Proactive session refresh every 10 minutes so active sessions never expire
+setInterval(async () => {
+    if (CURRENT_ACCESS_TOKEN) {
+        console.debug('[Auth] Performing scheduled proactive session refresh');
+        await refreshSession();
+    }
+}, 10 * 60 * 1000);
 
 // ─── Toast Notifications ────────────────────────────────────
 function showToast(message, type = 'info') {
     const container = document.getElementById('toastContainer');
+    if (!container) return;
     const iconNames = { success: 'check-circle', error: 'x-circle', info: 'info' };
 
     const toast = document.createElement('div');
@@ -110,7 +202,7 @@ function showToast(message, type = 'info') {
     toast.innerHTML = `
         <span class="toast-icon" aria-hidden="true">${Icon(iconNames[type])}</span>
         <span class="toast-text">${escapeHtml(message)}</span>
-        <button class="toast-close" aria-label="Dismiss notification" onclick="this.parentElement.remove()">×</button>
+        <button class="toast-close" aria-label="Dismiss notification" type="button">×</button>
     `;
     container.appendChild(toast);
 
@@ -409,7 +501,7 @@ async function loadLeads() {
                                     <strong>${escapeHtml(p.contact_name || p.phone)}</strong>
                                     <small style="color:var(--color-text-secondary);margin-left:8px">${escapeHtml(p.phone)} · ${p.message_count} msgs</small>
                                 </div>
-                                <button class="btn btn-sm btn-secondary" onclick="analyzeLead(${jsAttr(p.phone)})" type="button">${Icon('brain', 'icon-inline')}Analyze</button>
+                                <button class="btn btn-sm btn-secondary" data-action="analyze-lead" data-phone="${escapeHtml(p.phone)}" type="button">${Icon('brain', 'icon-inline')}Analyze</button>
                             </div>
                         `).join('')}
                     </div>
@@ -475,7 +567,7 @@ function renderLeadCard(lead) {
                     · ${lead.message_count} msgs
                     · Analyzed ${timeAgo(lead.last_analyzed_at)}
                 </span>
-                <button class="btn btn-sm btn-secondary" onclick="analyzeLead(${jsAttr(lead.phone)})" type="button" title="Re-analyze with latest messages">${Icon('refresh-cw', 'icon-inline')}Re-analyze</button>
+                <button class="btn btn-sm btn-secondary" data-action="analyze-lead" data-phone="${escapeHtml(lead.phone)}" type="button" title="Re-analyze with latest messages">${Icon('refresh-cw', 'icon-inline')}Re-analyze</button>
             </div>
         </div>`;
 }
@@ -811,8 +903,7 @@ function renderDealCard(deal) {
         : '';
 
     return `
-        <div class="deal-card" onclick="openDealModal(${jsAttr(deal.phone)})" role="button" tabindex="0"
-             onkeydown="if(event.key==='Enter')openDealModal(${jsAttr(deal.phone)})">
+        <div class="deal-card" data-action="open-deal" data-phone="${escapeHtml(deal.phone)}" role="button" tabindex="0">
             <div class="deal-card-top">
                 <strong>${escapeHtml(deal.contact_name || deal.phone)}</strong>
                 ${deal.deal_value ? `<span class="deal-value">${fmtMoney(deal.deal_value)}</span>` : ''}
@@ -877,8 +968,8 @@ async function openDealModal(phone) {
             </div>
 
             <div class="modal-actions">
-                <button class="btn btn-primary btn-sm" onclick="saveDealFromModal(${deal.id})" type="button">${Icon('save', 'icon-inline')}Save Changes</button>
-                <button class="btn btn-danger btn-sm" onclick="deleteDealFromModal(${deal.id})" type="button">${Icon('trash-2', 'icon-inline')}Delete Deal</button>
+                <button class="btn btn-primary btn-sm" data-action="save-deal" data-id="${deal.id}" type="button">${Icon('save', 'icon-inline')}Save Changes</button>
+                <button class="btn btn-danger btn-sm" data-action="delete-deal" data-id="${deal.id}" type="button">${Icon('trash-2', 'icon-inline')}Delete Deal</button>
                 <small style="color:var(--color-text-secondary)">${escapeHtml(deal.phone)} · Source: ${escapeHtml(deal.source || 'whatsapp')}</small>
             </div>
 
@@ -897,7 +988,7 @@ async function openDealModal(phone) {
                 <h3>${Icon('sticky-note', 'icon-inline')}Activity & Notes</h3>
                 <div class="note-form">
                     <input type="text" id="modalNewNote" placeholder="Add a note… (e.g. called them, sent quote)">
-                    <button class="btn btn-secondary btn-sm" onclick="addNoteFromModal()" type="button">Add</button>
+                    <button class="btn btn-secondary btn-sm" data-action="add-note" type="button">Add</button>
                 </div>
                 <div class="activity-timeline" id="modalActivities">
                     ${activities.length ? activities.map(renderActivity).join('') : '<p style="color:var(--color-text-secondary);font-size:0.85rem">No activity yet.</p>'}
@@ -1009,40 +1100,279 @@ function renderProductList(products) {
         return;
     }
 
-    container.innerHTML = products.map(p => `
-        <div class="product-row ${p.is_active ? '' : 'disabled'}">
-            <div class="product-row-info">
-                <strong>${escapeHtml(p.name)}</strong>
-                ${p.price ? `<span class="lead-badge lead-badge-score">${escapeHtml(p.price)}</span>` : ''}
-                ${p.category ? `<span class="lead-badge lead-badge-category">${escapeHtml(p.category)}</span>` : ''}
-                ${p.description ? `<div class="product-row-desc">${escapeHtml(p.description)}</div>` : ''}
-                ${p.url ? `<div class="product-row-desc"><a href="${escapeHtml(p.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(p.url)}</a></div>` : ''}
+    container.innerHTML = products.map(p => {
+        const thumbHtml = p.image_path
+            ? `<div class="product-thumb-box" data-action="preview-product-image" data-src="/api/products/images/${encodeURIComponent(p.image_path)}" data-title="${escapeHtml(p.name)}" title="Click to enlarge image" role="button" tabindex="0">
+                 <img src="/api/products/images/${encodeURIComponent(p.image_path)}"
+                      alt="${escapeHtml(p.name)}"
+                      class="product-thumb-img"
+                      loading="lazy" />
+               </div>`
+            : `<div class="product-thumb-box" title="No image"><div class="product-thumb-placeholder">${Icon('package')}</div></div>`;
+
+        return `
+            <div class="product-row ${p.is_active ? '' : 'disabled'}" id="product-row-${p.id}" data-id="${p.id}">
+                <div class="product-row-main">
+                    ${thumbHtml}
+                    <div class="product-row-info">
+                        <div class="product-row-title-bar">
+                            <span class="product-row-name">${escapeHtml(p.name)}</span>
+                            ${p.price ? `<span class="lead-badge lead-badge-score">${escapeHtml(p.price)}</span>` : ''}
+                            ${p.category ? `<span class="lead-badge lead-badge-category">${escapeHtml(p.category)}</span>` : ''}
+                            ${!p.is_active ? `<span class="lead-badge lead-badge-neutral" style="opacity:0.85">${Icon('eye-off', 'icon-inline')}Hidden from AI</span>` : ''}
+                        </div>
+                        ${p.description ? `<div class="product-row-desc">${escapeHtml(p.description)}</div>` : ''}
+                        ${p.url ? `<div class="product-row-desc"><a href="${escapeHtml(p.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(p.url)}</a></div>` : ''}
+                    </div>
+                </div>
+                <div class="rule-actions">
+                    <button class="btn btn-sm btn-secondary" data-action="edit-product" data-id="${p.id}" title="Edit Product / Image" type="button">${Icon('pencil')}</button>
+                    <button class="btn btn-sm btn-secondary" data-action="toggle-product" data-id="${p.id}" data-active="${p.is_active ? 0 : 1}" title="${p.is_active ? 'Hide from AI' : 'Show to AI'}" type="button">${Icon(p.is_active ? 'pause' : 'play')}</button>
+                    <button class="btn btn-sm btn-danger" data-action="delete-product" data-id="${p.id}" title="Delete" type="button">${Icon('trash-2')}</button>
+                </div>
             </div>
-            <div class="rule-actions">
-                <button class="btn btn-sm btn-secondary" onclick="toggleProduct(${p.id}, ${p.is_active ? 0 : 1})" title="${p.is_active ? 'Hide from AI' : 'Show to AI'}" type="button">${Icon(p.is_active ? 'pause' : 'play')}</button>
-                <button class="btn btn-sm btn-danger" onclick="deleteProductRow(${p.id})" title="Delete" type="button">${Icon('trash-2')}</button>
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
+}
+
+async function uploadProductImageFile(file) {
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+        throw new Error('Unsupported format. Please upload JPEG, PNG, or WebP images.');
+    }
+    const maxBytes = 5 * 1024 * 1024;
+    if (file.size > maxBytes) {
+        throw new Error('File exceeds the 5 MB maximum size limit.');
+    }
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const headers = {};
+    if (CURRENT_ACCESS_TOKEN) {
+        headers['Authorization'] = `Bearer ${CURRENT_ACCESS_TOKEN}`;
+    }
+
+    let res = await fetch(`${API}/api/products/upload-image`, {
+        method: 'POST',
+        headers,
+        body: formData
+    });
+
+    if (res.status === 401) {
+        const refreshRes = await refreshSession();
+        if (refreshRes.success) {
+            headers['Authorization'] = `Bearer ${CURRENT_ACCESS_TOKEN}`;
+            res = await fetch(`${API}/api/products/upload-image`, {
+                method: 'POST',
+                headers,
+                body: formData
+            });
+        } else if (refreshRes.isAuthFailure) {
+            window.location.href = '/login';
+            throw new Error('Not authenticated');
+        } else {
+            throw new Error('Temporary server issue during upload. Please try again.');
+        }
+    }
+
+    const data = await res.json();
+    if (!data.success) {
+        throw new Error(data.error || 'Failed to upload product image');
+    }
+    return data.data;
+}
+
+function setupProductImageUploader(prefix) {
+    const fileInput = document.getElementById(`${prefix}ImageFile`);
+    const hiddenInput = document.getElementById(`${prefix}ImagePath`);
+    const dropzone = document.getElementById(`${prefix}Dropzone`);
+    const previewContainer = document.getElementById(`${prefix}PreviewContainer`);
+    const previewImg = document.getElementById(`${prefix}ImagePreview`);
+    const filenameEl = document.getElementById(`${prefix}ImageFilename`);
+    const statusEl = document.getElementById(`${prefix}ImageStatus`);
+    const removeBtn = document.getElementById(`${prefix}ImageRemoveBtn`);
+
+    if (!fileInput || !dropzone) return;
+
+    dropzone.addEventListener('click', (e) => {
+        e.preventDefault();
+        fileInput.click();
+    });
+
+    const changeBtn = document.getElementById(`${prefix}ImageChangeBtn`) ||
+                      document.getElementById(`${prefix}ImageReplaceBtn`) ||
+                      previewContainer?.querySelector('.btn-secondary');
+    changeBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        fileInput.click();
+    });
+
+    ['dragenter', 'dragover'].forEach(name => {
+        dropzone.addEventListener(name, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.classList.add('dragover');
+        });
+    });
+    ['dragleave', 'drop'].forEach(name => {
+        dropzone.addEventListener(name, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropzone.classList.remove('dragover');
+        });
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+        const files = e.dataTransfer?.files;
+        if (files && files.length > 0) {
+            handleFileSelect(files[0]);
+        }
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        const files = e.target.files;
+        if (files && files.length > 0) {
+            handleFileSelect(files[0]);
+        }
+    });
+
+    async function handleFileSelect(file) {
+        const objectUrl = URL.createObjectURL(file);
+        previewImg.src = objectUrl;
+        filenameEl.textContent = file.name;
+        statusEl.className = 'preview-status';
+        statusEl.textContent = 'Uploading…';
+        dropzone.style.display = 'none';
+        previewContainer.style.display = 'flex';
+
+        try {
+            const uploaded = await uploadProductImageFile(file);
+            hiddenInput.value = uploaded.filename;
+            statusEl.className = 'preview-status';
+            statusEl.textContent = 'Ready to save';
+            showToast('Image uploaded successfully', 'success');
+        } catch (err) {
+            statusEl.className = 'preview-status error';
+            statusEl.textContent = err.message || 'Upload failed';
+            hiddenInput.value = '';
+            showToast(err.message || 'Image upload failed', 'error');
+        }
+    }
+
+    removeBtn?.addEventListener('click', () => {
+        resetProductImageUploader(prefix);
+    });
+}
+
+function resetProductImageUploader(prefix) {
+    const fileInput = document.getElementById(`${prefix}ImageFile`);
+    const hiddenInput = document.getElementById(`${prefix}ImagePath`);
+    const dropzone = document.getElementById(`${prefix}Dropzone`);
+    const previewContainer = document.getElementById(`${prefix}PreviewContainer`);
+    const previewImg = document.getElementById(`${prefix}ImagePreview`);
+    const filenameEl = document.getElementById(`${prefix}ImageFilename`);
+    const statusEl = document.getElementById(`${prefix}ImageStatus`);
+
+    if (fileInput) fileInput.value = '';
+    if (hiddenInput) hiddenInput.value = '';
+    if (previewImg) previewImg.src = '';
+    if (filenameEl) filenameEl.textContent = '';
+    if (statusEl) {
+        statusEl.className = 'preview-status';
+        statusEl.textContent = '';
+    }
+    if (dropzone) dropzone.style.display = 'flex';
+    if (previewContainer) previewContainer.style.display = 'none';
+}
+
+async function openEditProductModal(id) {
+    try {
+        const p = await api(`/api/products/${id}`);
+        if (!p) throw new Error('Product not found');
+
+        document.getElementById('editProdId').value = p.id;
+        document.getElementById('editProdName').value = p.name || '';
+        document.getElementById('editProdPrice').value = p.price || '';
+        document.getElementById('editProdCategory').value = p.category || '';
+        document.getElementById('editProdDesc').value = p.description || '';
+        document.getElementById('editProdUrl').value = p.url || '';
+        document.getElementById('editProdImagePath').value = p.image_path || '';
+
+        const dropzone = document.getElementById('editProdDropzone');
+        const previewContainer = document.getElementById('editProdPreviewContainer');
+        const previewImg = document.getElementById('editProdImagePreview');
+        const filenameEl = document.getElementById('editProdImageFilename');
+        const statusEl = document.getElementById('editProdImageStatus');
+
+        if (p.image_path) {
+            previewImg.src = `/api/products/images/${encodeURIComponent(p.image_path)}`;
+            filenameEl.textContent = p.image_path;
+            statusEl.className = 'preview-status';
+            statusEl.textContent = 'Current image';
+            dropzone.style.display = 'none';
+            previewContainer.style.display = 'flex';
+        } else {
+            resetProductImageUploader('editProd');
+        }
+
+        document.getElementById('editProductModalBackdrop').style.display = 'flex';
+    } catch (err) {
+        showToast('Failed to open product: ' + err.message, 'error');
+    }
+}
+
+function closeEditProductModal() {
+    const backdrop = document.getElementById('editProductModalBackdrop');
+    if (backdrop) backdrop.style.display = 'none';
+    resetProductImageUploader('editProd');
+}
+
+function previewProductImage(src, title) {
+    const backdrop = document.getElementById('imageLightboxBackdrop');
+    const img = document.getElementById('imageLightboxImg');
+    const titleEl = document.getElementById('imageLightboxTitle');
+    if (backdrop && img) {
+        img.src = src;
+        if (titleEl) titleEl.textContent = title || 'Product Image';
+        backdrop.style.display = 'flex';
+    }
+}
+
+function closeImageLightbox() {
+    const backdrop = document.getElementById('imageLightboxBackdrop');
+    if (backdrop) backdrop.style.display = 'none';
 }
 
 async function toggleProduct(id, newState) {
+    const row = document.getElementById(`product-row-${id}`);
+    const btn = row?.querySelector('[data-action="toggle-product"]');
+    if (btn) btn.disabled = true;
+
     try {
         await api(`/api/products/${id}`, { method: 'PUT', body: JSON.stringify({ is_active: newState }) });
-        loadBusiness();
+        showToast(newState ? 'Product is now visible to AI' : 'Product hidden from AI', 'success');
+        await loadBusiness();
     } catch (err) {
-        showToast('Failed to update product', 'error');
+        showToast(err.message || 'Failed to update product', 'error');
+        if (btn) btn.disabled = false;
     }
 }
 
 async function deleteProductRow(id) {
-    if (!confirm('Remove this product from the catalog?')) return;
+    if (!confirm('Remove this product from the catalog? This will delete the item and its image.')) return;
+    const row = document.getElementById(`product-row-${id}`);
+    const btn = row?.querySelector('[data-action="delete-product"]');
+    if (btn) btn.disabled = true;
+
     try {
         await api(`/api/products/${id}`, { method: 'DELETE' });
-        showToast('Product removed', 'success');
-        loadBusiness();
+        showToast('Product removed from catalog', 'success');
+        if (row) row.remove();
+        await loadBusiness();
     } catch (err) {
-        showToast('Failed to remove product', 'error');
+        showToast(err.message || 'Failed to remove product', 'error');
+        if (btn) btn.disabled = false;
     }
 }
 
@@ -1147,7 +1477,9 @@ async function loadChatbotRules() {
                 <div class="rule-actions">
                     <button
                         class="btn btn-sm btn-secondary"
-                        onclick="toggleRule(${rule.id}, ${rule.is_active ? 0 : 1})"
+                        data-action="toggle-rule"
+                        data-id="${rule.id}"
+                        data-active="${rule.is_active ? 0 : 1}"
                         title="${rule.is_active ? 'Disable rule' : 'Enable rule'}"
                         aria-label="${rule.is_active ? 'Disable' : 'Enable'} rule: ${escapeHtml(rule.trigger_keyword)}"
                         type="button">
@@ -1155,7 +1487,8 @@ async function loadChatbotRules() {
                     </button>
                     <button
                         class="btn btn-sm btn-danger"
-                        onclick="deleteRule(${rule.id})"
+                        data-action="delete-rule"
+                        data-id="${rule.id}"
                         title="Delete rule"
                         aria-label="Delete rule: ${escapeHtml(rule.trigger_keyword)}"
                         type="button">
@@ -1286,7 +1619,8 @@ async function loadContacts() {
                 <td>
                     <button
                         class="btn btn-sm btn-danger"
-                        onclick="deleteContact(${c.id})"
+                        data-action="delete-contact"
+                        data-id="${c.id}"
                         title="Delete contact"
                         aria-label="Delete contact ${escapeHtml(c.name || c.phone)}"
                         type="button">${Icon('trash-2')}</button>
@@ -1349,13 +1683,19 @@ function quickSelectNext(n) {
 }
 
 async function deleteContact(id) {
-    if (!confirm('Delete this contact?')) return;
+    if (!confirm('Are you sure you want to delete this contact?')) return;
+    const btn = document.querySelector(`[data-action="delete-contact"][data-id="${id}"]`);
+    if (btn) btn.disabled = true;
+
     try {
         await api(`/api/contacts/${id}`, { method: 'DELETE' });
-        showToast('Contact deleted', 'success');
-        loadContacts();
+        SELECTED_CONTACTS.delete(Number(id));
+        updateSelectionBar();
+        showToast('Contact deleted successfully', 'success');
+        await loadContacts();
     } catch (err) {
-        showToast('Failed to delete contact', 'error');
+        showToast(err.message || 'Failed to delete contact', 'error');
+        if (btn) btn.disabled = false;
     }
 }
 
@@ -1545,7 +1885,7 @@ async function loadScheduled() {
                 </td>
                 <td>
                     ${msg.status === 'pending'
-                        ? `<button class="btn btn-sm btn-danger" onclick="cancelScheduled(${msg.id})" aria-label="Cancel scheduled message" type="button">Cancel</button>`
+                        ? `<button class="btn btn-sm btn-danger" data-action="cancel-scheduled" data-id="${msg.id}" aria-label="Cancel scheduled message" type="button">Cancel</button>`
                         : '—'}
                 </td>
             </tr>
@@ -1600,7 +1940,7 @@ async function loadAppointments() {
                     </td>
                     <td>
                         ${a.status === 'confirmed'
-                            ? `<button class="btn btn-sm btn-danger" onclick="cancelAppointment(${a.id})" aria-label="Cancel appointment" type="button">Cancel</button>`
+                            ? `<button class="btn btn-sm btn-danger" data-action="cancel-appointment" data-id="${a.id}" aria-label="Cancel appointment" type="button">Cancel</button>`
                             : '—'}
                     </td>
                 </tr>
@@ -2084,7 +2424,7 @@ function escapeHtml(str) {
         .replace(/'/g, '&#39;');
 }
 
-/** Safely embed an arbitrary string as an argument inside an inline onclick="fn(...)" handler. */
+/** Safely encode an arbitrary string as a JSON attribute value. */
 function jsAttr(str) {
     return escapeHtml(JSON.stringify(str == null ? '' : String(str)));
 }
@@ -2127,6 +2467,112 @@ document.addEventListener('DOMContentLoaded', async () => {
     // this page should run for a logged-out visitor.
     const authed = await checkAuth();
     if (!authed) return;
+
+    // ── Prevent any unwanted modals/overlays from popping up on login ──
+    ['dealModalBackdrop', 'outreachModalBackdrop', 'editProductModalBackdrop', 'imageLightboxBackdrop'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.style.display = 'none';
+            el.classList.remove('show');
+        }
+    });
+
+    // ── Event Delegation for Action Buttons (CSP script-src-attr 'none' compliance) ──
+    // 1. Toast close
+    document.getElementById('toastContainer')?.addEventListener('click', (e) => {
+        const closeBtn = e.target.closest('.toast-close');
+        if (closeBtn) closeBtn.closest('.toast')?.remove();
+    });
+
+    // 2. Products List
+    document.getElementById('productList')?.addEventListener('click', (e) => {
+        const target = e.target.closest('[data-action]');
+        if (!target) return;
+        const action = target.dataset.action;
+        const id = parseInt(target.dataset.id, 10);
+        if (action === 'edit-product') {
+            openEditProductModal(id);
+        } else if (action === 'toggle-product') {
+            const nextActive = parseInt(target.dataset.active, 10);
+            toggleProduct(id, nextActive);
+        } else if (action === 'delete-product') {
+            deleteProductRow(id);
+        } else if (action === 'preview-product-image') {
+            previewProductImage(target.dataset.src, target.dataset.title);
+        }
+    });
+
+    // 3. Contacts Table
+    const bindContactsDelegation = (tableEl) => {
+        tableEl?.addEventListener('click', (e) => {
+            const btn = e.target.closest('[data-action="delete-contact"]');
+            if (!btn) return;
+            const id = parseInt(btn.dataset.id, 10);
+            deleteContact(id);
+        });
+    };
+    bindContactsDelegation(document.getElementById('contactsTableBody'));
+    bindContactsDelegation(document.getElementById('contactsTable'));
+
+    // 4. Chatbot Rules List
+    document.getElementById('rulesList')?.addEventListener('click', (e) => {
+        const target = e.target.closest('[data-action]');
+        if (!target) return;
+        const action = target.dataset.action;
+        const id = parseInt(target.dataset.id, 10);
+        if (action === 'toggle-rule') {
+            const nextActive = parseInt(target.dataset.active, 10);
+            toggleRule(id, nextActive);
+        } else if (action === 'delete-rule') {
+            deleteRule(id);
+        }
+    });
+
+    // 5. Scheduled Messages Table
+    document.getElementById('scheduledBody')?.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-action="cancel-scheduled"]');
+        if (!btn) return;
+        const id = parseInt(btn.dataset.id, 10);
+        cancelScheduled(id);
+    });
+
+    // 6. Appointments Table
+    document.getElementById('appointmentsBody')?.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-action="cancel-appointment"]');
+        if (!btn) return;
+        const id = parseInt(btn.dataset.id, 10);
+        cancelAppointment(id);
+    });
+
+    // 7. Leads List (Pending and Cards)
+    document.getElementById('leadsList')?.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-action="analyze-lead"]');
+        if (!btn) return;
+        const phone = btn.dataset.phone;
+        if (phone) analyzeLead(phone);
+    });
+
+    // 8. CRM Kanban Board & Deal Modal
+    document.getElementById('kanbanBoard')?.addEventListener('click', (e) => {
+        const card = e.target.closest('[data-action="open-deal"]');
+        if (!card) return;
+        const phone = card.dataset.phone;
+        if (phone) openDealModal(phone);
+    });
+
+    document.getElementById('dealModalBody')?.addEventListener('click', (e) => {
+        const target = e.target.closest('[data-action]');
+        if (!target) return;
+        const action = target.dataset.action;
+        const id = parseInt(target.dataset.id, 10);
+        if (action === 'save-deal') {
+            saveDealFromModal(id);
+        } else if (action === 'delete-deal') {
+            deleteDealFromModal(id);
+        } else if (action === 'add-note') {
+            addNoteFromModal();
+        }
+    });
 
     document.getElementById('logoutBtn')?.addEventListener('click', logout);
 
@@ -2423,10 +2869,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    // ── Product image uploaders & form handling ─────────────
+    setupProductImageUploader('prod');
+    setupProductImageUploader('editProd');
+
     document.getElementById('addProductForm')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const name = document.getElementById('prodName').value.trim();
-        if (!name) return;
+        if (!name) {
+            showToast('Please enter a product name', 'error');
+            return;
+        }
+        const btn = document.getElementById('addProductBtn') || e.target.querySelector('button[type="submit"]');
+        if (btn) btn.disabled = true;
         try {
             await api('/api/products', {
                 method: 'POST',
@@ -2435,14 +2890,68 @@ document.addEventListener('DOMContentLoaded', async () => {
                     price:       document.getElementById('prodPrice').value.trim(),
                     category:    document.getElementById('prodCategory').value.trim(),
                     description: document.getElementById('prodDesc').value.trim(),
-                    url:         document.getElementById('prodUrl').value.trim()
+                    url:         document.getElementById('prodUrl').value.trim(),
+                    image_path:  document.getElementById('prodImagePath')?.value?.trim() || ''
                 })
             });
             showToast('Added to catalog!', 'success');
             document.getElementById('addProductForm').reset();
+            resetProductImageUploader('prod');
             loadBusiness();
         } catch (err) {
-            showToast('Failed to add product', 'error');
+            showToast(err.message || 'Failed to add product', 'error');
+        } finally {
+            if (btn) btn.disabled = false;
+        }
+    });
+
+    document.getElementById('editProductForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('editProdId').value;
+        const name = document.getElementById('editProdName').value.trim();
+        if (!id || !name) {
+            showToast('Please enter a product name', 'error');
+            return;
+        }
+        const btn = document.getElementById('editProductSaveBtn');
+        if (btn) btn.disabled = true;
+        try {
+            await api(`/api/products/${id}`, {
+                method: 'PUT',
+                body: JSON.stringify({
+                    name,
+                    price:       document.getElementById('editProdPrice').value.trim(),
+                    category:    document.getElementById('editProdCategory').value.trim(),
+                    description: document.getElementById('editProdDesc').value.trim(),
+                    url:         document.getElementById('editProdUrl').value.trim(),
+                    image_path:  document.getElementById('editProdImagePath')?.value?.trim() || ''
+                })
+            });
+            showToast('Product updated successfully!', 'success');
+            closeEditProductModal();
+            loadBusiness();
+        } catch (err) {
+            showToast(err.message || 'Failed to update product', 'error');
+        } finally {
+            if (btn) btn.disabled = false;
+        }
+    });
+
+    document.getElementById('editProductModalClose')?.addEventListener('click', closeEditProductModal);
+    document.getElementById('editProductCancelBtn')?.addEventListener('click', closeEditProductModal);
+    document.getElementById('editProductModalBackdrop')?.addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeEditProductModal();
+    });
+
+    document.getElementById('imageLightboxClose')?.addEventListener('click', closeImageLightbox);
+    document.getElementById('imageLightboxBackdrop')?.addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeImageLightbox();
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeEditProductModal();
+            closeImageLightbox();
         }
     });
 

@@ -11,11 +11,35 @@ const {
     getDashboardStats, logMessage, logOutgoingMessageIdempotent, findMessageByIdempotencyKey,
     getMonthlyOutgoingCount, clearMessages,
     getLeadAnalyses, getLeadAnalysis, deleteLeadAnalysis, getConversationPhones, getLeadStats,
-    getProducts, countProducts, createProduct, updateProduct, deleteProduct,
+    getProducts, countProducts, getProductById, searchProducts, createProduct, updateProduct, deleteProduct,
     CRM_STAGES, getCrmDeals, getCrmDealByPhone, getCrmDealById, createCrmDeal,
     updateCrmDeal, deleteCrmDeal, getCrmStats, getCrmAnalytics, addCrmActivity, getCrmActivities,
     assertPersistable, transaction, runSql
 } = require('../services/database');
+
+const multer = require('multer');
+const {
+    saveProductImage, getProductImageAbsolutePath, deleteProductImage,
+    getMimeType, isSafeFilename, MAX_IMAGE_SIZE_BYTES
+} = require('../services/product-storage');
+
+const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: { fileSize: MAX_IMAGE_SIZE_BYTES }
+});
+
+function handleImageUpload(req, res, next) {
+    upload.single('image')(req, res, (err) => {
+        if (err) {
+            if (err.code === 'LIMIT_FILE_SIZE') {
+                const mb = (MAX_IMAGE_SIZE_BYTES / (1024 * 1024)).toFixed(0);
+                return res.status(400).json({ success: false, error: `Image file exceeds maximum limit of ${mb} MB.` });
+            }
+            return res.status(400).json({ success: false, error: err.message || 'File upload failed' });
+        }
+        next();
+    });
+}
 
 const { sendTextMessage, getStatus, initWhatsAppClient, destroyClientForUser } = require('../services/whatsapp-client');
 const { testMessage } = require('../services/chatbot');
@@ -731,6 +755,47 @@ router.get('/products', asyncHandler(async (req, res) => {
     res.json({ success: true, data: await getProducts(req.user.id) });
 }));
 
+router.get('/products/images/:filename', asyncHandler(async (req, res) => {
+    const filename = req.params.filename;
+    if (!isSafeFilename(filename)) {
+        return res.status(400).json({ success: false, error: 'Invalid image filename' });
+    }
+
+    const absPath = getProductImageAbsolutePath(filename);
+    if (!absPath) {
+        return res.status(404).json({ success: false, error: 'Image not found' });
+    }
+
+    res.setHeader('Content-Type', getMimeType(filename));
+    res.setHeader('Cache-Control', 'public, max-age=86400, must-revalidate');
+    res.sendFile(absPath);
+}));
+
+router.get('/products/:id', asyncHandler(async (req, res) => {
+    const id = requireId(req.params.id, 'product id');
+    const product = await getProductById(req.user.id, id);
+    if (!product) return res.status(404).json({ success: false, error: 'Product not found' });
+    res.json({ success: true, data: product });
+}));
+
+router.post('/products/upload-image', writeLimiter, requireDurableWrite, handleImageUpload, asyncHandler(async (req, res) => {
+    if (!req.user || !req.user.id) {
+        return res.status(401).json({ success: false, error: 'Authentication required' });
+    }
+    if (!req.file || !req.file.buffer) {
+        throw new ValidationError('No image file was uploaded.', 'image');
+    }
+
+    const filename = await saveProductImage(req.user.id, req.file.buffer);
+    res.json({
+        success: true,
+        data: {
+            filename,
+            url: `/api/products/images/${filename}`
+        }
+    });
+}));
+
 /**
  * Validates a product URL.
  *
@@ -754,6 +819,20 @@ function validateProductUrl(value) {
     return parsed.toString();
 }
 
+function validateProductImageRef(imagePath) {
+    if (!imagePath) return '';
+    const clean = String(imagePath).trim();
+    if (!clean) return '';
+    if (!isSafeFilename(clean)) {
+        throw new ValidationError('Invalid product image reference.', 'image_path');
+    }
+    const absPath = getProductImageAbsolutePath(clean);
+    if (!absPath) {
+        throw new ValidationError('Referenced product image does not exist on server.', 'image_path');
+    }
+    return clean;
+}
+
 router.post('/products', writeLimiter, requireDurableWrite, asyncHandler(async (req, res) => {
     const body = req.body || {};
     const name = sanitizeSpreadsheetCell(requireString(body.name, 'name', { max: LIMITS.PRODUCT_NAME }));
@@ -766,12 +845,15 @@ router.post('/products', writeLimiter, requireDurableWrite, asyncHandler(async (
         });
     }
 
+    const image_path = validateProductImageRef(body.image_path);
+
     const product = await createProduct(req.user.id, {
         name,
         description: optionalString(body.description, 'description', LIMITS.PRODUCT_DESCRIPTION),
         price: optionalString(body.price, 'price', LIMITS.PRODUCT_PRICE),
         category: optionalString(body.category, 'category', LIMITS.PRODUCT_CATEGORY),
-        url: validateProductUrl(body.url)
+        url: validateProductUrl(body.url),
+        image_path
     });
     res.json({ success: true, data: product });
 }));
@@ -780,23 +862,55 @@ router.put('/products/:id', writeLimiter, requireDurableWrite, asyncHandler(asyn
     const id = requireId(req.params.id, 'product id');
     const body = req.body || {};
 
+    const existing = await getProductById(req.user.id, id);
+    if (!existing) return res.status(404).json({ success: false, error: 'Product not found' });
+
     const fields = {};
     if (body.name !== undefined)        fields.name = sanitizeSpreadsheetCell(requireString(body.name, 'name', { max: LIMITS.PRODUCT_NAME }));
     if (body.description !== undefined) fields.description = optionalString(body.description, 'description', LIMITS.PRODUCT_DESCRIPTION);
     if (body.price !== undefined)       fields.price = optionalString(body.price, 'price', LIMITS.PRODUCT_PRICE);
     if (body.category !== undefined)    fields.category = optionalString(body.category, 'category', LIMITS.PRODUCT_CATEGORY);
     if (body.url !== undefined)         fields.url = validateProductUrl(body.url);
+    if (body.image_path !== undefined)  fields.image_path = validateProductImageRef(body.image_path);
     if (body.is_active !== undefined)   fields.is_active = (body.is_active === true || body.is_active === 1 || body.is_active === '1') ? 1 : 0;
 
     const updated = await updateProduct(req.user.id, id, fields);
     if (!updated) return res.status(404).json({ success: false, error: 'Product not found' });
+
+    // Clean up replaced old image if it was replaced with a new or empty image
+    if (fields.image_path !== undefined && existing.image_path && existing.image_path !== fields.image_path) {
+        await deleteProductImage(existing.image_path);
+    }
+
+    res.json({ success: true, data: updated });
+}));
+
+router.delete('/products/:id/image', writeLimiter, requireDurableWrite, asyncHandler(async (req, res) => {
+    const id = requireId(req.params.id, 'product id');
+    const product = await getProductById(req.user.id, id);
+    if (!product) return res.status(404).json({ success: false, error: 'Product not found' });
+
+    if (product.image_path) {
+        await updateProduct(req.user.id, id, { image_path: '' });
+        await deleteProductImage(product.image_path);
+    }
+
+    const updated = await getProductById(req.user.id, id);
     res.json({ success: true, data: updated });
 }));
 
 router.delete('/products/:id', writeLimiter, asyncHandler(async (req, res) => {
     const id = requireId(req.params.id, 'product id');
+    const existing = await getProductById(req.user.id, id);
+    if (!existing) return res.status(404).json({ success: false, error: 'Product not found' });
+
     const { changes } = await deleteProduct(req.user.id, id);
     if (!changes) return res.status(404).json({ success: false, error: 'Product not found' });
+
+    if (existing.image_path) {
+        await deleteProductImage(existing.image_path);
+    }
+
     res.json({ success: true });
 }));
 

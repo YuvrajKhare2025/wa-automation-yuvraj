@@ -1,3 +1,4 @@
+const fs = require('fs');
 const {
     getChatbotRules, incrementRuleHitCount, getSetting, getConversation,
     logMessage, getUserById, getMonthlyOutgoingCount
@@ -6,6 +7,7 @@ const { generateReply } = require('./ai');
 const { scheduleAutoAnalysis } = require('./lead-analyzer');
 const { safeRegexTest } = require('../utils/validate');
 const { conversationQueue } = require('../utils/conversation-queue');
+const { getImageFilePath } = require('./product-storage');
 
 // ─── Anti-Ban Rate Limiting ─────────────────────────────────
 const userRateLimits = new Map();
@@ -88,7 +90,7 @@ function ruleMatches(rule, text) {
 }
 
 // ─── Human Simulation (Delay & Typing) ──────────────────────
-async function safeReply(client, phone, responseText, msg) {
+async function safeReply(client, phone, responseText, msg, productToSend = null) {
     // Show typing indicator
     if (msg && client) {
         try {
@@ -104,20 +106,85 @@ async function safeReply(client, phone, responseText, msg) {
     const delayMs = Math.floor(Math.random() * 1500) + 1500;
     await new Promise(resolve => setTimeout(resolve, delayMs));
 
-    // Send reply — prefer msg.reply() to avoid WhatsApp LID format issues
-    try {
-        if (msg) {
-            await msg.reply(responseText);
-        } else if (client) {
-            const chatId = phone.includes('@') ? phone : `${phone}@c.us`;
-            await client.sendMessage(chatId, responseText);
+    // Extract text and product if responseText is an AI response object
+    let textToSend = responseText;
+    if (responseText && typeof responseText === 'object') {
+        if (!productToSend && responseText.product) {
+            productToSend = responseText.product;
         }
-    } catch (sendErr) {
-        console.error('   ❌ Primary reply failed, attempting fallback...', sendErr.message?.split('\n')[0]);
-        if (client && msg && msg.from) {
-            await client.sendMessage(msg.from, responseText);
+        textToSend = responseText.text !== undefined ? responseText.text : String(responseText);
+    } else {
+        textToSend = String(responseText || '');
+    }
+
+    // If a product with an image was selected, deliver media message
+    let mediaSent = false;
+    if (productToSend && productToSend.image_path) {
+        const filePath = getImageFilePath(productToSend.image_path);
+        if (filePath && fs.existsSync(filePath)) {
+            try {
+                const { MessageMedia } = require('whatsapp-web.js');
+                const media = MessageMedia.fromFilePath(filePath);
+
+                let caption = textToSend;
+                let followUp = null;
+                // WhatsApp media caption limit is ~1024 characters
+                if (caption.length > 1024) {
+                    followUp = caption.slice(1000);
+                    caption = caption.slice(0, 1000);
+                }
+
+                if (msg) {
+                    try {
+                        await msg.reply(media, undefined, { caption });
+                    } catch (replyErr) {
+                        if (client && msg.from) {
+                            await client.sendMessage(msg.from, media, { caption });
+                        } else {
+                            throw replyErr;
+                        }
+                    }
+                } else if (client) {
+                    const chatId = phone.includes('@') ? phone : `${phone}@c.us`;
+                    await client.sendMessage(chatId, media, { caption });
+                }
+
+                mediaSent = true;
+                console.log(`📸 Product image (${productToSend.name || productToSend.id}) delivered via WhatsApp.`);
+
+                if (followUp) {
+                    if (msg) {
+                        await msg.reply(followUp);
+                    } else if (client) {
+                        const chatId = phone.includes('@') ? phone : `${phone}@c.us`;
+                        await client.sendMessage(chatId, followUp);
+                    }
+                }
+            } catch (mediaErr) {
+                console.error('   ⚠️ Failed to send product image media, falling back to text reply:', mediaErr.message?.split('\n')[0]);
+                mediaSent = false;
+            }
         } else {
-            throw sendErr;
+            console.warn(`   ⚠️ Product image file not found on disk (${productToSend.image_path}), proceeding with text reply.`);
+        }
+    }
+
+    if (!mediaSent) {
+        // Send reply — prefer msg.reply() to avoid WhatsApp LID format issues
+        try {
+            if (msg) {
+                await msg.reply(textToSend);
+            } else if (client) {
+                const chatId = phone.includes('@') ? phone : `${phone}@c.us`;
+                await client.sendMessage(chatId, textToSend);
+            }
+        } catch (sendErr) {
+            console.error('   ❌ Primary reply failed, attempting fallback...', sendErr.message?.split('\n')[0]);
+            if (client && msg && msg.from) {
+                await client.sendMessage(msg.from, textToSend);
+            } else {
+                throw sendErr;
+            }
         }
     }
 }
@@ -180,9 +247,10 @@ async function _processMessageInternal(userId, phone, messageText, contactName =
 
         try {
             const aiResponse = await generateReply(userId, aiSystemPrompt, recentHistory, contactName, phone);
-            await safeReply(client, phone, aiResponse, msg);
-            await logMessage(userId, { phone, contactName, direction: 'outgoing', body: aiResponse });
-            return { replied: true, rule: 'ai_persona', response: aiResponse };
+            await safeReply(client, phone, aiResponse, msg, aiResponse.product);
+            const responseText = aiResponse.text !== undefined ? aiResponse.text : String(aiResponse);
+            await logMessage(userId, { phone, contactName, direction: 'outgoing', body: responseText });
+            return { replied: true, rule: 'ai_persona', response: responseText, product: aiResponse.product };
         } catch (aiErr) {
             console.warn('⚠️ AI Persona Mode failed (falling back to rules/default reply):', aiErr.message?.split('\n')[0]);
         }
@@ -230,9 +298,10 @@ async function _processMessageInternal(userId, phone, messageText, contactName =
 
         try {
             const aiResponse = await generateReply(userId, aiSystemPrompt, recentHistory, contactName, phone);
-            await safeReply(client, phone, aiResponse, msg);
-            await logMessage(userId, { phone, contactName, direction: 'outgoing', body: aiResponse });
-            return { replied: true, rule: 'ai_fallback', response: aiResponse };
+            await safeReply(client, phone, aiResponse, msg, aiResponse.product);
+            const responseText = aiResponse.text !== undefined ? aiResponse.text : String(aiResponse);
+            await logMessage(userId, { phone, contactName, direction: 'outgoing', body: responseText });
+            return { replied: true, rule: 'ai_fallback', response: responseText, product: aiResponse.product };
         } catch (aiErr) {
             console.warn('⚠️ AI Fallback failed (falling back to default reply):', aiErr.message?.split('\n')[0]);
         }

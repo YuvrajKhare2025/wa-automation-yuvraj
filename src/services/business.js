@@ -51,11 +51,12 @@ async function getBusinessContext(userId) {
     if (info.products.length) {
         lines.push('Products / Services catalog:');
         for (const p of info.products.slice(0, MAX_PRODUCTS_IN_CONTEXT)) {
-            const bits = [flat(p.name)];
+            const bits = [`[ID: ${p.id}] ${flat(p.name)}`];
             if (p.price)       bits.push(`price: ${flat(p.price)}`);
             if (p.category)    bits.push(`category: ${flat(p.category)}`);
             if (p.description) bits.push(flat(p.description));
             if (p.url)         bits.push(`link: ${flat(p.url)}`);
+            if (p.image_path)  bits.push('has_photo: yes');
             lines.push(`  - ${bits.join(' | ')}`);
         }
         if (info.products.length > MAX_PRODUCTS_IN_CONTEXT) {

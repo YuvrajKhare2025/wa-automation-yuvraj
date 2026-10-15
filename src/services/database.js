@@ -845,18 +845,34 @@ async function countProducts(userId) {
     return row ? row.count : 0;
 }
 
-async function createProduct(userId, { name, description = '', price = '', category = '', url = '' }) {
+async function getProductById(userId, id) {
+    return queryGet('SELECT * FROM products WHERE id = $1 AND user_id = $2', [id, userId]);
+}
+
+async function searchProducts(userId, queryText) {
+    const term = `%${String(queryText || '').trim().toLowerCase()}%`;
+    return queryAll(
+        `SELECT * FROM products
+         WHERE user_id = $1 AND is_active = 1
+           AND (LOWER(name) LIKE $2 OR LOWER(description) LIKE $2 OR LOWER(category) LIKE $2)
+         ORDER BY name ASC
+         LIMIT 10`,
+        [userId, term]
+    );
+}
+
+async function createProduct(userId, { name, description = '', price = '', category = '', url = '', image_path = '' }) {
     const res = await query(
-        `INSERT INTO products (user_id, name, description, price, category, url)
-         VALUES ($1, $2, $3, $4, $5, $6)
+        `INSERT INTO products (user_id, name, description, price, category, url, image_path)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
          RETURNING *`,
-        [userId, name, description, price, category, url]
+        [userId, name, description, price, category, url, image_path || '']
     );
     return res.rows[0];
 }
 
 async function updateProduct(userId, id, fields) {
-    const allowed = ['name', 'description', 'price', 'category', 'url', 'is_active'];
+    const allowed = ['name', 'description', 'price', 'category', 'url', 'image_path', 'is_active'];
     const sets = [];
     const params = [];
     let idx = 1;
@@ -864,7 +880,7 @@ async function updateProduct(userId, id, fields) {
     for (const [key, value] of Object.entries(fields)) {
         if (allowed.includes(key)) {
             sets.push(`${key} = $${idx++}`);
-            params.push(key === 'is_active' ? (value ? 1 : 0) : value);
+            params.push(key === 'is_active' ? (value ? 1 : 0) : (value ?? ''));
         }
     }
     if (sets.length === 0) return queryGet('SELECT * FROM products WHERE id = $1 AND user_id = $2', [id, userId]);
@@ -1430,6 +1446,8 @@ module.exports = {
     getLeadStats,
     getProducts,
     countProducts,
+    getProductById,
+    searchProducts,
     createProduct,
     updateProduct,
     deleteProduct,

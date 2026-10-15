@@ -79,10 +79,10 @@ function getPoolConfig() {
     const connectionString = (process.env.DATABASE_URL || '').trim();
 
     const maxConnections = parseInt(process.env.PGMAX_CONNECTIONS || process.env.DB_POOL_MAX || '20', 10);
-    const connectionTimeoutMillis = parseInt(process.env.PGCONNECT_TIMEOUT_MS || '5000', 10);
-    const idleTimeoutMillis = parseInt(process.env.PGIDLE_TIMEOUT_MS || '30000', 10);
-    const statementTimeout = parseInt(process.env.PGSTATEMENT_TIMEOUT_MS || '10000', 10);
-    const queryTimeout = parseInt(process.env.PGQUERY_TIMEOUT_MS || '10000', 10);
+    const connectionTimeoutMillis = parseInt(process.env.PGCONNECT_TIMEOUT_MS || process.env.DB_CONN_TIMEOUT_MS || '15000', 10);
+    const idleTimeoutMillis = parseInt(process.env.PGIDLE_TIMEOUT_MS || process.env.DB_POOL_IDLE_TIMEOUT_MS || '30000', 10);
+    const statementTimeout = parseInt(process.env.PGSTATEMENT_TIMEOUT_MS || process.env.DB_STATEMENT_TIMEOUT_MS || '15000', 10);
+    const queryTimeout = parseInt(process.env.PGQUERY_TIMEOUT_MS || process.env.DB_QUERY_TIMEOUT_MS || '15000', 10);
 
     // Timeout Hierarchy:
     // 1. connectionTimeoutMillis: Client-side timeout for acquiring an idle client or establishing a new socket.

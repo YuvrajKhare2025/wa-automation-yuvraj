@@ -935,7 +935,31 @@
                                 <input type="url" id="prodUrl" placeholder="https://…">
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-secondary"><span class="btn-icon" data-icon="plus" aria-hidden="true"></span> Add to Catalog</button>
+                        <div class="form-group" style="margin-bottom:14px">
+                            <label>Product Image (Optional — JPEG, PNG, WebP up to 5MB)</label>
+                            <div class="product-image-uploader-box">
+                                <input type="file" id="prodImageFile" accept="image/jpeg,image/png,image/webp" style="display:none">
+                                <input type="hidden" id="prodImagePath">
+                                <div class="product-dropzone" id="prodDropzone">
+                                    <span data-icon="image" class="icon-inline" aria-hidden="true"></span>
+                                    <span id="prodDropzoneText">Click or drag image here (JPEG, PNG, WebP &bull; Max 5MB)</span>
+                                </div>
+                                <div class="product-image-preview-bar" id="prodPreviewContainer" style="display:none">
+                                    <div class="preview-img-container">
+                                        <img id="prodImagePreview" src="" alt="Preview" class="product-thumb-preview">
+                                    </div>
+                                    <div class="preview-meta">
+                                        <span id="prodImageFilename" class="preview-filename"></span>
+                                        <span id="prodImageStatus" class="preview-status"></span>
+                                    </div>
+                                    <div class="preview-actions">
+                                        <button type="button" class="btn btn-sm btn-secondary" id="prodImageChangeBtn">Change</button>
+                                        <button type="button" class="btn btn-sm btn-danger" id="prodImageRemoveBtn">Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-secondary" id="addProductBtn"><span class="btn-icon" data-icon="plus" aria-hidden="true"></span> Add to Catalog</button>
                     </form>
                     <div class="product-list" id="productList" aria-live="polite" style="margin-top:14px"></div>
                 </div>
@@ -1256,6 +1280,88 @@
                     <button type="button" class="btn btn-primary" id="outreachDoneBtn" style="display:none">Done</button>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Edit Product Modal ── -->
+<div class="modal-backdrop" id="editProductModalBackdrop" style="display:none" role="dialog" aria-modal="true" aria-labelledby="editProductModalTitle">
+    <div class="modal" id="editProductModal" style="max-width:560px">
+        <div class="modal-header">
+            <h2 id="editProductModalTitle">Edit Product / Service</h2>
+            <button class="modal-close" id="editProductModalClose" aria-label="Close" type="button">×</button>
+        </div>
+        <div class="modal-body">
+            <form id="editProductForm" novalidate>
+                <input type="hidden" id="editProdId">
+                <input type="hidden" id="editProdImagePath">
+                <div class="form-row-3">
+                    <div class="form-group">
+                        <label for="editProdName">Name</label>
+                        <input type="text" id="editProdName" placeholder="Product name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editProdPrice">Price</label>
+                        <input type="text" id="editProdPrice" placeholder="e.g. ₹1,499">
+                    </div>
+                    <div class="form-group">
+                        <label for="editProdCategory">Category</label>
+                        <input type="text" id="editProdCategory" placeholder="e.g. Services">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editProdDesc">Description</label>
+                        <input type="text" id="editProdDesc" placeholder="Description for WhatsApp chatbot">
+                    </div>
+                    <div class="form-group">
+                        <label for="editProdUrl">Link (optional)</label>
+                        <input type="url" id="editProdUrl" placeholder="https://…">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top:12px;margin-bottom:16px">
+                    <label>Product Image</label>
+                    <div class="product-image-uploader-box">
+                        <input type="file" id="editProdImageFile" accept="image/jpeg,image/png,image/webp" style="display:none">
+                        <div class="product-dropzone" id="editProdDropzone">
+                            <span data-icon="image" class="icon-inline" aria-hidden="true"></span>
+                            <span id="editProdDropzoneText">Click or drag image here to attach/replace</span>
+                        </div>
+                        <div class="product-image-preview-bar" id="editProdPreviewContainer" style="display:none">
+                            <div class="preview-img-container">
+                                <img id="editProdImagePreview" src="" alt="Preview" class="product-thumb-preview">
+                            </div>
+                            <div class="preview-meta">
+                                <span id="editProdImageFilename" class="preview-filename"></span>
+                                <span id="editProdImageStatus" class="preview-status"></span>
+                            </div>
+                            <div class="preview-actions">
+                                <button type="button" class="btn btn-sm btn-secondary" id="editProdImageReplaceBtn">Replace</button>
+                                <button type="button" class="btn btn-sm btn-danger" id="editProdImageRemoveBtn">Remove Image</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-actions" style="display:flex;justify-content:flex-end;gap:10px">
+                    <button type="button" class="btn btn-secondary" id="editProductCancelBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="editProductSaveBtn">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ── Product Image Lightbox Modal ── -->
+<div class="modal-backdrop" id="imageLightboxBackdrop" style="display:none" role="dialog" aria-modal="true" aria-labelledby="imageLightboxTitle">
+    <div class="modal image-lightbox-modal" id="imageLightboxModal">
+        <div class="modal-header">
+            <h2 id="imageLightboxTitle">Product Image</h2>
+            <button class="modal-close" id="imageLightboxClose" aria-label="Close" type="button">×</button>
+        </div>
+        <div class="modal-body" style="padding:16px;display:flex;justify-content:center;align-items:center">
+            <img id="imageLightboxImg" src="" alt="Product Large View" style="max-width:100%;max-height:75vh;border-radius:var(--radius-md)" />
         </div>
     </div>
 </div>

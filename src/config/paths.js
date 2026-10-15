@@ -38,6 +38,7 @@ const DB_PATH     = path.join(DATA_DIR, 'whatsapp.db');
 const SECRET_PATH = path.join(DATA_DIR, '.session_secret');
 const AUTH_ROOT   = path.join(PERSIST_ROOT, '.wwebjs_auth');
 const CACHE_ROOT  = path.join(PERSIST_ROOT, '.wwebjs_cache');
+const PRODUCT_UPLOADS_DIR = path.join(DATA_DIR, 'product_images');
 
 /**
  * In production, refuse to start if the persistence root either doesn't
@@ -50,6 +51,7 @@ function assertPersistRootWritable() {
     if (process.env.NODE_ENV === 'test') return;
     try {
         fs.mkdirSync(DATA_DIR, { recursive: true });
+        fs.mkdirSync(PRODUCT_UPLOADS_DIR, { recursive: true });
         const probe = path.join(DATA_DIR, '.write-probe');
         fs.writeFileSync(probe, 'ok');
         fs.unlinkSync(probe);
@@ -69,5 +71,6 @@ module.exports = {
     SECRET_PATH,
     AUTH_ROOT,
     CACHE_ROOT,
+    PRODUCT_UPLOADS_DIR,
     assertPersistRootWritable,
 };

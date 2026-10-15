@@ -2,23 +2,34 @@ let ALL_USERS = [];
 let CURRENT_ADMIN = null;
 let CURRENT_FILTER = 'all';
 let CURRENT_ACCESS_TOKEN = null;
+let _refreshPromise = null;
 
 async function refreshSession() {
-    try {
-        const res = await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' });
-        if (res.ok) {
-            const data = await res.json();
-            if (data.accessToken) {
-                CURRENT_ACCESS_TOKEN = data.accessToken;
-                return true;
+    if (_refreshPromise) return _refreshPromise;
+    _refreshPromise = (async () => {
+        try {
+            const res = await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.accessToken) {
+                    CURRENT_ACCESS_TOKEN = data.accessToken;
+                    return true;
+                }
             }
+        } catch (e) {
+            console.warn('[Admin Auth] Session refresh network error:', e.message);
+        } finally {
+            _refreshPromise = null;
         }
-    } catch (e) {}
-    return false;
+        return false;
+    })();
+    return _refreshPromise;
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
     if (typeof hydrateIcons === 'function') hydrateIcons();
+
+    closeEditModal();
 
     const ok = await checkAdminAuth();
     if (!ok) return;
@@ -412,13 +423,20 @@ function openEditModal(id) {
     document.getElementById('editRole').value = u.role;
     document.getElementById('editPlan').value = u.plan || 'free';
     document.getElementById('editMessageLimit').value = u.message_limit || 0;
-    document.getElementById('editRuleLimit').value = u.rule_limit || 0;
-    document.getElementById('editModalBackdrop').classList.add('show');
-    if (typeof hydrateIcons === 'function') hydrateIcons(document.getElementById('editModalBackdrop'));
+    const backdrop = document.getElementById('editModalBackdrop');
+    if (backdrop) {
+        backdrop.style.display = 'flex';
+        backdrop.classList.add('show');
+        if (typeof hydrateIcons === 'function') hydrateIcons(backdrop);
+    }
 }
 
 function closeEditModal() {
-    document.getElementById('editModalBackdrop').classList.remove('show');
+    const backdrop = document.getElementById('editModalBackdrop');
+    if (backdrop) {
+        backdrop.style.display = 'none';
+        backdrop.classList.remove('show');
+    }
 }
 
 async function saveEditModal() {

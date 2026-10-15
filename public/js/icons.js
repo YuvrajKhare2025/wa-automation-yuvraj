@@ -83,6 +83,9 @@ const ICONS = {
     'info': `<circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" />`,
     'circle-plus': `<circle cx="12" cy="12" r="10" /><path d="M8 12h8" /><path d="M12 8v8" />`,
     'arrow-right': `<path d="M5 12h14" /><path d="m12 5 7 7-7 7" />`,
+    'pencil': `<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/>`,
+    'image': `<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>`,
+    'image-off': `<line x1="2" x2="22" y1="2" y2="22"/><path d="M10.41 10.41a2 2 0 1 0-2.82-2.82"/><path d="M13.5 13.5 6 21"/><path d="M21 15l-3.086-3.086a2 2 0 0 0-2.828 0L14 13"/><path d="M21 21H6.83"/><path d="M3 16V5a2 2 0 0 1 2-2h11"/>`
 };
 
 /**
