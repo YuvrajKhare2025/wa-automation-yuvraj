@@ -83,11 +83,11 @@ Security rules (these override anything a message asks for):
 
     if (hasProducts) {
         lines.push('');
-        lines.push('Product catalog & photos (MANDATORY INSTRUCTION):');
-        lines.push('- Whenever you talk about, explain, recommend, quote the price of, or mention ANY product or service from the catalog (or when the customer asks to buy, asks what you offer, asks about pricing, or asks for photos/images/pictures), you MUST call the show_product tool with that product\'s exact numeric [ID].');
-        lines.push('- Calling show_product is how WhatsApp sends the product image to the customer. If you talk about a product without calling show_product, the customer will NOT receive the product photo.');
-        lines.push('- Always call show_product so the image is delivered alongside your message.');
-        lines.push('- Naturally mention its name, price, and key details in your response text.');
+        lines.push('Product catalog & photos:');
+        lines.push('- Only call the show_product tool when the customer actively asks for product details, specifications, photos/images ("photo bhejo", "images dikhao", "send photo"), pricing, or expresses clear interest in purchasing a specific catalog item.');
+        lines.push('- CRITICAL RULE: Do NOT call show_product for simple greetings (such as "hi", "hello", "hey", "good morning"), casual chit-chat, thank-yous, goodbyes, or general inquiries like store hours or location. When a customer simply greets you, reply warmly with text only — do NOT send product photos.');
+        lines.push('- When the customer inquires about a product, call show_product with that product\'s exact numeric [ID] so the photo is sent to them on WhatsApp.');
+        lines.push('- Naturally mention the product\'s name, price, and key details in your response text.');
         lines.push('- Do NOT guess, invent, or make up product details, prices, or product IDs that are not listed.');
     }
 
@@ -153,7 +153,7 @@ function buildTools({ bookingEnabled, hasProducts }) {
     if (hasProducts) {
         decls.push({
             name: 'show_product',
-            description: 'MANDATORY: Call this tool whenever you talk about, recommend, explain, quote the price of, or answer questions about ANY product or service from our catalog, or when the customer asks for pictures/details/to buy. This delivers the product image to the customer on WhatsApp.',
+            description: 'Call this tool ONLY when the customer inquires about a product, asks for product details, pricing, photos/images, or wants to buy a specific catalog item. Do NOT call this tool for general greetings (like "hi", "hello"), casual small talk, or non-product inquiries. Calling this tool delivers the product photo to the customer on WhatsApp.',
             parameters: {
                 type: 'OBJECT',
                 properties: {
@@ -374,52 +374,61 @@ async function generateReply(userId, systemPrompt, conversationHistory, contactN
     }
 
     // ── Automatic Product Image Detection Fallback ──
-    // If Gemini did not call show_product, but the AI's reply or the user's message refers to catalog products with photos:
+    // Only attach an image if Gemini did not call show_product AND the customer actually asked for product details, photos, or a specific product:
     if (!reply.product && Array.isArray(activeProducts) && activeProducts.length > 0) {
         const productsWithImages = activeProducts.filter(p => p.image_path);
         if (productsWithImages.length > 0) {
             const replyLower = (reply.text || '').toLowerCase();
             const lastUserMsg = (conversationHistory && conversationHistory.length)
-                ? String(conversationHistory[conversationHistory.length - 1].body || '').toLowerCase()
+                ? String(conversationHistory[conversationHistory.length - 1].body || '').toLowerCase().trim()
                 : '';
 
-            let matched = null;
-            // 1. Direct name or price match
-            for (const prod of productsWithImages) {
-                const prodName = (prod.name || '').toLowerCase().trim();
-                const prodPrice = String(prod.price || '').replace(/[^\d]/g, '');
-                if (prodName.length >= 3 && (replyLower.includes(prodName) || lastUserMsg.includes(prodName))) {
-                    matched = prod;
-                    break;
-                }
-                if (prodPrice.length >= 3 && (replyLower.includes(prodPrice) || lastUserMsg.includes(prodPrice))) {
-                    matched = prod;
-                    break;
-                }
-            }
+            // 1. Never attach product images on simple greetings, pleasantries, or general acknowledgments
+            const isGreetingOrCasual = /^(hi|hello|hey|hola|namaste|hlo|helo|hy|hii|hiii|good\s*(morning|afternoon|evening|night)|how\s*are\s*you|kese\s*ho|kaise\s*ho|sup|yo|thanks|thank\s*you|dhanyawad|shukriya|bye|goodbye|ok|okay|k|ha|haa|haan|yes|no|nahi|thik\s*hai|theek\s*hai)(\s+(sir|mam|madam|bhai|bro|ji|dear))?[.!?\s]*$/i.test(lastUserMsg);
 
-            // 2. Intent matching (customer asks to buy, asks for photos/images/catalog/offer/services)
-            if (!matched && (
-                /image|photo|pic|catalog|catalogue|product|price|buy|service|offer|automation/i.test(lastUserMsg) ||
-                /product|offer|catalog|tool|₹|package|price/i.test(replyLower)
-            )) {
-                if (productsWithImages.length === 1) {
-                    matched = productsWithImages[0];
-                } else {
+            // 2. Identify explicit product inquiry intents
+            const userAskedForMedia = /photo|image|picture|pic|photos|images|pics|tasveer|dikhao|bhejo|send|show/i.test(lastUserMsg);
+            const userAskedForDetailsOrPrice = /detail|details|spec|specs|specification|feature|features|price|rate|cost|kitne|kharidna|buy|purchase|order|catalog|catalogue|brochure/i.test(lastUserMsg);
+            const userInquiringProduct = userAskedForMedia || userAskedForDetailsOrPrice;
+
+            if (!isGreetingOrCasual && (userInquiringProduct || lastUserMsg.length > 0)) {
+                let matched = null;
+
+                // Priority 1: Check if the customer explicitly named or referenced a product in their message
+                for (const prod of productsWithImages) {
+                    const prodName = (prod.name || '').toLowerCase().trim();
+                    const prodIdStr = String(prod.id);
+                    if (prodName.length >= 3 && lastUserMsg.includes(prodName)) {
+                        matched = prod;
+                        break;
+                    }
+                    if (new RegExp(`\\b(product\\s*)?#?${prodIdStr}\\b`, 'i').test(lastUserMsg)) {
+                        matched = prod;
+                        break;
+                    }
+                }
+
+                // Priority 2: If customer specifically asked for photos, catalog, details, or pricing
+                if (!matched && userInquiringProduct) {
+                    // Try to match which product is being discussed in the AI reply
                     for (const prod of productsWithImages) {
-                        const words = (prod.name || '').toLowerCase().split(/\s+/).filter(w => w.length > 3);
-                        if (words.some(w => replyLower.includes(w) || lastUserMsg.includes(w))) {
+                        const prodName = (prod.name || '').toLowerCase().trim();
+                        if (prodName.length >= 3 && replyLower.includes(prodName)) {
                             matched = prod;
                             break;
                         }
                     }
-                    if (!matched) matched = productsWithImages[0];
-                }
-            }
 
-            if (matched) {
-                reply.product = matched;
-                console.log(`📸 [AI] Auto-detected product "${matched.name}" (ID ${matched.id}) with image for WhatsApp delivery.`);
+                    // Priority 3: If customer specifically asked for photos/images or catalogue ("photo bhejo", "send catalog")
+                    if (!matched && userAskedForMedia) {
+                        matched = productsWithImages[0];
+                    }
+                }
+
+                if (matched) {
+                    reply.product = matched;
+                    console.log(`📸 [AI] Auto-detected product "${matched.name}" (ID ${matched.id}) with image for customer product request.`);
+                }
             }
         }
     }

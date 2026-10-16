@@ -16,12 +16,15 @@ const {
     updateCrmDeal, deleteCrmDeal, getCrmStats, getCrmAnalytics, addCrmActivity, getCrmActivities,
     assertPersistable, transaction, runSql
 } = require('../services/database');
-
 const multer = require('multer');
 const {
     saveProductImage, getProductImageAbsolutePath, restoreProductImageIfMissing, deleteProductImage,
     getMimeType, isSafeFilename, MAX_IMAGE_SIZE_BYTES
 } = require('../services/product-storage');
+const {
+    saveOutreachImage, getOutreachImageAbsolutePath, deleteOutreachImage,
+    getMimeType: getOutreachMimeType, isSafeFilename: isSafeOutreachFilename
+} = require('../services/outreach-storage');
 
 const upload = multer({
     storage: multer.memoryStorage(),
@@ -324,7 +327,24 @@ router.post('/contacts/outreach', sendLimiter, requireDurableWrite, asyncHandler
             error: `Outreach is capped at ${MAX_RECIPIENTS_PER_JOB} recipients per send — you selected ${contactIds.length}. Split into smaller batches.`
         });
     }
-    const message = requireString(body.message, 'message', { max: LIMITS.MESSAGE_BODY });
+
+    const mediaId = typeof body.mediaId === 'string' && body.mediaId.trim().length > 0
+        ? body.mediaId.trim()
+        : null;
+
+    let message = '';
+    if (body.message !== undefined && body.message !== null && String(body.message).trim().length > 0) {
+        message = requireString(body.message, 'message', { max: LIMITS.MESSAGE_BODY });
+    } else if (!mediaId) {
+        return res.status(400).json({ success: false, error: 'Please enter a message or attach an image.' });
+    }
+
+    if (mediaId) {
+        const absPath = getOutreachImageAbsolutePath(mediaId, req.user.id);
+        if (!absPath) {
+            return res.status(400).json({ success: false, error: 'Attached media file not found or invalid' });
+        }
+    }
 
     const status = getStatus(req.user.id);
     if (!status.connected) {
@@ -336,8 +356,57 @@ router.post('/contacts/outreach', sendLimiter, requireDurableWrite, asyncHandler
         return res.status(400).json({ success: false, error: 'None of the selected contacts could be found' });
     }
 
-    const job = startOutreachJob(req.user, contacts, message);
-    res.json({ success: true, data: { jobId: job.id, total: job.total } });
+    const job = startOutreachJob(req.user, contacts, message, mediaId);
+    res.json({ success: true, data: { jobId: job.id, total: job.total, mediaId: job.mediaId } });
+}));
+
+router.post('/contacts/outreach/upload-media', writeLimiter, requireDurableWrite, handleImageUpload, asyncHandler(async (req, res) => {
+    if (!req.user || !req.user.id) {
+        return res.status(401).json({ success: false, error: 'Authentication required' });
+    }
+    if (!req.file || !req.file.buffer) {
+        throw new ValidationError('No image file was uploaded.', 'image');
+    }
+
+    const saved = await saveOutreachImage(req.user.id, req.file.buffer);
+    res.json({
+        success: true,
+        data: {
+            mediaId: saved.mediaId,
+            filename: saved.filename,
+            size: saved.size,
+            ext: saved.ext,
+            mime: saved.mime,
+            url: `/api/contacts/outreach/media/${saved.filename}`
+        }
+    });
+}));
+
+router.get('/contacts/outreach/media/:filename', asyncHandler(async (req, res) => {
+    if (!req.user || !req.user.id) {
+        return res.status(401).json({ success: false, error: 'Authentication required' });
+    }
+    const filename = String(req.params.filename || '');
+    const absPath = getOutreachImageAbsolutePath(filename, req.user.id);
+    if (!absPath) {
+        return res.status(404).json({ success: false, error: 'Image not found' });
+    }
+
+    res.setHeader('Content-Type', getOutreachMimeType(filename));
+    res.setHeader('Cache-Control', 'private, max-age=3600, must-revalidate');
+    res.sendFile(absPath);
+}));
+
+router.delete('/contacts/outreach/media/:filename', writeLimiter, asyncHandler(async (req, res) => {
+    if (!req.user || !req.user.id) {
+        return res.status(401).json({ success: false, error: 'Authentication required' });
+    }
+    const filename = String(req.params.filename || '');
+    const deleted = await deleteOutreachImage(filename, req.user.id);
+    if (!deleted) {
+        return res.status(404).json({ success: false, error: 'Media file not found or not authorized' });
+    }
+    res.json({ success: true, message: 'Media attachment removed' });
 }));
 
 router.get('/contacts/outreach/:jobId', (req, res) => {

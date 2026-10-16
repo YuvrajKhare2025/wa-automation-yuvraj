@@ -1200,6 +1200,13 @@ function setupProductImageUploader(prefix) {
         fileInput.click();
     });
 
+    dropzone.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            fileInput.click();
+        }
+    });
+
     const changeBtn = document.getElementById(`${prefix}ImageChangeBtn`) ||
                       document.getElementById(`${prefix}ImageReplaceBtn`) ||
                       previewContainer?.querySelector('.btn-secondary');
@@ -1245,6 +1252,7 @@ function setupProductImageUploader(prefix) {
         statusEl.textContent = 'Uploading…';
         dropzone.style.display = 'none';
         previewContainer.style.display = 'flex';
+        if (typeof hydrateIcons === 'function') hydrateIcons(previewContainer);
 
         try {
             const uploaded = await uploadProductImageFile(file);
@@ -1773,6 +1781,255 @@ function handleCsvFileSelected(e) {
 
 // ─── Bulk outreach ──────────────────────────────────────────
 let OUTREACH_POLL_TIMER = null;
+let CURRENT_OUTREACH_MEDIA = null;
+let IS_OUTREACH_UPLOADING = false;
+
+function formatOutreachFileSize(bytes) {
+    if (!bytes || bytes <= 0) return '0 B';
+    const units = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+    return `${(bytes / Math.pow(1024, i)).toFixed(i > 0 ? 1 : 0)} ${units[i]}`;
+}
+
+function resetOutreachMediaUploader() {
+    CURRENT_OUTREACH_MEDIA = null;
+    IS_OUTREACH_UPLOADING = false;
+
+    const fileInput = document.getElementById('outreachImageInput');
+    const attachCard = document.getElementById('outreachAttachCard');
+    const previewBar = document.getElementById('outreachPreviewBar');
+    const previewImg = document.getElementById('outreachImagePreview');
+    const filenameEl = document.getElementById('outreachImageFilename');
+    const metaEl = document.getElementById('outreachImageMeta');
+    const progressBar = document.getElementById('outreachUploadProgressBar');
+    const errorEl = document.getElementById('outreachMediaError');
+    const sendBtn = document.getElementById('outreachSendBtn');
+
+    if (fileInput) fileInput.value = '';
+    if (previewImg) previewImg.src = '';
+    if (filenameEl) filenameEl.textContent = '';
+    if (metaEl) {
+        metaEl.className = 'preview-status';
+        metaEl.textContent = '';
+    }
+    if (progressBar) progressBar.style.display = 'none';
+    if (errorEl) {
+        errorEl.style.display = 'none';
+        errorEl.textContent = '';
+    }
+    if (previewBar) previewBar.style.display = 'none';
+    if (attachCard) attachCard.style.display = 'flex';
+    if (sendBtn) sendBtn.disabled = false;
+}
+
+function uploadOutreachMediaFile(file, onProgress) {
+    return new Promise((resolve, reject) => {
+        const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        if (!validTypes.includes(file.type)) {
+            return reject(new Error('Unsupported format. Please select a genuine JPG, PNG, or WebP image.'));
+        }
+        const maxBytes = 5 * 1024 * 1024;
+        if (file.size > maxBytes) {
+            return reject(new Error('File exceeds the 5 MB maximum size limit.'));
+        }
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `${API}/api/contacts/outreach/upload-media`);
+
+        if (CURRENT_ACCESS_TOKEN) {
+            xhr.setRequestHeader('Authorization', `Bearer ${CURRENT_ACCESS_TOKEN}`);
+        }
+
+        if (xhr.upload && typeof onProgress === 'function') {
+            xhr.upload.onprogress = (e) => {
+                if (e.lengthComputable) {
+                    const percent = Math.round((e.loaded / e.total) * 100);
+                    onProgress(percent);
+                }
+            };
+        }
+
+        xhr.onload = () => {
+            try {
+                const data = JSON.parse(xhr.responseText);
+                if (xhr.status >= 200 && xhr.status < 300 && data.success) {
+                    resolve(data.data);
+                } else {
+                    reject(new Error(data.error || `Upload failed (${xhr.status})`));
+                }
+            } catch (err) {
+                reject(new Error('Invalid server response during media upload'));
+            }
+        };
+
+        xhr.onerror = () => {
+            reject(new Error('Network error occurred during media upload.'));
+        };
+
+        xhr.send(formData);
+    });
+}
+
+async function handleOutreachFileSelect(file) {
+    if (!file) return;
+
+    const errorEl = document.getElementById('outreachMediaError');
+    const attachCard = document.getElementById('outreachAttachCard');
+    const previewBar = document.getElementById('outreachPreviewBar');
+    const previewImg = document.getElementById('outreachImagePreview');
+    const filenameEl = document.getElementById('outreachImageFilename');
+    const metaEl = document.getElementById('outreachImageMeta');
+    const progressBar = document.getElementById('outreachUploadProgressBar');
+    const progressFill = document.getElementById('outreachUploadProgressFill');
+    const progressPercent = document.getElementById('outreachUploadProgressPercent');
+    const sendBtn = document.getElementById('outreachSendBtn');
+
+    if (errorEl) {
+        errorEl.style.display = 'none';
+        errorEl.textContent = '';
+    }
+
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!validTypes.includes(file.type)) {
+        if (errorEl) {
+            errorEl.textContent = 'Unsupported format. Please select a genuine JPG, PNG, or WebP image.';
+            errorEl.style.display = 'flex';
+        }
+        showToast('Unsupported format. Please select JPG, PNG, or WebP.', 'error');
+        return;
+    }
+    const maxBytes = 5 * 1024 * 1024;
+    if (file.size > maxBytes) {
+        if (errorEl) {
+            errorEl.textContent = 'File exceeds the 5 MB maximum size limit.';
+            errorEl.style.display = 'flex';
+        }
+        showToast('Image size exceeds 5MB limit', 'error');
+        return;
+    }
+
+    // Instant local preview
+    const localUrl = URL.createObjectURL(file);
+    if (previewImg) previewImg.src = localUrl;
+    if (filenameEl) filenameEl.textContent = file.name;
+    if (metaEl) {
+        metaEl.className = 'preview-status';
+        metaEl.textContent = `${formatOutreachFileSize(file.size)} • Uploading…`;
+    }
+    if (attachCard) attachCard.style.display = 'none';
+    if (previewBar) previewBar.style.display = 'flex';
+    if (progressBar) progressBar.style.display = 'block';
+    if (progressFill) progressFill.style.width = '0%';
+    if (progressPercent) progressPercent.textContent = '0%';
+    if (sendBtn) sendBtn.disabled = true;
+    IS_OUTREACH_UPLOADING = true;
+
+    try {
+        const uploaded = await uploadOutreachMediaFile(file, (percent) => {
+            if (progressFill) progressFill.style.width = `${percent}%`;
+            if (progressPercent) progressPercent.textContent = `${percent}%`;
+        });
+
+        CURRENT_OUTREACH_MEDIA = uploaded;
+        IS_OUTREACH_UPLOADING = false;
+
+        if (progressBar) progressBar.style.display = 'none';
+        if (metaEl) {
+            metaEl.className = 'preview-status';
+            metaEl.textContent = `${formatOutreachFileSize(uploaded.size || file.size)} • Ready to send`;
+        }
+        if (sendBtn) sendBtn.disabled = false;
+        showToast('Image attached', 'success');
+        if (typeof hydrateIcons === 'function') hydrateIcons(previewBar);
+    } catch (err) {
+        IS_OUTREACH_UPLOADING = false;
+        CURRENT_OUTREACH_MEDIA = null;
+        if (progressBar) progressBar.style.display = 'none';
+        if (previewBar) previewBar.style.display = 'none';
+        if (attachCard) attachCard.style.display = 'flex';
+        if (sendBtn) sendBtn.disabled = false;
+        if (errorEl) {
+            errorEl.textContent = err.message || 'Image upload failed';
+            errorEl.style.display = 'flex';
+        }
+        showToast(err.message || 'Image upload failed', 'error');
+    }
+}
+
+function setupOutreachMediaAttachment() {
+    const fileInput = document.getElementById('outreachImageInput');
+    const attachCard = document.getElementById('outreachAttachCard');
+    const attachBtn = document.getElementById('outreachAttachBtn');
+    const replaceBtn = document.getElementById('outreachReplaceBtn');
+    const removeBtn = document.getElementById('outreachRemoveBtn');
+
+    if (!fileInput) return;
+
+    attachBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        fileInput.click();
+    });
+
+    replaceBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        fileInput.click();
+    });
+
+    removeBtn?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        if (CURRENT_OUTREACH_MEDIA?.filename) {
+            const fname = CURRENT_OUTREACH_MEDIA.filename;
+            api(`/api/contacts/outreach/media/${encodeURIComponent(fname)}`, { method: 'DELETE' }).catch(() => {});
+        }
+        resetOutreachMediaUploader();
+        showToast('Image removed', 'info');
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        const files = e.target.files;
+        if (files && files.length > 0) {
+            handleOutreachFileSelect(files[0]);
+        }
+    });
+
+    if (attachCard) {
+        attachCard.addEventListener('click', (e) => {
+            if (e.target !== attachBtn && !attachBtn?.contains(e.target)) {
+                fileInput.click();
+            }
+        });
+        attachCard.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                fileInput.click();
+            }
+        });
+
+        ['dragenter', 'dragover'].forEach(name => {
+            attachCard.addEventListener(name, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                attachCard.classList.add('dragover');
+            });
+        });
+        ['dragleave', 'drop'].forEach(name => {
+            attachCard.addEventListener(name, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                attachCard.classList.remove('dragover');
+            });
+        });
+        attachCard.addEventListener('drop', (e) => {
+            const files = e.dataTransfer?.files;
+            if (files && files.length > 0) {
+                handleOutreachFileSelect(files[0]);
+            }
+        });
+    }
+}
 
 function openOutreachModal() {
     if (SELECTED_CONTACTS.size === 0) return;
@@ -1786,6 +2043,8 @@ function openOutreachModal() {
     document.getElementById('outreachRecipientCount').innerHTML = recipText;
 
     document.getElementById('outreachMessage').value = '';
+    resetOutreachMediaUploader();
+
     document.getElementById('outreachComposeView').style.display = '';
     document.getElementById('outreachProgressView').style.display = 'none';
     document.getElementById('outreachSendBtn').disabled = false;
@@ -1799,8 +2058,18 @@ function closeOutreachModal() {
 }
 
 async function submitOutreach() {
+    if (IS_OUTREACH_UPLOADING) {
+        showToast('Please wait for the image upload to complete', 'warning');
+        return;
+    }
+
     const message = document.getElementById('outreachMessage').value.trim();
-    if (!message) { showToast('Write a message first', 'error'); return; }
+    const mediaId = CURRENT_OUTREACH_MEDIA ? CURRENT_OUTREACH_MEDIA.mediaId : null;
+
+    if (!message && !mediaId) {
+        showToast('Please enter a message or attach an image', 'error');
+        return;
+    }
 
     const btn = document.getElementById('outreachSendBtn');
     btn.disabled = true;
@@ -1809,14 +2078,19 @@ async function submitOutreach() {
         const contactIds = Array.from(SELECTED_CONTACTS.keys());
         const { jobId, total } = await api('/api/contacts/outreach', {
             method: 'POST',
-            body: JSON.stringify({ contactIds, message })
+            body: JSON.stringify({ contactIds, message, mediaId })
         });
 
         document.getElementById('outreachComposeView').style.display = 'none';
         document.getElementById('outreachProgressView').style.display = 'block';
         document.getElementById('outreachDoneBtn').style.display = 'none';
         document.getElementById('outreachProgressList').innerHTML = '';
-        document.getElementById('outreachProgressSummary').textContent = `Sending to ${total} contacts — this runs in the background with a delay between each send, so it'll take a while. You can close this and it'll keep going.`;
+        
+        let typeDescription = 'text message';
+        if (mediaId && message) typeDescription = 'image with personalized caption';
+        else if (mediaId) typeDescription = 'image message';
+
+        document.getElementById('outreachProgressSummary').textContent = `Sending ${typeDescription} to ${total} contacts — this runs in the background with a delay between each send, so it'll take a while. You can close this and it'll keep going.`;
 
         pollOutreachJob(jobId);
     } catch (err) {
@@ -2794,6 +3068,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
     document.getElementById('outreachSendBtn').addEventListener('click', submitOutreach);
     document.getElementById('outreachDoneBtn').addEventListener('click', closeOutreachModal);
+    setupOutreachMediaAttachment();
 
     // ── Message search & filter ─────────────────────────────
     let messageSearchTimeout;

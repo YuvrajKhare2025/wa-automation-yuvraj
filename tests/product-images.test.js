@@ -125,6 +125,21 @@ describe('Product Images Feature Test Suite', () => {
         test('show_product function declaration exists in ai.js tools schema', () => {
             const aiModule = require('../src/services/ai');
             expect(typeof aiModule.generateReply).toBe('function');
+            expect(typeof aiModule.buildSystemInstruction).toBe('function');
+        });
+
+        test('buildSystemInstruction enforces that show_product is NOT called on greetings', () => {
+            const { buildSystemInstruction } = require('../src/services/ai');
+            const instruction = buildSystemInstruction({
+                systemPrompt: 'You are an assistant',
+                ownerName: 'Acme Owner',
+                businessName: 'Acme Corp',
+                hasProducts: true
+            });
+
+            expect(instruction).toContain('Product catalog & photos:');
+            expect(instruction).toContain('CRITICAL RULE: Do NOT call show_product for simple greetings');
+            expect(instruction).toContain('Only call the show_product tool when the customer actively asks for product details');
         });
     });
 

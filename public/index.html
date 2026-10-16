@@ -935,26 +935,60 @@
                                 <input type="url" id="prodUrl" placeholder="https://…">
                             </div>
                         </div>
-                        <div class="form-group" style="margin-bottom:14px">
-                            <label>Product Image (Optional — JPEG, PNG, WebP up to 5MB)</label>
+                        <!-- ── Product Image Upload (Enhanced UI) ── -->
+                        <div class="form-group product-media-section" style="margin-bottom:18px">
+                            <div class="product-media-header">
+                                <label class="product-media-label" for="prodImageFile">
+                                    <span class="product-media-icon-badge">
+                                        <span data-icon="image" aria-hidden="true"></span>
+                                    </span>
+                                    <span class="product-media-title">Product Image</span>
+                                    <span class="product-badge-optional">Optional</span>
+                                </label>
+                                <span class="product-media-specs">JPG, PNG, WEBP (Max 5MB)</span>
+                            </div>
+
                             <div class="product-image-uploader-box">
                                 <input type="file" id="prodImageFile" accept="image/jpeg,image/png,image/webp" style="display:none">
                                 <input type="hidden" id="prodImagePath">
-                                <div class="product-dropzone" id="prodDropzone">
-                                    <span data-icon="image" class="icon-inline" aria-hidden="true"></span>
-                                    <span id="prodDropzoneText">Click or drag image here (JPEG, PNG, WebP &bull; Max 5MB)</span>
+
+                                <div class="product-dropzone" id="prodDropzone" tabindex="0" role="button" aria-label="Attach product image">
+                                    <div class="product-dropzone-icon-bubble">
+                                        <span data-icon="upload-cloud" class="product-cloud-icon" aria-hidden="true"></span>
+                                    </div>
+                                    <div class="product-dropzone-info">
+                                        <div class="product-dropzone-main-text">
+                                            <button type="button" class="btn btn-secondary product-browse-btn" id="prodBrowseBtn" tabindex="-1">
+                                                <span data-icon="image" aria-hidden="true"></span>
+                                                <span>Choose Image</span>
+                                            </button>
+                                            <span class="product-dropzone-divider">or drag &amp; drop</span>
+                                        </div>
+                                        <div class="product-dropzone-subtext" id="prodDropzoneText">Click anywhere to browse image from your device</div>
+                                    </div>
                                 </div>
-                                <div class="product-image-preview-bar" id="prodPreviewContainer" style="display:none">
-                                    <div class="preview-img-container">
-                                        <img id="prodImagePreview" src="" alt="Preview" class="product-thumb-preview">
+
+                                <div class="product-image-preview-bar product-preview-card" id="prodPreviewContainer" style="display:none">
+                                    <div class="preview-img-container product-thumb-wrap">
+                                        <img id="prodImagePreview" src="" alt="Product Image Preview" class="product-thumb-preview">
                                     </div>
-                                    <div class="preview-meta">
-                                        <span id="prodImageFilename" class="preview-filename"></span>
-                                        <span id="prodImageStatus" class="preview-status"></span>
+                                    <div class="preview-meta product-preview-details">
+                                        <div class="product-preview-name-row">
+                                            <span id="prodImageFilename" class="preview-filename"></span>
+                                        </div>
+                                        <div class="product-preview-badge-row">
+                                            <span id="prodImageStatus" class="preview-status"></span>
+                                        </div>
                                     </div>
-                                    <div class="preview-actions">
-                                        <button type="button" class="btn btn-sm btn-secondary" id="prodImageChangeBtn">Change</button>
-                                        <button type="button" class="btn btn-sm btn-danger" id="prodImageRemoveBtn">Remove</button>
+                                    <div class="preview-actions product-preview-actions">
+                                        <button type="button" class="btn btn-sm btn-secondary product-action-btn" id="prodImageChangeBtn" title="Choose another image">
+                                            <span data-icon="refresh-cw" aria-hidden="true"></span>
+                                            <span>Replace</span>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-danger product-action-btn" id="prodImageRemoveBtn" title="Remove product image">
+                                            <span data-icon="trash-2" aria-hidden="true"></span>
+                                            <span>Remove</span>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -1262,13 +1296,86 @@
                     <label for="outreachMessage">Message</label>
                     <textarea id="outreachMessage" rows="5" placeholder="Hi {{name}}, ..."></textarea>
                     <div style="font-size:.78rem;color:var(--color-text-secondary);margin-top:4px">
-                        Use <code>{{name}}</code> to personalize with each contact's saved name.
+                        Use <code>{{name}}</code> to personalize with each contact's saved name. If an image is attached, this text will be sent as the image caption.
                     </div>
                 </div>
+
+                <!-- ── Outreach Media Attachment ── -->
+                <div class="form-group outreach-media-section">
+                    <div class="outreach-media-header">
+                        <label class="outreach-media-label" for="outreachImageInput">
+                            <span class="outreach-media-icon-badge">
+                                <span data-icon="paperclip" aria-hidden="true"></span>
+                            </span>
+                            <span class="outreach-media-title">Image Attachment</span>
+                            <span class="outreach-badge-optional">Optional</span>
+                        </label>
+                        <span class="outreach-media-specs">JPG, PNG, WEBP (Max 5MB)</span>
+                    </div>
+
+                    <input type="file" id="outreachImageInput" accept="image/jpeg,image/png,image/webp" style="display:none">
+
+                    <!-- Modern Enhanced Dropzone / Attach Card -->
+                    <div class="outreach-attach-card" id="outreachAttachCard" tabindex="0" role="button" aria-label="Attach an image for outreach">
+                        <div class="outreach-attach-icon-bubble">
+                            <span data-icon="upload-cloud" class="outreach-cloud-icon" aria-hidden="true"></span>
+                        </div>
+                        <div class="outreach-attach-info">
+                            <div class="outreach-attach-main-text">
+                                <button type="button" class="btn btn-secondary outreach-attach-btn" id="outreachAttachBtn">
+                                    <span data-icon="image" aria-hidden="true"></span>
+                                    <span>Attach Image</span>
+                                </button>
+                                <span class="outreach-attach-divider">or drag &amp; drop</span>
+                            </div>
+                            <div class="outreach-attach-subtext">Click anywhere in this box to browse from your device</div>
+                        </div>
+                    </div>
+
+                    <!-- Modern Progress bar (during upload) -->
+                    <div id="outreachUploadProgressBar" class="outreach-upload-progress" style="display:none">
+                        <div class="outreach-progress-header">
+                            <span id="outreachUploadProgressText" class="outreach-progress-title">Uploading image...</span>
+                            <span id="outreachUploadProgressPercent" class="outreach-progress-pct">0%</span>
+                        </div>
+                        <div class="outreach-progress-track">
+                            <div id="outreachUploadProgressFill" class="outreach-progress-fill"></div>
+                        </div>
+                    </div>
+
+                    <!-- Validation / upload error banner -->
+                    <div id="outreachMediaError" class="outreach-media-error" style="display:none"></div>
+
+                    <!-- Premium Preview Card (when image is selected/uploaded) -->
+                    <div class="product-image-preview-bar outreach-preview-card" id="outreachPreviewBar" style="display:none">
+                        <div class="preview-img-container outreach-thumb-wrap">
+                            <img id="outreachImagePreview" src="" alt="Image Attachment Preview" class="product-thumb-preview">
+                        </div>
+                        <div class="preview-meta outreach-preview-details">
+                            <div class="outreach-preview-name-row">
+                                <span id="outreachImageFilename" class="preview-filename"></span>
+                            </div>
+                            <div class="outreach-preview-badge-row">
+                                <span id="outreachImageMeta" class="preview-status"></span>
+                            </div>
+                        </div>
+                        <div class="preview-actions outreach-preview-actions">
+                            <button type="button" class="btn btn-sm btn-secondary outreach-action-btn" id="outreachReplaceBtn" title="Choose another image">
+                                <span data-icon="refresh-cw" aria-hidden="true"></span>
+                                <span>Replace</span>
+                            </button>
+                            <button type="button" class="btn btn-sm btn-danger outreach-action-btn" id="outreachRemoveBtn" title="Remove attached image">
+                                <span data-icon="trash-2" aria-hidden="true"></span>
+                                <span>Remove</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" id="outreachCancelBtn">Cancel</button>
                     <button type="button" class="btn btn-primary" id="outreachSendBtn">
-                        <span data-icon="send" aria-hidden="true"></span> Send
+                        <span data-icon="send" aria-hidden="true"></span> Send Outreach
                     </button>
                 </div>
             </div>
@@ -1320,25 +1427,58 @@
                     </div>
                 </div>
 
-                <div class="form-group" style="margin-top:12px;margin-bottom:16px">
-                    <label>Product Image</label>
+                <div class="form-group product-media-section" style="margin-top:14px;margin-bottom:18px">
+                    <div class="product-media-header">
+                        <label class="product-media-label" for="editProdImageFile">
+                            <span class="product-media-icon-badge">
+                                <span data-icon="image" aria-hidden="true"></span>
+                            </span>
+                            <span class="product-media-title">Product Image</span>
+                            <span class="product-badge-optional">Optional</span>
+                        </label>
+                        <span class="product-media-specs">JPG, PNG, WEBP (Max 5MB)</span>
+                    </div>
+
                     <div class="product-image-uploader-box">
                         <input type="file" id="editProdImageFile" accept="image/jpeg,image/png,image/webp" style="display:none">
-                        <div class="product-dropzone" id="editProdDropzone">
-                            <span data-icon="image" class="icon-inline" aria-hidden="true"></span>
-                            <span id="editProdDropzoneText">Click or drag image here to attach/replace</span>
+
+                        <div class="product-dropzone" id="editProdDropzone" tabindex="0" role="button" aria-label="Attach or replace product image">
+                            <div class="product-dropzone-icon-bubble">
+                                <span data-icon="upload-cloud" class="product-cloud-icon" aria-hidden="true"></span>
+                            </div>
+                            <div class="product-dropzone-info">
+                                <div class="product-dropzone-main-text">
+                                    <button type="button" class="btn btn-secondary product-browse-btn" id="editProdBrowseBtn" tabindex="-1">
+                                        <span data-icon="image" aria-hidden="true"></span>
+                                        <span>Choose Image</span>
+                                    </button>
+                                    <span class="product-dropzone-divider">or drag &amp; drop</span>
+                                </div>
+                                <div class="product-dropzone-subtext" id="editProdDropzoneText">Click anywhere to attach or replace image</div>
+                            </div>
                         </div>
-                        <div class="product-image-preview-bar" id="editProdPreviewContainer" style="display:none">
-                            <div class="preview-img-container">
-                                <img id="editProdImagePreview" src="" alt="Preview" class="product-thumb-preview">
+
+                        <div class="product-image-preview-bar product-preview-card" id="editProdPreviewContainer" style="display:none">
+                            <div class="preview-img-container product-thumb-wrap">
+                                <img id="editProdImagePreview" src="" alt="Product Image Preview" class="product-thumb-preview">
                             </div>
-                            <div class="preview-meta">
-                                <span id="editProdImageFilename" class="preview-filename"></span>
-                                <span id="editProdImageStatus" class="preview-status"></span>
+                            <div class="preview-meta product-preview-details">
+                                <div class="product-preview-name-row">
+                                    <span id="editProdImageFilename" class="preview-filename"></span>
+                                </div>
+                                <div class="product-preview-badge-row">
+                                    <span id="editProdImageStatus" class="preview-status"></span>
+                                </div>
                             </div>
-                            <div class="preview-actions">
-                                <button type="button" class="btn btn-sm btn-secondary" id="editProdImageReplaceBtn">Replace</button>
-                                <button type="button" class="btn btn-sm btn-danger" id="editProdImageRemoveBtn">Remove Image</button>
+                            <div class="preview-actions product-preview-actions">
+                                <button type="button" class="btn btn-sm btn-secondary product-action-btn" id="editProdImageReplaceBtn" title="Choose another image">
+                                    <span data-icon="refresh-cw" aria-hidden="true"></span>
+                                    <span>Replace</span>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-danger product-action-btn" id="editProdImageRemoveBtn" title="Remove product image">
+                                    <span data-icon="trash-2" aria-hidden="true"></span>
+                                    <span>Remove Image</span>
+                                </button>
                             </div>
                         </div>
                     </div>

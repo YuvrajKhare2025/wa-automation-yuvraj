@@ -26,13 +26,14 @@
  * resumable and re-sends to people who already received it.
  */
 
-const { sendTextMessage } = require('./whatsapp-client');
+const { sendTextMessage, sendMediaMessage, MessageMedia } = require('./whatsapp-client');
 const {
     logMessage, getContactByPhone, upsertContact, getMonthlyOutgoingCount,
     markContactOutreached, getUserById
 } = require('./database');
 const { tryNormalizePhone } = require('../utils/validate');
 const { checkAvailabilityNow, logOutreachEvent } = require('./google-calendar');
+const { getOutreachImageAbsolutePath } = require('./outreach-storage');
 
 const MAX_RECIPIENTS_PER_JOB = parseInt(process.env.MAX_OUTREACH_RECIPIENTS_PER_JOB, 10) || 25;
 const MIN_DELAY_MS = 3000;
@@ -63,6 +64,7 @@ function randomDelay() {
 }
 
 function renderTemplate(template, contact) {
+    if (!template) return '';
     return template.replace(/\{\{\s*name\s*\}\}/gi, contact.name || 'there');
 }
 
@@ -88,7 +90,24 @@ function countTotalRunningJobs() {
  * sending happens afterward, off the caller's stack. Poll
  * getOutreachJob(jobId) for progress.
  */
-function startOutreachJob(user, contacts, messageTemplate) {
+function startOutreachJob(user, contacts, messageTemplate = '', mediaId = null) {
+    const hasMessage = typeof messageTemplate === 'string' && messageTemplate.trim().length > 0;
+    const hasMedia = !!mediaId;
+    if (!hasMessage && !hasMedia) {
+        const err = new Error('Please enter a message or attach an image.');
+        err.status = 400;
+        throw err;
+    }
+
+    if (hasMedia) {
+        const filePath = getOutreachImageAbsolutePath(mediaId, user.id);
+        if (!filePath) {
+            const err = new Error('Attached media file not found or invalid.');
+            err.status = 400;
+            throw err;
+        }
+    }
+
     if (contacts.length > MAX_RECIPIENTS_PER_JOB) {
         const err = new Error(`Outreach is capped at ${MAX_RECIPIENTS_PER_JOB} recipients per send — you selected ${contacts.length}. Split into smaller batches.`);
         err.status = 400;
@@ -109,6 +128,7 @@ function startOutreachJob(user, contacts, messageTemplate) {
     const job = {
         id: jobId,
         userId: user.id,
+        mediaId: mediaId || null,
         total: contacts.length,
         sent: 0,
         failed: 0,
@@ -123,7 +143,7 @@ function startOutreachJob(user, contacts, messageTemplate) {
     // Deliberately not awaited. The rejection handler matters: an unhandled
     // rejection here would, given server.js's process.exit(1) policy, take
     // down every tenant because one send loop threw.
-    runJob(job, user, contacts, messageTemplate).catch(err => {
+    runJob(job, user, contacts, messageTemplate, mediaId).catch(err => {
         job.status = 'done';
         job.finishedAt = Date.now();
         job.error = 'The send stopped unexpectedly. Some messages may not have been sent.';
@@ -132,7 +152,24 @@ function startOutreachJob(user, contacts, messageTemplate) {
     return job;
 }
 
-async function runJob(job, user, contacts, messageTemplate) {
+async function runJob(job, user, contacts, messageTemplate = '', mediaId = null) {
+    let preloadedMedia = null;
+    if (mediaId) {
+        try {
+            const filePath = getOutreachImageAbsolutePath(mediaId, user.id);
+            if (!filePath) {
+                throw new Error('Attached image could not be found on disk');
+            }
+            preloadedMedia = MessageMedia.fromFilePath(filePath);
+        } catch (err) {
+            job.status = 'failed';
+            job.finishedAt = Date.now();
+            job.error = `Failed to prepare attached media: ${err.message}`;
+            console.error(`❌ Outreach job ${job.id} media preload failed:`, err.message);
+            return;
+        }
+    }
+
     for (const contact of contacts) {
         if (job.cancelRequested) {
             const remaining = job.total - job.sent - job.failed - job.skipped;
@@ -198,18 +235,32 @@ async function runJob(job, user, contacts, messageTemplate) {
             continue;
         }
 
-        const personalized = renderTemplate(messageTemplate, contact);
+        const personalized = messageTemplate ? renderTemplate(messageTemplate, contact) : '';
         try {
-            const result = await sendTextMessage(fresh.id, phone, personalized);
-            await logMessage(fresh.id, {
-                waMessageId: result?.id?._serialized || result?.messageId || null,
-                phone,
-                contactName: contact.name || '',
-                direction: 'outgoing',
-                messageType: 'text',
-                body: personalized,
-                status: 'sent'
-            });
+            let result;
+            if (preloadedMedia) {
+                result = await sendMediaMessage(fresh.id, phone, preloadedMedia, personalized);
+                await logMessage(fresh.id, {
+                    waMessageId: result?.id?._serialized || result?.messageId || null,
+                    phone,
+                    contactName: contact.name || '',
+                    direction: 'outgoing',
+                    messageType: 'image',
+                    body: personalized || '[Image]',
+                    status: 'sent'
+                });
+            } else {
+                result = await sendTextMessage(fresh.id, phone, personalized);
+                await logMessage(fresh.id, {
+                    waMessageId: result?.id?._serialized || result?.messageId || null,
+                    phone,
+                    contactName: contact.name || '',
+                    direction: 'outgoing',
+                    messageType: 'text',
+                    body: personalized,
+                    status: 'sent'
+                });
+            }
             if (!(await getContactByPhone(fresh.id, phone))) await upsertContact(fresh.id, phone, contact.name);
             await markContactOutreached(fresh.id, phone);
             job.sent++;
@@ -217,13 +268,13 @@ async function runJob(job, user, contacts, messageTemplate) {
             // Best-effort, deliberately not awaited before continuing: this
             // is a courtesy record, not something the send itself should
             // wait on, and logOutreachEvent already swallows its own errors.
-            logOutreachEvent(fresh.id, { phone, name: contact.name, message: personalized }).catch?.(() => {});
+            logOutreachEvent(fresh.id, { phone, name: contact.name, message: personalized || '[Image]' }).catch?.(() => {});
         } catch (err) {
             job.failed++;
             // Don't echo raw internals into a response body the browser shows.
             job.results.push({
                 phone, name: contact.name, status: 'failed',
-                reason: /not connected/i.test(err.message) ? 'WhatsApp disconnected' : 'Send failed'
+                reason: /not connected/i.test(err.message) ? 'WhatsApp disconnected' : (err.message || 'Send failed')
             });
             // A disconnected client will fail for every remaining recipient,
             // several seconds apart, for the rest of the job. Stop instead.

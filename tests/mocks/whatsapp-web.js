@@ -84,9 +84,30 @@ class LocalAuth {
     }
 }
 
+class MessageMedia {
+    constructor(mimetype, data, filename = null) {
+        this.mimetype = mimetype;
+        this.data = data;
+        this.filename = filename;
+    }
+
+    static fromFilePath(filePath) {
+        const fs = require('fs');
+        const path = require('path');
+        const data = fs.readFileSync(filePath).toString('base64');
+        const ext = path.extname(filePath).toLowerCase();
+        let mimetype = 'application/octet-stream';
+        if (ext === '.jpg' || ext === '.jpeg') mimetype = 'image/jpeg';
+        else if (ext === '.png') mimetype = 'image/png';
+        else if (ext === '.webp') mimetype = 'image/webp';
+        return new MessageMedia(mimetype, data, path.basename(filePath));
+    }
+}
+
 module.exports = {
     Client: FakeClient,
     LocalAuth,
+    MessageMedia,
     // Test helpers (not part of the real library's surface).
     __instances: instances,
     __reset() {

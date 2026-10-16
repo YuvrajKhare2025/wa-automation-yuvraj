@@ -936,6 +936,50 @@ async function sendProductMediaMessage(userId, phone, productIdOrData, caption =
     return await s.client.sendMessage(chatId, media, { caption: String(caption || '') });
 }
 
+/**
+ * Sends a media message (e.g., outreach image) with an optional caption.
+ * mediaInput can be either an already-constructed MessageMedia instance (for efficient batch reuse)
+ * or a filepath/filename.
+ */
+async function sendMediaMessage(userId, phone, mediaInput, caption = '') {
+    const s = getSession(Number(userId), false);
+    if (!s || !s.isConnected || !s.client) {
+        const err = new Error('WhatsApp client is not connected');
+        err.code = 'WA_NOT_CONNECTED';
+        err.status = 409;
+        throw err;
+    }
+    const digits = String(phone).replace(/\D/g, '');
+    if (digits.length < 7 || digits.length > 15) {
+        const err = new Error('Invalid destination phone number');
+        err.status = 400;
+        throw err;
+    }
+
+    let media = mediaInput;
+    if (typeof mediaInput === 'string') {
+        const { getOutreachImageAbsolutePath } = require('./outreach-storage');
+        let filePath = getOutreachImageAbsolutePath(mediaInput, userId) || mediaInput;
+        if (!fs.existsSync(filePath)) {
+            const err = new Error('Media file not found on disk');
+            err.status = 404;
+            throw err;
+        }
+        media = MessageMedia.fromFilePath(filePath);
+    } else if (!mediaInput || typeof mediaInput !== 'object' || !mediaInput.mimetype || !mediaInput.data) {
+        const err = new Error('Invalid media input provided');
+        err.status = 400;
+        throw err;
+    }
+
+    const chatId = `${digits}@c.us`;
+    const options = {};
+    if (caption && String(caption).trim().length > 0) {
+        options.caption = String(caption);
+    }
+    return await s.client.sendMessage(chatId, media, options);
+}
+
 module.exports = {
     initWhatsAppClient,
     destroyClientForUser,
@@ -946,6 +990,8 @@ module.exports = {
     getSessionMetrics,
     sendTextMessage,
     sendProductMediaMessage,
+    sendMediaMessage,
+    MessageMedia,
     authDataPath,
     MAX_CONCURRENT_SESSIONS,
     MAX_SSE_CLIENTS_PER_USER,

@@ -1084,6 +1084,318 @@ h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.015em; }
 .outreach-progress-row.ok { color: var(--color-success); }
 .outreach-progress-row.fail { color: var(--color-error); }
 
+/* ─── Outreach media attachment (Enhanced UI) ─── */
+.outreach-media-section {
+    margin-top: 16px;
+    margin-bottom: 20px;
+    background: #FAF8F5;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    transition: border-color 0.2s ease;
+}
+
+.outreach-media-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.outreach-media-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 !important;
+    cursor: default;
+}
+
+.outreach-media-icon-badge {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: rgba(16, 185, 129, 0.12);
+    color: var(--green-700);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.outreach-media-icon-badge svg {
+    width: 14px;
+    height: 14px;
+}
+
+.outreach-media-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--color-text-primary);
+}
+
+.outreach-badge-optional {
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 10px;
+    background: #E5E7EB;
+    color: #4B5563;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.outreach-media-specs {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+}
+
+/* ── Modern Dropzone & Attach Card ── */
+.outreach-attach-card {
+    border: 2px dashed #D1D5DB;
+    border-radius: var(--radius-md);
+    padding: 18px 20px;
+    background: #FFFFFF;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.outreach-attach-card:hover, .outreach-attach-card:focus, .outreach-attach-card.dragover {
+    border-color: var(--green-500);
+    background: rgba(16, 185, 129, 0.04);
+    box-shadow: 0 6px 20px -4px rgba(16, 185, 129, 0.18);
+    transform: translateY(-1px);
+    outline: none;
+}
+
+.outreach-attach-icon-bubble {
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.14) 0%, rgba(5, 150, 105, 0.08) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    color: var(--green-600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.25s ease, background-color 0.25s ease;
+}
+
+.outreach-attach-icon-bubble svg {
+    width: 22px;
+    height: 22px;
+}
+
+.outreach-attach-card:hover .outreach-attach-icon-bubble {
+    transform: scale(1.08) rotate(-3deg);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.22) 0%, rgba(5, 150, 105, 0.14) 100%);
+}
+
+.outreach-attach-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.outreach-attach-main-text {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.outreach-attach-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 7px 15px;
+    border-radius: 8px;
+    background: #FFFFFF;
+    color: var(--green-800);
+    border: 1.5px solid var(--green-500);
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.12);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.outreach-attach-btn:hover {
+    background: var(--green-500);
+    color: #FFFFFF;
+    border-color: var(--green-600);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    transform: translateY(-1px);
+}
+
+.outreach-attach-btn svg {
+    width: 15px;
+    height: 15px;
+}
+
+.outreach-attach-divider {
+    font-size: 0.82rem;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+}
+
+.outreach-attach-subtext {
+    font-size: 0.77rem;
+    color: var(--color-text-secondary);
+}
+
+/* ── Modern Progress Bar ── */
+.outreach-upload-progress {
+    margin-top: 12px;
+    padding: 10px 14px;
+    background: #FFFFFF;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+}
+
+.outreach-progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.78rem;
+    margin-bottom: 6px;
+}
+
+.outreach-progress-title {
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.outreach-progress-pct {
+    font-weight: 700;
+    color: var(--green-600);
+}
+
+.outreach-progress-track {
+    background: #E5E7EB;
+    height: 6px;
+    border-radius: 9999px;
+    overflow: hidden;
+}
+
+.outreach-progress-fill {
+    background: linear-gradient(90deg, #10B981, #059669);
+    width: 0%;
+    height: 100%;
+    transition: width 0.2s ease;
+    border-radius: 9999px;
+}
+
+/* ── Modern Preview Card ── */
+.outreach-preview-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    border: 1.5px solid rgba(16, 185, 129, 0.35);
+    border-radius: var(--radius-md);
+    background: #FFFFFF;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.08);
+    animation: fadeUp 0.25s var(--ease);
+}
+
+.outreach-thumb-wrap {
+    width: 58px;
+    height: 58px;
+    min-width: 58px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #E5E7EB;
+    background: #F3F4F6;
+    position: relative;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+}
+
+.outreach-preview-details {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.outreach-preview-name-row {
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.outreach-preview-badge-row .preview-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--green-700);
+}
+
+.outreach-preview-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.outreach-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 500;
+    font-size: 0.78rem;
+    padding: 6px 11px;
+    border-radius: 6px;
+}
+
+.outreach-action-btn svg {
+    width: 13px;
+    height: 13px;
+}
+
+.outreach-replace-btn:hover {
+    background: #E5E7EB;
+}
+
+.outreach-remove-btn {
+    background: #FEE2E2;
+    border-color: #FCA5A5;
+    color: #DC2626;
+}
+
+.outreach-remove-btn:hover {
+    background: #DC2626;
+    color: #FFFFFF;
+    border-color: #DC2626;
+}
+
+.outreach-media-error {
+    background: #FEE2E2;
+    color: #B91C1C;
+    border: 1px solid #FCA5A5;
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    font-size: 0.8rem;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
 /* ─── Quick-select (outreach batch picker) ──────────────────── */
 .quick-select-row {
     display: flex;
@@ -1552,73 +1864,208 @@ h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.015em; }
     word-break: break-word;
 }
 
-/* ─── Product Image Upload Drag & Drop Box ─── */
-.product-image-uploader-box {
-    margin-top: 6px;
+/* ─── Product Image Upload Drag & Drop Box (Enhanced UI) ─── */
+.product-media-section {
+    background: #FAF8F5;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 16px;
+    transition: border-color 0.2s ease;
 }
 
-.product-dropzone {
-    border: 2px dashed var(--color-border);
-    border-radius: var(--radius-md);
-    padding: 16px 20px;
-    text-align: center;
-    background: var(--cream-subtle);
-    cursor: pointer;
-    transition: all 0.2s var(--ease);
+.product-media-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.product-media-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 !important;
+    cursor: default;
+}
+
+.product-media-icon-badge {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    background: rgba(16, 185, 129, 0.12);
+    color: var(--green-700);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+}
+
+.product-media-icon-badge svg {
+    width: 14px;
+    height: 14px;
+}
+
+.product-media-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--color-text-primary);
+}
+
+.product-badge-optional {
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 10px;
+    background: #E5E7EB;
+    color: #4B5563;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.product-media-specs {
+    font-size: 0.75rem;
     color: var(--color-text-secondary);
-    font-size: 0.88rem;
     font-weight: 500;
 }
 
-.product-dropzone:hover, .product-dropzone.dragover {
-    border-color: var(--green-500);
-    background: rgba(16, 185, 129, 0.05);
-    color: var(--green-800);
+.product-image-uploader-box {
+    margin-top: 4px;
 }
 
-.product-image-preview-bar {
+.product-dropzone {
+    border: 2px dashed #D1D5DB;
+    border-radius: var(--radius-md);
+    padding: 18px 20px;
+    background: #FFFFFF;
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 10px 14px;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    background: #FFFFFF;
-    margin-top: 8px;
-    animation: fadeUp 0.25s var(--ease);
+    gap: 16px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
 }
 
-.preview-img-container {
-    width: 52px;
-    height: 52px;
-    min-width: 52px;
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    border: 1px solid var(--color-border);
-    background: var(--cream-subtle);
+.product-dropzone:hover, .product-dropzone:focus, .product-dropzone.dragover {
+    border-color: var(--green-500);
+    background: rgba(16, 185, 129, 0.04);
+    box-shadow: 0 6px 20px -4px rgba(16, 185, 129, 0.18);
+    transform: translateY(-1px);
+    outline: none;
 }
 
-.product-thumb-preview {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+.product-dropzone-icon-bubble {
+    width: 46px;
+    height: 46px;
+    min-width: 46px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.14) 0%, rgba(5, 150, 105, 0.08) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    color: var(--green-600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.25s ease, background-color 0.25s ease;
 }
 
-.preview-meta {
+.product-dropzone-icon-bubble svg {
+    width: 22px;
+    height: 22px;
+}
+
+.product-dropzone:hover .product-dropzone-icon-bubble {
+    transform: scale(1.08) rotate(-3deg);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.22) 0%, rgba(5, 150, 105, 0.14) 100%);
+}
+
+.product-dropzone-info {
     flex: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
 }
 
-.preview-filename {
+.product-dropzone-main-text {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.product-browse-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 7px 15px;
+    border-radius: 8px;
+    background: #FFFFFF;
+    color: var(--green-800);
+    border: 1.5px solid var(--green-500);
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.12);
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.product-browse-btn:hover {
+    background: var(--green-500);
+    color: #FFFFFF;
+    border-color: var(--green-600);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    transform: translateY(-1px);
+}
+
+.product-browse-btn svg {
+    width: 15px;
+    height: 15px;
+}
+
+.product-dropzone-divider {
     font-size: 0.82rem;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+}
+
+.product-dropzone-subtext {
+    font-size: 0.77rem;
+    color: var(--color-text-secondary);
+}
+
+.product-preview-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    border: 1.5px solid rgba(16, 185, 129, 0.35);
+    border-radius: var(--radius-md);
+    background: #FFFFFF;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.08);
+    margin-top: 8px;
+    animation: fadeUp 0.25s var(--ease);
+}
+
+.product-thumb-wrap {
+    width: 58px;
+    height: 58px;
+    min-width: 58px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #E5E7EB;
+    background: #F3F4F6;
+    position: relative;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.06);
+}
+
+.product-preview-details {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.product-preview-name-row {
+    font-size: 0.86rem;
     font-weight: 600;
     color: var(--color-text-primary);
     white-space: nowrap;
@@ -1626,19 +2073,42 @@ h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.015em; }
     text-overflow: ellipsis;
 }
 
-.preview-status {
-    font-size: 0.75rem;
-    color: var(--green-600);
+.product-preview-badge-row .preview-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--green-700);
 }
 
-.preview-status.error {
+.product-preview-badge-row .preview-status.error {
+    background: #FEE2E2;
     color: #DC2626;
 }
 
-.preview-actions {
+.product-preview-actions {
     display: flex;
-    gap: 6px;
+    gap: 8px;
     flex-shrink: 0;
+}
+
+.product-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 500;
+    font-size: 0.78rem;
+    padding: 6px 11px;
+    border-radius: 6px;
+}
+
+.product-action-btn svg {
+    width: 13px;
+    height: 13px;
 }
 
 /* Modal lightbox for product image zoom */
