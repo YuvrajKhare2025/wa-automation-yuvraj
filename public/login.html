@@ -1,65 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Log In — DIVYORA AI</title>
-<meta name="theme-color" content="#0A3325">
-<link rel="icon" type="image/png" href="/images/favicon.png">
-<link rel="stylesheet" href="css/landing.css?v=20261020_divyora1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log In — DIVYORA AI</title>
+    <meta name="theme-color" content="#0A3325">
+    <link rel="icon" type="image/png" href="/images/favicon.png">
+    <link rel="stylesheet" href="css/landing.css?v=20261020_divyora1">
 </head>
+
 <body>
 
-<div class="auth-shell">
-    <div class="auth-visual">
-        <div class="auth-visual-inner">
-            <span class="brand" style="color:#fff;display:flex;align-items:center;gap:12px;"><img src="/images/divyora-icon-transparent.png" alt="DIVYORA AI Logo" class="brand-logo-img" width="36" height="36"> DIVYORA AI</span>
-            <h2>Welcome back to your WhatsApp command center.</h2>
-            <p>Log in to see today's conversations, your AI-scored leads, and exactly where every deal stands in your pipeline.</p>
-            <ul class="auth-points">
-                <li><span data-icon="check-circle" aria-hidden="true"></span> Your own isolated WhatsApp connection</li>
-                <li><span data-icon="check-circle" aria-hidden="true"></span> Every chat auto-analyzed by AI</li>
-                <li><span data-icon="check-circle" aria-hidden="true"></span> A live sales pipeline, always up to date</li>
-            </ul>
+    <div class="auth-shell">
+        <div class="auth-visual">
+            <div class="auth-visual-inner">
+                <span class="brand" style="color:#fff;display:flex;align-items:center;gap:12px;"><img
+                        src="/images/divyora-icon.png" alt="DIVYORA AI Logo" class="brand-logo-img" width="36"
+                        height="36"> DIVYORA AI</span>
+                <h2>Welcome back to your WhatsApp command center.</h2>
+                <p>Log in to see today's conversations, your AI-scored leads, and exactly where every deal stands in
+                    your pipeline.</p>
+                <ul class="auth-points">
+                    <li><span data-icon="check-circle" aria-hidden="true"></span> Your own isolated WhatsApp connection
+                    </li>
+                    <li><span data-icon="check-circle" aria-hidden="true"></span> Every chat auto-analyzed by AI</li>
+                    <li><span data-icon="check-circle" aria-hidden="true"></span> A live sales pipeline, always up to
+                        date</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="auth-form-side">
+            <div class="auth-card">
+                <a href="/" class="back-home"><span data-icon="chevron-right" style="transform:rotate(180deg)"
+                        aria-hidden="true"></span> Back to home</a>
+                <span class="brand" style="display:flex;align-items:center;gap:10px;margin-bottom:18px;"><img
+                        src="/images/divyora-icon.png" alt="DIVYORA AI Logo" class="brand-logo-img" width="34"
+                        height="34"> DIVYORA AI</span>
+                <h1>Log in to your account</h1>
+                <p class="sub">Don't have an account? <a href="/signup">Sign up free</a></p>
+
+                <div class="form-error" id="formError"><span data-icon="triangle-alert" aria-hidden="true"></span><span
+                        id="formErrorText"></span></div>
+
+                <form id="loginForm" novalidate>
+                    <div class="form-field">
+                        <label for="email">Email address</label>
+                        <div class="input-wrap">
+                            <span class="icon-left" data-icon="mail" aria-hidden="true"></span>
+                            <input type="email" id="email" name="email" placeholder="you@business.com"
+                                autocomplete="email" required>
+                        </div>
+                    </div>
+                    <div class="form-field">
+                        <label for="password">Password</label>
+                        <div class="input-wrap">
+                            <span class="icon-left" data-icon="lock" aria-hidden="true"></span>
+                            <input type="password" id="password" name="password" placeholder="••••••••"
+                                autocomplete="current-password" required>
+                            <button type="button" class="pw-toggle" id="pwToggle" aria-label="Show password"><span
+                                    data-icon="eye" aria-hidden="true"></span></button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block btn-lg" id="submitBtn">
+                        <span data-icon="log-out" style="transform:rotate(180deg)" aria-hidden="true"></span> Log In
+                    </button>
+                </form>
+
+                <p class="auth-switch">New here? <a href="/signup">Create your free account</a></p>
+            </div>
         </div>
     </div>
 
-    <div class="auth-form-side">
-        <div class="auth-card">
-            <a href="/" class="back-home"><span data-icon="chevron-right" style="transform:rotate(180deg)" aria-hidden="true"></span> Back to home</a>
-            <span class="brand" style="display:flex;align-items:center;gap:10px;margin-bottom:18px;"><img src="/images/divyora-icon-transparent.png" alt="DIVYORA AI Logo" class="brand-logo-img" width="34" height="34"> DIVYORA AI</span>
-            <h1>Log in to your account</h1>
-            <p class="sub">Don't have an account? <a href="/signup">Sign up free</a></p>
-
-            <div class="form-error" id="formError"><span data-icon="triangle-alert" aria-hidden="true"></span><span id="formErrorText"></span></div>
-
-            <form id="loginForm" novalidate>
-                <div class="form-field">
-                    <label for="email">Email address</label>
-                    <div class="input-wrap">
-                        <span class="icon-left" data-icon="mail" aria-hidden="true"></span>
-                        <input type="email" id="email" name="email" placeholder="you@business.com" autocomplete="email" required>
-                    </div>
-                </div>
-                <div class="form-field">
-                    <label for="password">Password</label>
-                    <div class="input-wrap">
-                        <span class="icon-left" data-icon="lock" aria-hidden="true"></span>
-                        <input type="password" id="password" name="password" placeholder="••••••••" autocomplete="current-password" required>
-                        <button type="button" class="pw-toggle" id="pwToggle" aria-label="Show password"><span data-icon="eye" aria-hidden="true"></span></button>
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary btn-block btn-lg" id="submitBtn">
-                    <span data-icon="log-out" style="transform:rotate(180deg)" aria-hidden="true"></span> Log In
-                </button>
-            </form>
-
-            <p class="auth-switch">New here? <a href="/signup">Create your free account</a></p>
-        </div>
-    </div>
-</div>
-
-<script src="js/icons.js"></script>
-<script src="js/auth.js"></script>
+    <script src="js/icons.js"></script>
+    <script src="js/auth.js"></script>
 </body>
+
 </html>

@@ -1,1514 +1,1711 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DIVYORA AI — Dashboard</title>
-    <meta name="description" content="Manage your WhatsApp Business automation — chatbot rules, contacts, scheduled messages and analytics.">
+    <meta name="description"
+        content="Manage your WhatsApp Business automation — chatbot rules, contacts, scheduled messages and analytics.">
     <meta name="theme-color" content="#0D4530">
     <link rel="icon" type="image/png" href="/images/favicon.png">
     <link rel="stylesheet" href="css/style.css?v=20261020_divyora1">
 </head>
+
 <body>
 
-<!-- ══════════════════════════════════════════
+    <!-- ══════════════════════════════════════════
      SIDEBAR
 ══════════════════════════════════════════ -->
-<aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-        <div class="logo">
-            <div class="logo-icon">
-                <img src="/images/divyora-icon-transparent.png" alt="DIVYORA AI Logo" class="logo-img" width="30" height="30">
-            </div>
-            <div class="logo-text">
-                <span class="logo-title">DIVYORA AI</span>
-                <span class="logo-subtitle" id="modeIndicator">Where Vision Meets Intelligence</span>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <img src="/images/divyora-icon.png" alt="DIVYORA AI Logo" class="logo-img" width="30" height="30">
+                </div>
+                <div class="logo-text">
+                    <span class="logo-title">DIVYORA AI</span>
+                    <span class="logo-subtitle" id="modeIndicator">Where Vision Meets Intelligence</span>
+                </div>
             </div>
         </div>
-    </div>
 
-    <nav class="sidebar-nav" role="navigation" aria-label="Main navigation">
-        <a href="#" class="nav-item active" data-section="dashboard" id="nav-dashboard" role="menuitem">
-            <span class="nav-icon" data-icon="layout-dashboard" aria-hidden="true"></span>
-            <span class="nav-label">Dashboard</span>
-        </a>
-        <a href="#" class="nav-item" data-section="messages" id="nav-messages" role="menuitem">
-            <span class="nav-icon" data-icon="message-circle" aria-hidden="true"></span>
-            <span class="nav-label">Messages</span>
-        </a>
-        <a href="#" class="nav-item" data-section="leads" id="nav-leads" role="menuitem">
-            <span class="nav-icon" data-icon="target" aria-hidden="true"></span>
-            <span class="nav-label">Lead Analysis</span>
-        </a>
-        <a href="#" class="nav-item" data-section="crm" id="nav-crm" role="menuitem">
-            <span class="nav-icon" data-icon="trending-up" aria-hidden="true"></span>
-            <span class="nav-label">CRM</span>
-        </a>
-        <a href="#" class="nav-item" data-section="chatbot" id="nav-chatbot" role="menuitem">
-            <span class="nav-icon" data-icon="bot" aria-hidden="true"></span>
-            <span class="nav-label">Chatbot Rules</span>
-        </a>
-        <a href="#" class="nav-item" data-section="contacts" id="nav-contacts" role="menuitem">
-            <span class="nav-icon" data-icon="users" aria-hidden="true"></span>
-            <span class="nav-label">Contacts</span>
-        </a>
-        <a href="#" class="nav-item" data-section="scheduled" id="nav-scheduled" role="menuitem">
-            <span class="nav-icon" data-icon="clock" aria-hidden="true"></span>
-            <span class="nav-label">Scheduled</span>
-        </a>
-        <a href="#" class="nav-item" data-section="appointments" id="nav-appointments" role="menuitem">
-            <span class="nav-icon" data-icon="calendar-clock" aria-hidden="true"></span>
-            <span class="nav-label">Appointments</span>
-        </a>
-        <a href="#" class="nav-item" data-section="settings" id="nav-settings" role="menuitem">
-            <span class="nav-icon" data-icon="settings" aria-hidden="true"></span>
-            <span class="nav-label">Settings</span>
-        </a>
-        <a href="/admin" class="nav-item" id="nav-admin" role="menuitem" style="display:none">
-            <span class="nav-icon" data-icon="crown" aria-hidden="true"></span>
-            <span class="nav-label">Admin</span>
-        </a>
-    </nav>
+        <nav class="sidebar-nav" role="navigation" aria-label="Main navigation">
+            <a href="#" class="nav-item active" data-section="dashboard" id="nav-dashboard" role="menuitem">
+                <span class="nav-icon" data-icon="layout-dashboard" aria-hidden="true"></span>
+                <span class="nav-label">Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" data-section="messages" id="nav-messages" role="menuitem">
+                <span class="nav-icon" data-icon="message-circle" aria-hidden="true"></span>
+                <span class="nav-label">Messages</span>
+            </a>
+            <a href="#" class="nav-item" data-section="leads" id="nav-leads" role="menuitem">
+                <span class="nav-icon" data-icon="target" aria-hidden="true"></span>
+                <span class="nav-label">Lead Analysis</span>
+            </a>
+            <a href="#" class="nav-item" data-section="crm" id="nav-crm" role="menuitem">
+                <span class="nav-icon" data-icon="trending-up" aria-hidden="true"></span>
+                <span class="nav-label">CRM</span>
+            </a>
+            <a href="#" class="nav-item" data-section="chatbot" id="nav-chatbot" role="menuitem">
+                <span class="nav-icon" data-icon="bot" aria-hidden="true"></span>
+                <span class="nav-label">Chatbot Rules</span>
+            </a>
+            <a href="#" class="nav-item" data-section="contacts" id="nav-contacts" role="menuitem">
+                <span class="nav-icon" data-icon="users" aria-hidden="true"></span>
+                <span class="nav-label">Contacts</span>
+            </a>
+            <a href="#" class="nav-item" data-section="scheduled" id="nav-scheduled" role="menuitem">
+                <span class="nav-icon" data-icon="clock" aria-hidden="true"></span>
+                <span class="nav-label">Scheduled</span>
+            </a>
+            <a href="#" class="nav-item" data-section="appointments" id="nav-appointments" role="menuitem">
+                <span class="nav-icon" data-icon="calendar-clock" aria-hidden="true"></span>
+                <span class="nav-label">Appointments</span>
+            </a>
+            <a href="#" class="nav-item" data-section="settings" id="nav-settings" role="menuitem">
+                <span class="nav-icon" data-icon="settings" aria-hidden="true"></span>
+                <span class="nav-label">Settings</span>
+            </a>
+            <a href="/admin" class="nav-item" id="nav-admin" role="menuitem" style="display:none">
+                <span class="nav-icon" data-icon="crown" aria-hidden="true"></span>
+                <span class="nav-label">Admin</span>
+            </a>
+        </nav>
 
-    <div class="sidebar-footer">
-        <div class="connection-status" id="connectionStatus" aria-live="polite">
-            <span class="status-dot" aria-hidden="true"></span>
-            <span class="status-text">Checking…</span>
+        <div class="sidebar-footer">
+            <div class="connection-status" id="connectionStatus" aria-live="polite">
+                <span class="status-dot" aria-hidden="true"></span>
+                <span class="status-text">Checking…</span>
+            </div>
         </div>
-    </div>
-</aside>
+    </aside>
 
-<!-- ── Top Bar (desktop) ── -->
-<header class="topbar" id="topbar" role="banner">
-    <div class="topbar-search">
-        <input type="search" id="globalSearch" placeholder="Search messages, contacts…" aria-label="Global search">
-    </div>
-    <div class="topbar-spacer"></div>
-    <div class="topbar-actions">
-        <button class="topbar-icon-btn" id="refreshBtn" title="Refresh" aria-label="Refresh current section"><span data-icon="refresh-cw" aria-hidden="true"></span></button>
-        <span class="topbar-user-name" id="topbarUserName" title="Account"></span>
-        <button class="topbar-icon-btn" id="logoutBtn" title="Log out" aria-label="Log out"><span data-icon="log-out" aria-hidden="true"></span></button>
-        <div class="topbar-avatar" id="topbarAvatar" title="Account" aria-label="Account menu">WA</div>
-    </div>
-</header>
+    <!-- ── Top Bar (desktop) ── -->
+    <header class="topbar" id="topbar" role="banner">
+        <div class="topbar-search">
+            <input type="search" id="globalSearch" placeholder="Search messages, contacts…" aria-label="Global search">
+        </div>
+        <div class="topbar-spacer"></div>
+        <div class="topbar-actions">
+            <button class="topbar-icon-btn" id="refreshBtn" title="Refresh" aria-label="Refresh current section"><span
+                    data-icon="refresh-cw" aria-hidden="true"></span></button>
+            <span class="topbar-user-name" id="topbarUserName" title="Account"></span>
+            <button class="topbar-icon-btn" id="logoutBtn" title="Log out" aria-label="Log out"><span
+                    data-icon="log-out" aria-hidden="true"></span></button>
+            <div class="topbar-avatar" id="topbarAvatar" title="Account" aria-label="Account menu">WA</div>
+        </div>
+    </header>
 
-<!-- ── Mobile Header ── -->
-<header class="mobile-header" id="mobileHeader" role="banner">
-    <button class="hamburger" id="menuToggle" aria-label="Open navigation menu" aria-expanded="false" aria-controls="sidebar">
-        <span></span><span></span><span></span>
-    </button>
-    <span class="mobile-title">DIVYORA AI</span>
-</header>
+    <!-- ── Mobile Header ── -->
+    <header class="mobile-header" id="mobileHeader" role="banner">
+        <button class="hamburger" id="menuToggle" aria-label="Open navigation menu" aria-expanded="false"
+            aria-controls="sidebar">
+            <span></span><span></span><span></span>
+        </button>
+        <span class="mobile-title">DIVYORA AI</span>
+    </header>
 
-<div class="overlay" id="overlay" role="presentation"></div>
+    <div class="overlay" id="overlay" role="presentation"></div>
 
-<!-- ══════════════════════════════════════════
+    <!-- ══════════════════════════════════════════
      MAIN CONTENT
 ══════════════════════════════════════════ -->
-<main class="main-content" id="mainContent" role="main">
+    <main class="main-content" id="mainContent" role="main">
 
-    <!-- ── DASHBOARD ── -->
-    <section class="section active" id="section-dashboard" aria-labelledby="dashboard-heading">
-        <div class="page-inner">
-            <div class="section-header">
-                <h1 id="dashboard-heading">Dashboard</h1>
-                <p class="section-subtitle">Everything happening in your WhatsApp business, at a glance — click any tile to jump in</p>
-            </div>
+        <!-- ── DASHBOARD ── -->
+        <section class="section active" id="section-dashboard" aria-labelledby="dashboard-heading">
+            <div class="page-inner">
+                <div class="section-header">
+                    <h1 id="dashboard-heading">Dashboard</h1>
+                    <p class="section-subtitle">Everything happening in your WhatsApp business, at a glance — click any
+                        tile to jump in</p>
+                </div>
 
-            <!-- Error banner placeholder -->
-            <div id="dashboardError" style="display:none"></div>
+                <!-- Error banner placeholder -->
+                <div id="dashboardError" style="display:none"></div>
 
-            <!-- ── Messages ── -->
-            <div class="stat-group-title"><span data-icon="message-circle" aria-hidden="true"></span> Messages</div>
-            <div class="stats-grid" role="list" aria-label="Message metrics">
-                <div class="stat-card stat-clickable" role="listitem" data-goto="messages" title="Open Messages">
-                    <div class="stat-icon sent" data-icon="send" aria-hidden="true"></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="valSentToday">0</span>
-                        <span class="stat-label">Sent Today</span>
-                    </div>
-                </div>
-                <div class="stat-card stat-clickable" role="listitem" data-goto="messages" title="Open Messages">
-                    <div class="stat-icon received" data-icon="inbox" aria-hidden="true"></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="valReceivedToday">0</span>
-                        <span class="stat-label">Received Today</span>
-                    </div>
-                </div>
-                <div class="stat-card stat-clickable" role="listitem" data-goto="messages" title="Open Messages">
-                    <div class="stat-icon total" data-icon="layers" aria-hidden="true"></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="valTotalMessages">0</span>
-                        <span class="stat-label">Total Messages</span>
-                    </div>
-                </div>
-                <div class="stat-card stat-clickable" role="listitem" data-goto="scheduled" title="Open Scheduled">
-                    <div class="stat-icon scheduled" data-icon="clock" aria-hidden="true"></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="valPendingScheduled">0</span>
-                        <span class="stat-label">Scheduled Pending</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ── Leads ── -->
-            <div class="stat-group-title"><span data-icon="target" aria-hidden="true"></span> Leads</div>
-            <div class="stats-grid" role="list" aria-label="Lead metrics">
-                <div class="stat-card stat-clickable" role="listitem" data-goto="leads" title="Open Lead Analysis">
-                    <div class="stat-icon analyzed" data-icon="brain" aria-hidden="true"></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="valDashLeadsTotal">0</span>
-                        <span class="stat-label">Analyzed Chats</span>
-                    </div>
-                </div>
-                <div class="stat-card stat-clickable" role="listitem" data-goto="leads" title="Open Lead Analysis">
-                    <div class="stat-icon interested" data-icon="heart" aria-hidden="true"></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="valDashInterested">0</span>
-                        <span class="stat-label">Interested Leads</span>
-                    </div>
-                </div>
-                <div class="stat-card stat-clickable" role="listitem" data-goto="leads" title="Open Lead Analysis">
-                    <div class="stat-icon hot" data-icon="flame" aria-hidden="true"></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="valDashHighPriority">0</span>
-                        <span class="stat-label">High Priority</span>
-                    </div>
-                </div>
-                <div class="stat-card stat-clickable" role="listitem" data-goto="leads" title="Open Lead Analysis">
-                    <div class="stat-icon awaiting" data-icon="hourglass" aria-hidden="true"></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="valDashAwaiting">0</span>
-                        <span class="stat-label">Awaiting Analysis</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ── Sales Pipeline ── -->
-            <div class="stat-group-title"><span data-icon="briefcase" aria-hidden="true"></span> Sales Pipeline</div>
-            <div class="stats-grid" role="list" aria-label="Sales metrics">
-                <div class="stat-card stat-clickable" role="listitem" data-goto="crm" title="Open CRM">
-                    <div class="stat-icon money" data-icon="wallet" aria-hidden="true"></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="valDashPipeline">0</span>
-                        <span class="stat-label">Pipeline Value</span>
-                    </div>
-                </div>
-                <div class="stat-card stat-clickable" role="listitem" data-goto="crm" title="Open CRM">
-                    <div class="stat-icon deals" data-icon="folder-open" aria-hidden="true"></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="valDashOpenDeals">0</span>
-                        <span class="stat-label">Open Deals</span>
-                    </div>
-                </div>
-                <div class="stat-card stat-clickable" role="listitem" data-goto="crm" title="Open CRM">
-                    <div class="stat-icon won" data-icon="trophy" aria-hidden="true"></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="valDashWon">0</span>
-                        <span class="stat-label">Deals Won</span>
-                    </div>
-                </div>
-                <div class="stat-card stat-clickable" role="listitem" data-goto="crm" title="Open CRM">
-                    <div class="stat-icon followups" data-icon="calendar-clock" aria-hidden="true"></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="valDashFollowups">0</span>
-                        <span class="stat-label">Follow-ups Due</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ── Workspace ── -->
-            <div class="stat-group-title"><span data-icon="settings" aria-hidden="true"></span> Workspace</div>
-            <div class="stats-grid" role="list" aria-label="Workspace status">
-                <div class="stat-card stat-clickable" role="listitem" data-goto="contacts" title="Open Contacts">
-                    <div class="stat-icon contacts" data-icon="users" aria-hidden="true"></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="valContacts">0</span>
-                        <span class="stat-label">Total Contacts</span>
-                    </div>
-                </div>
-                <div class="stat-card stat-clickable" role="listitem" data-goto="chatbot" title="Open Chatbot Rules">
-                    <div class="stat-icon rules" data-icon="bot" aria-hidden="true"></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="valActiveRules">0</span>
-                        <span class="stat-label">Active Rules</span>
-                    </div>
-                </div>
-                <div class="stat-card stat-clickable" role="listitem" data-goto="settings" title="Open Settings">
-                    <div class="stat-icon whatsapp" data-icon="smartphone" aria-hidden="true"></div>
-                    <div class="stat-info">
-                        <span class="stat-value stat-value-text" id="valWaStatus">—</span>
-                        <span class="stat-label">WhatsApp</span>
-                    </div>
-                </div>
-                <div class="stat-card stat-clickable" role="listitem" data-goto="settings" title="Open Settings">
-                    <div class="stat-icon ai" data-icon="sparkles" aria-hidden="true"></div>
-                    <div class="stat-info">
-                        <span class="stat-value stat-value-text" id="valAiStatus">—</span>
-                        <span class="stat-label">AI Persona</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ── MESSAGES ── -->
-    <section class="section" id="section-messages" aria-labelledby="messages-heading">
-        <div class="page-inner">
-            <div class="section-header">
-                <h1 id="messages-heading">Messages</h1>
-                <p class="section-subtitle">All incoming and outgoing messages</p>
-            </div>
-
-            <div id="messagesError" style="display:none"></div>
-
-
-
-            <div class="toolbar">
-                <div class="search-box">
-                    <input type="search" id="messageSearch" placeholder="Search by phone number…" aria-label="Search messages">
-                </div>
-                <div class="filter-group">
-                    <select id="messageFilter" aria-label="Filter by direction">
-                        <option value="">All Messages</option>
-                        <option value="incoming">Incoming</option>
-                        <option value="outgoing">Outgoing</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="table-container">
-                    <table class="data-table" aria-label="Messages log">
-                        <thead>
-                            <tr>
-                                <th scope="col">Direction</th>
-                                <th scope="col">Phone / Name</th>
-                                <th scope="col">Message</th>
-                                <th scope="col">Status</th>
-                                <th scope="col">Time</th>
-                            </tr>
-                        </thead>
-                        <tbody id="messagesBody">
-                            <tr><td colspan="5" class="empty-state">Loading messages…</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ── LEAD ANALYSIS ── -->
-    <section class="section" id="section-leads" aria-labelledby="leads-heading">
-        <div class="page-inner">
-            <div class="section-header">
-                <h1 id="leads-heading">Lead Analysis</h1>
-                <p class="section-subtitle">AI-powered summaries, interest detection, issues and priorities for every conversation</p>
-            </div>
-
-            <div id="leadsError" style="display:none"></div>
-
-            <!-- Lead stats -->
-            <div class="stats-grid" role="list" aria-label="Lead metrics">
-                <div class="stat-card" role="listitem">
-                    <div class="stat-icon sent" data-icon="target" aria-hidden="true"></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="valLeadsTotal">0</span>
-                        <span class="stat-label">Analyzed Chats</span>
-                    </div>
-                </div>
-                <div class="stat-card" role="listitem">
-                    <div class="stat-icon received" data-icon="check-circle" aria-hidden="true"></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="valLeadsInterested">0</span>
-                        <span class="stat-label">Interested</span>
-                    </div>
-                </div>
-                <div class="stat-card" role="listitem">
-                    <div class="stat-icon rules" data-icon="flame" aria-hidden="true"></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="valLeadsHigh">0</span>
-                        <span class="stat-label">High Priority</span>
-                    </div>
-                </div>
-                <div class="stat-card" role="listitem">
-                    <div class="stat-icon contacts" data-icon="hourglass" aria-hidden="true"></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="valLeadsPending">0</span>
-                        <span class="stat-label">Awaiting Analysis</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="toolbar">
-                <div class="filter-group">
-                    <select id="leadInterestFilter" aria-label="Filter by interest">
-                        <option value="">All Interest Levels</option>
-                        <option value="interested">Interested</option>
-                        <option value="neutral">Neutral</option>
-                        <option value="not_interested">Not Interested</option>
-                        <option value="unclear">Unclear</option>
-                    </select>
-                    <select id="leadPriorityFilter" aria-label="Filter by priority">
-                        <option value="">All Priorities</option>
-                        <option value="high">High</option>
-                        <option value="medium">Medium</option>
-                        <option value="low">Low</option>
-                    </select>
-                </div>
-                <div class="topbar-spacer"></div>
-                <button class="btn btn-primary" id="analyzeAllBtn" type="button">
-                    <span class="btn-icon" data-icon="brain" aria-hidden="true"></span> Analyze All Chats
-                </button>
-            </div>
-
-            <div id="leadsList" aria-live="polite">
-                <div class="empty-state">
-                    <span class="empty-state-icon icon" data-icon="target" aria-hidden="true"></span>
-                    <div class="empty-state-title">Loading lead analyses…</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ── CRM ── -->
-    <section class="section" id="section-crm" aria-labelledby="crm-heading">
-        <div class="page-inner page-inner-wide">
-            <div class="section-header">
-                <h1 id="crm-heading">CRM Pipeline</h1>
-                <p class="section-subtitle">Track every conversation as a deal — auto-filled by AI, managed by you</p>
-            </div>
-
-            <div id="crmError" style="display:none"></div>
-
-            <!-- CRM stats -->
-            <div class="stats-grid" role="list" aria-label="CRM metrics">
-                <div class="stat-card" role="listitem">
-                    <div class="stat-icon sent" data-icon="wallet" aria-hidden="true"></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="valCrmPipeline">0</span>
-                        <span class="stat-label">Pipeline Value</span>
-                    </div>
-                </div>
-                <div class="stat-card" role="listitem">
-                    <div class="stat-icon received" data-icon="folder-open" aria-hidden="true"></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="valCrmOpen">0</span>
-                        <span class="stat-label">Open Deals</span>
-                    </div>
-                </div>
-                <div class="stat-card" role="listitem">
-                    <div class="stat-icon rules" data-icon="trophy" aria-hidden="true"></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="valCrmWon">0</span>
-                        <span class="stat-label">Won</span>
-                    </div>
-                </div>
-                <div class="stat-card" role="listitem">
-                    <div class="stat-icon contacts" data-icon="calendar-clock" aria-hidden="true"></div>
-                    <div class="stat-info">
-                        <span class="stat-value" id="valCrmFollowups">0</span>
-                        <span class="stat-label">Follow-ups Due</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Analytics charts -->
-            <div class="charts-grid" id="crmChartsGrid">
-                <div class="card chart-card">
-                    <h2 class="card-title"><span data-icon="pie-chart" data-icon-class="icon-inline" aria-hidden="true"></span>Open Deals by Stage</h2>
-                    <div class="chart-flex">
-                        <div class="chart-canvas-wrap chart-donut"><canvas id="chartStageDeals" role="img" aria-label="Donut chart of open deals per pipeline stage"></canvas></div>
-                        <div class="chart-legend" id="legendStageDeals"></div>
-                    </div>
-                </div>
-                <div class="card chart-card">
-                    <h2 class="card-title"><span data-icon="wallet" data-icon-class="icon-inline" aria-hidden="true"></span>Pipeline Value by Stage</h2>
-                    <div class="chart-canvas-wrap chart-bars"><canvas id="chartStageValue" role="img" aria-label="Bar chart of deal value per pipeline stage"></canvas></div>
-                </div>
-                <div class="card chart-card">
-                    <h2 class="card-title"><span data-icon="target" data-icon-class="icon-inline" aria-hidden="true"></span>Lead Interest Mix</h2>
-                    <div class="chart-flex">
-                        <div class="chart-canvas-wrap chart-donut"><canvas id="chartInterest" role="img" aria-label="Donut chart of leads by interest level"></canvas></div>
-                        <div class="chart-legend" id="legendInterest"></div>
-                    </div>
-                </div>
-                <div class="card chart-card">
-                    <h2 class="card-title"><span data-icon="activity" data-icon-class="icon-inline" aria-hidden="true"></span>Message Activity — Last 7 Days</h2>
-                    <div class="chart-canvas-wrap chart-bars"><canvas id="chartActivity" role="img" aria-label="Line chart of incoming and outgoing messages over the last seven days"></canvas></div>
-                </div>
-            </div>
-
-            <div class="toolbar">
-                <div class="filter-group">
-                    <button class="btn btn-secondary btn-sm" id="addDealBtn" type="button"><span class="btn-icon" data-icon="plus" aria-hidden="true"></span> Add Deal</button>
-                </div>
-                <div class="topbar-spacer"></div>
-                <small style="color:var(--color-text-secondary)">Deals are auto-created when the AI analyzes a sales chat. Personal chats are skipped.</small>
-            </div>
-
-            <!-- Add deal form (hidden by default) -->
-            <div class="card" id="addDealCard" style="display:none">
-                <h2 class="card-title">Add Deal Manually</h2>
-                <form id="addDealForm" novalidate>
-                    <div class="form-row-3">
-                        <div class="form-group">
-                            <label for="dealPhone">Phone Number</label>
-                            <input type="tel" id="dealPhone" placeholder="e.g. 919876543210" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="dealName">Contact Name</label>
-                            <input type="text" id="dealName" placeholder="Name">
-                        </div>
-                        <div class="form-group">
-                            <label for="dealValue">Deal Value</label>
-                            <input type="number" id="dealValue" placeholder="0" min="0" step="any">
+                <!-- ── Messages ── -->
+                <div class="stat-group-title"><span data-icon="message-circle" aria-hidden="true"></span> Messages</div>
+                <div class="stats-grid" role="list" aria-label="Message metrics">
+                    <div class="stat-card stat-clickable" role="listitem" data-goto="messages" title="Open Messages">
+                        <div class="stat-icon sent" data-icon="send" aria-hidden="true"></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="valSentToday">0</span>
+                            <span class="stat-label">Sent Today</span>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="dealStage">Stage</label>
-                            <select id="dealStage">
-                                <option value="new">New</option>
-                                <option value="contacted">Contacted</option>
-                                <option value="qualified">Qualified</option>
-                                <option value="proposal">Proposal</option>
-                                <option value="negotiation">Negotiation</option>
-                                <option value="won">Won</option>
-                                <option value="lost">Lost</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="dealProduct">Product / Service</label>
-                            <input type="text" id="dealProduct" placeholder="What are they interested in?">
+                    <div class="stat-card stat-clickable" role="listitem" data-goto="messages" title="Open Messages">
+                        <div class="stat-icon received" data-icon="inbox" aria-hidden="true"></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="valReceivedToday">0</span>
+                            <span class="stat-label">Received Today</span>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Add Deal</button>
-                </form>
-            </div>
-
-            <!-- Kanban board -->
-            <div class="kanban-board" id="kanbanBoard" aria-label="Sales pipeline board">
-                <div class="empty-state">
-                    <span class="empty-state-icon icon" data-icon="trending-up" aria-hidden="true"></span>
-                    <div class="empty-state-title">Loading pipeline…</div>
+                    <div class="stat-card stat-clickable" role="listitem" data-goto="messages" title="Open Messages">
+                        <div class="stat-icon total" data-icon="layers" aria-hidden="true"></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="valTotalMessages">0</span>
+                            <span class="stat-label">Total Messages</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-clickable" role="listitem" data-goto="scheduled" title="Open Scheduled">
+                        <div class="stat-icon scheduled" data-icon="clock" aria-hidden="true"></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="valPendingScheduled">0</span>
+                            <span class="stat-label">Scheduled Pending</span>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- ── CHATBOT RULES ── -->
-    <section class="section" id="section-chatbot" aria-labelledby="chatbot-heading">
-        <div class="page-inner">
-            <div class="section-header">
-                <h1 id="chatbot-heading">Chatbot Rules</h1>
-                <p class="section-subtitle">Configure auto-reply rules for incoming messages</p>
-            </div>
-
-            <div id="chatbotError" style="display:none"></div>
-
-            <!-- Test widget -->
-            <div class="card test-card">
-                <h2 class="card-title">Test a Message</h2>
-                <div class="test-form">
-                    <input type="text" id="testMessage" placeholder="e.g. hello, what are your prices?" aria-label="Test message input">
-                    <button class="btn btn-secondary" id="testChatbotBtn" type="button">Test</button>
+                <!-- ── Leads ── -->
+                <div class="stat-group-title"><span data-icon="target" aria-hidden="true"></span> Leads</div>
+                <div class="stats-grid" role="list" aria-label="Lead metrics">
+                    <div class="stat-card stat-clickable" role="listitem" data-goto="leads" title="Open Lead Analysis">
+                        <div class="stat-icon analyzed" data-icon="brain" aria-hidden="true"></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="valDashLeadsTotal">0</span>
+                            <span class="stat-label">Analyzed Chats</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-clickable" role="listitem" data-goto="leads" title="Open Lead Analysis">
+                        <div class="stat-icon interested" data-icon="heart" aria-hidden="true"></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="valDashInterested">0</span>
+                            <span class="stat-label">Interested Leads</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-clickable" role="listitem" data-goto="leads" title="Open Lead Analysis">
+                        <div class="stat-icon hot" data-icon="flame" aria-hidden="true"></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="valDashHighPriority">0</span>
+                            <span class="stat-label">High Priority</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-clickable" role="listitem" data-goto="leads" title="Open Lead Analysis">
+                        <div class="stat-icon awaiting" data-icon="hourglass" aria-hidden="true"></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="valDashAwaiting">0</span>
+                            <span class="stat-label">Awaiting Analysis</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="test-result" id="testResult" style="display:none;" role="alert" aria-live="polite"></div>
-            </div>
 
-            <!-- Add Rule -->
-            <div class="card">
-                <h2 class="card-title">Add New Rule</h2>
-                <form id="addRuleForm" novalidate>
-                    <div class="form-row-3">
-                        <div class="form-group">
-                            <label for="ruleTrigger">Trigger Keyword</label>
-                            <input type="text" id="ruleTrigger" placeholder="e.g. price" required autocomplete="off">
-                        </div>
-                        <div class="form-group">
-                            <label for="ruleMatchType">Match Type</label>
-                            <select id="ruleMatchType">
-                                <option value="contains">Contains</option>
-                                <option value="exact">Exact</option>
-                                <option value="startswith">Starts With</option>
-                                <option value="regex">Regex</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="rulePriority">Priority</label>
-                            <input type="number" id="rulePriority" value="5" min="0" max="100">
+                <!-- ── Sales Pipeline ── -->
+                <div class="stat-group-title"><span data-icon="briefcase" aria-hidden="true"></span> Sales Pipeline
+                </div>
+                <div class="stats-grid" role="list" aria-label="Sales metrics">
+                    <div class="stat-card stat-clickable" role="listitem" data-goto="crm" title="Open CRM">
+                        <div class="stat-icon money" data-icon="wallet" aria-hidden="true"></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="valDashPipeline">0</span>
+                            <span class="stat-label">Pipeline Value</span>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="ruleResponse">Auto-Reply Message</label>
-                        <textarea id="ruleResponse" rows="3" placeholder="The reply to send… (use {name} for contact name)" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Add Rule</button>
-                </form>
-            </div>
-
-            <!-- Rules list -->
-            <div class="card">
-                <h2 class="card-title">Active Rules</h2>
-                <div class="rules-list" id="rulesList" aria-live="polite">
-                    <!-- Skeleton -->
-                    <div id="rulesSkeleton">
-                        <div class="skeleton-row">
-                            <div class="skeleton skeleton-circle"></div>
-                            <div class="skeleton-lines">
-                                <div class="skeleton skeleton-line skeleton-line-short"></div>
-                                <div class="skeleton skeleton-line skeleton-line-long"></div>
-                            </div>
+                    <div class="stat-card stat-clickable" role="listitem" data-goto="crm" title="Open CRM">
+                        <div class="stat-icon deals" data-icon="folder-open" aria-hidden="true"></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="valDashOpenDeals">0</span>
+                            <span class="stat-label">Open Deals</span>
                         </div>
-                        <div class="skeleton-row">
-                            <div class="skeleton skeleton-circle"></div>
-                            <div class="skeleton-lines">
-                                <div class="skeleton skeleton-line skeleton-line-short"></div>
-                                <div class="skeleton skeleton-line skeleton-line-long"></div>
-                            </div>
+                    </div>
+                    <div class="stat-card stat-clickable" role="listitem" data-goto="crm" title="Open CRM">
+                        <div class="stat-icon won" data-icon="trophy" aria-hidden="true"></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="valDashWon">0</span>
+                            <span class="stat-label">Deals Won</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-clickable" role="listitem" data-goto="crm" title="Open CRM">
+                        <div class="stat-icon followups" data-icon="calendar-clock" aria-hidden="true"></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="valDashFollowups">0</span>
+                            <span class="stat-label">Follow-ups Due</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Workspace ── -->
+                <div class="stat-group-title"><span data-icon="settings" aria-hidden="true"></span> Workspace</div>
+                <div class="stats-grid" role="list" aria-label="Workspace status">
+                    <div class="stat-card stat-clickable" role="listitem" data-goto="contacts" title="Open Contacts">
+                        <div class="stat-icon contacts" data-icon="users" aria-hidden="true"></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="valContacts">0</span>
+                            <span class="stat-label">Total Contacts</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-clickable" role="listitem" data-goto="chatbot"
+                        title="Open Chatbot Rules">
+                        <div class="stat-icon rules" data-icon="bot" aria-hidden="true"></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="valActiveRules">0</span>
+                            <span class="stat-label">Active Rules</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-clickable" role="listitem" data-goto="settings" title="Open Settings">
+                        <div class="stat-icon whatsapp" data-icon="smartphone" aria-hidden="true"></div>
+                        <div class="stat-info">
+                            <span class="stat-value stat-value-text" id="valWaStatus">—</span>
+                            <span class="stat-label">WhatsApp</span>
+                        </div>
+                    </div>
+                    <div class="stat-card stat-clickable" role="listitem" data-goto="settings" title="Open Settings">
+                        <div class="stat-icon ai" data-icon="sparkles" aria-hidden="true"></div>
+                        <div class="stat-info">
+                            <span class="stat-value stat-value-text" id="valAiStatus">—</span>
+                            <span class="stat-label">AI Persona</span>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- ── CONTACTS ── -->
-    <section class="section" id="section-contacts" aria-labelledby="contacts-heading">
-        <div class="page-inner">
-            <div class="section-header">
-                <h1 id="contacts-heading">Contacts</h1>
-                <p class="section-subtitle">Manage your WhatsApp contacts</p>
+        <!-- ── MESSAGES ── -->
+        <section class="section" id="section-messages" aria-labelledby="messages-heading">
+            <div class="page-inner">
+                <div class="section-header">
+                    <h1 id="messages-heading">Messages</h1>
+                    <p class="section-subtitle">All incoming and outgoing messages</p>
+                </div>
+
+                <div id="messagesError" style="display:none"></div>
+
+
+
+                <div class="toolbar">
+                    <div class="search-box">
+                        <input type="search" id="messageSearch" placeholder="Search by phone number…"
+                            aria-label="Search messages">
+                    </div>
+                    <div class="filter-group">
+                        <select id="messageFilter" aria-label="Filter by direction">
+                            <option value="">All Messages</option>
+                            <option value="incoming">Incoming</option>
+                            <option value="outgoing">Outgoing</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="table-container">
+                        <table class="data-table" aria-label="Messages log">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Direction</th>
+                                    <th scope="col">Phone / Name</th>
+                                    <th scope="col">Message</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="messagesBody">
+                                <tr>
+                                    <td colspan="5" class="empty-state">Loading messages…</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
+        </section>
 
-            <div id="contactsError" style="display:none"></div>
+        <!-- ── LEAD ANALYSIS ── -->
+        <section class="section" id="section-leads" aria-labelledby="leads-heading">
+            <div class="page-inner">
+                <div class="section-header">
+                    <h1 id="leads-heading">Lead Analysis</h1>
+                    <p class="section-subtitle">AI-powered summaries, interest detection, issues and priorities for
+                        every conversation</p>
+                </div>
 
-            <div class="card">
-                <h2 class="card-title">Add Contact</h2>
-                <form id="addContactForm" novalidate>
-                    <div class="form-row-3">
-                        <div class="form-group">
-                            <label for="contactPhone">Phone Number</label>
-                            <input type="tel" id="contactPhone" placeholder="e.g. 919876543210" required autocomplete="tel">
-                        </div>
-                        <div class="form-group">
-                            <label for="contactName">Name</label>
-                            <input type="text" id="contactName" placeholder="Contact name" autocomplete="name">
-                        </div>
-                        <div class="form-group">
-                            <label for="contactLabel">Label</label>
-                            <input type="text" id="contactLabel" placeholder="e.g. Customer, Lead">
+                <div id="leadsError" style="display:none"></div>
+
+                <!-- Lead stats -->
+                <div class="stats-grid" role="list" aria-label="Lead metrics">
+                    <div class="stat-card" role="listitem">
+                        <div class="stat-icon sent" data-icon="target" aria-hidden="true"></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="valLeadsTotal">0</span>
+                            <span class="stat-label">Analyzed Chats</span>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Add Contact</button>
-                </form>
-            </div>
-
-            <div class="card">
-                <h2 class="card-title">Import from CSV</h2>
-                <p class="card-note">Columns matched by name, so headers like "Mobile Number" or "WhatsApp #" work
-                    the same as "phone" — <code>phone</code> is the only required column.
-                    <a href="#" id="downloadCsvTemplate">Download a template</a> if you want the exact format.</p>
-                <div class="csv-import-row">
-                    <input type="file" id="csvFileInput" accept=".csv,text/csv" class="sr-only">
-                    <label for="csvFileInput" class="btn btn-secondary" id="csvFileLabel" tabindex="0" role="button">
-                        <span data-icon="upload" aria-hidden="true"></span> Choose CSV file
-                    </label>
-                    <span id="csvFileName" style="color:var(--color-text-secondary);font-size:.85rem"></span>
-                </div>
-                <div id="csvImportResult" style="display:none;margin-top:var(--space-md)"></div>
-            </div>
-
-            <div class="toolbar">
-                <div class="search-box">
-                    <input type="search" id="contactSearch" placeholder="Search contacts…" aria-label="Search contacts">
-                </div>
-            </div>
-
-            <div class="card quick-select-card">
-                <h2 class="card-title" style="font-size:.95rem">Quick-select for outreach</h2>
-                <div class="quick-select-row">
-                    <label for="quickSelectCount" class="sr-only">Number to select</label>
-                    <input type="number" id="quickSelectCount" value="20" min="1" max="25" step="1">
-                    <div class="quick-select-presets">
-                        <button type="button" class="btn btn-sm btn-secondary quick-select-preset" data-n="10">10</button>
-                        <button type="button" class="btn btn-sm btn-secondary quick-select-preset" data-n="20">20</button>
-                        <button type="button" class="btn btn-sm btn-secondary quick-select-preset" data-n="25">25</button>
+                    <div class="stat-card" role="listitem">
+                        <div class="stat-icon received" data-icon="check-circle" aria-hidden="true"></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="valLeadsInterested">0</span>
+                            <span class="stat-label">Interested</span>
+                        </div>
                     </div>
-                    <button type="button" class="btn btn-sm btn-primary" id="quickSelectBtn">Select next N</button>
-                    <label class="quick-select-checkbox">
-                        <input type="checkbox" id="quickSelectIncludeReached">
-                        Include already-reached contacts
-                    </label>
+                    <div class="stat-card" role="listitem">
+                        <div class="stat-icon rules" data-icon="flame" aria-hidden="true"></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="valLeadsHigh">0</span>
+                            <span class="stat-label">High Priority</span>
+                        </div>
+                    </div>
+                    <div class="stat-card" role="listitem">
+                        <div class="stat-icon contacts" data-icon="hourglass" aria-hidden="true"></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="valLeadsPending">0</span>
+                            <span class="stat-label">Awaiting Analysis</span>
+                        </div>
+                    </div>
                 </div>
-                <p class="card-note" style="margin:8px 0 0">Picks from contacts <strong>not yet sent an outreach message</strong> first
-                    (top of the currently filtered/searched list), so repeated batches of 20 naturally work through your list without
-                    re-messaging the same people. Check the box above if you specifically want to re-reach people.</p>
-            </div>
 
-            <div class="selection-bar" id="contactsSelectionBar" style="display:none">
-                <span id="contactsSelectionCount">0 selected</span>
-                <div class="selection-bar-actions">
-                    <button type="button" class="btn btn-sm btn-secondary" id="clearSelectionBtn">Clear</button>
-                    <button type="button" class="btn btn-sm btn-primary" id="openOutreachBtn">
-                        <span data-icon="send" aria-hidden="true"></span> Send Outreach
+                <div class="toolbar">
+                    <div class="filter-group">
+                        <select id="leadInterestFilter" aria-label="Filter by interest">
+                            <option value="">All Interest Levels</option>
+                            <option value="interested">Interested</option>
+                            <option value="neutral">Neutral</option>
+                            <option value="not_interested">Not Interested</option>
+                            <option value="unclear">Unclear</option>
+                        </select>
+                        <select id="leadPriorityFilter" aria-label="Filter by priority">
+                            <option value="">All Priorities</option>
+                            <option value="high">High</option>
+                            <option value="medium">Medium</option>
+                            <option value="low">Low</option>
+                        </select>
+                    </div>
+                    <div class="topbar-spacer"></div>
+                    <button class="btn btn-primary" id="analyzeAllBtn" type="button">
+                        <span class="btn-icon" data-icon="brain" aria-hidden="true"></span> Analyze All Chats
                     </button>
                 </div>
-            </div>
 
-            <div class="card">
-                <div class="table-container">
-                    <table class="data-table" id="contactsTable" aria-label="Contacts list">
-                        <thead>
-                            <tr>
-                                <th scope="col" style="width:2.5rem"><input type="checkbox" id="contactsSelectAll" aria-label="Select all contacts"></th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Phone</th>
-                                <th scope="col">Label</th>
-                                <th scope="col">Reached</th>
-                                <th scope="col">Added</th>
-                                <th scope="col"><span class="sr-only">Actions</span></th>
-                            </tr>
-                        </thead>
-                        <tbody id="contactsBody">
-                            <tr><td colspan="7" class="empty-state">Loading contacts…</td></tr>
-                        </tbody>
-                    </table>
+                <div id="leadsList" aria-live="polite">
+                    <div class="empty-state">
+                        <span class="empty-state-icon icon" data-icon="target" aria-hidden="true"></span>
+                        <div class="empty-state-title">Loading lead analyses…</div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- ── SCHEDULED ── -->
-    <section class="section" id="section-scheduled" aria-labelledby="scheduled-heading">
-        <div class="page-inner">
-            <div class="section-header">
-                <h1 id="scheduled-heading">Scheduled Messages</h1>
-                <p class="section-subtitle">Schedule messages for future delivery</p>
-            </div>
+        <!-- ── CRM ── -->
+        <section class="section" id="section-crm" aria-labelledby="crm-heading">
+            <div class="page-inner page-inner-wide">
+                <div class="section-header">
+                    <h1 id="crm-heading">CRM Pipeline</h1>
+                    <p class="section-subtitle">Track every conversation as a deal — auto-filled by AI, managed by you
+                    </p>
+                </div>
 
-            <div id="scheduledError" style="display:none"></div>
+                <div id="crmError" style="display:none"></div>
 
-            <div class="card">
-                <h2 class="card-title">Schedule a Message</h2>
-                <form id="scheduleForm" novalidate>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="schedPhone">Phone Number</label>
-                            <input type="tel" id="schedPhone" placeholder="e.g. 919876543210" required autocomplete="tel">
-                        </div>
-                        <div class="form-group">
-                            <label for="schedDate">Send At</label>
-                            <input type="datetime-local" id="schedDate" required>
+                <!-- CRM stats -->
+                <div class="stats-grid" role="list" aria-label="CRM metrics">
+                    <div class="stat-card" role="listitem">
+                        <div class="stat-icon sent" data-icon="wallet" aria-hidden="true"></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="valCrmPipeline">0</span>
+                            <span class="stat-label">Pipeline Value</span>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="schedMessage">Message</label>
-                        <textarea id="schedMessage" rows="3" placeholder="Message to send at scheduled time…" required></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Schedule Message</button>
-                </form>
-            </div>
-
-            <div class="card">
-                <h2 class="card-title">Scheduled Messages</h2>
-                <div class="table-container">
-                    <table class="data-table" aria-label="Scheduled messages list">
-                        <thead>
-                            <tr>
-                                <th scope="col">Phone</th>
-                                <th scope="col">Message</th>
-                                <th scope="col">Scheduled At</th>
-                                <th scope="col">Status</th>
-                                <th scope="col"><span class="sr-only">Actions</span></th>
-                            </tr>
-                        </thead>
-                        <tbody id="scheduledBody">
-                            <tr><td colspan="5" class="empty-state">No scheduled messages</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ── APPOINTMENTS ── -->
-    <section class="section" id="section-appointments" aria-labelledby="appointments-heading">
-        <div class="page-inner">
-            <div class="section-header">
-                <h1 id="appointments-heading">Appointments</h1>
-                <p class="section-subtitle">Bookings made by your chatbot, plus anything you add manually</p>
-            </div>
-
-            <div id="appointmentsError" style="display:none"></div>
-
-            <div class="card" id="apptBookingDisabledNotice" style="display:none">
-                <p class="card-note"><span data-icon="info" data-icon-class="icon-inline" aria-hidden="true"></span>Appointment booking isn't set up yet. Go to <strong>Settings &rarr; Booking</strong> to set your weekly hours and turn it on.</p>
-            </div>
-
-            <div class="card">
-                <h2 class="card-title">Book an Appointment</h2>
-                <p class="card-note">Add a booking manually (e.g. a walk-in or phone call) — it uses the same working hours and conflict checks as the chatbot.</p>
-                <form id="apptBookForm" novalidate>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="apptPhone">Phone Number</label>
-                            <input type="tel" id="apptPhone" placeholder="e.g. 919876543210" required autocomplete="tel">
-                        </div>
-                        <div class="form-group">
-                            <label for="apptContactName">Contact Name (optional)</label>
-                            <input type="text" id="apptContactName" placeholder="e.g. Priya Sharma">
+                    <div class="stat-card" role="listitem">
+                        <div class="stat-icon received" data-icon="folder-open" aria-hidden="true"></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="valCrmOpen">0</span>
+                            <span class="stat-label">Open Deals</span>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="apptSlotSelect">Available Slot</label>
-                        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-                            <select id="apptSlotSelect" style="flex:1;min-width:220px">
-                                <option value="">Loading available slots…</option>
-                            </select>
-                            <button class="btn btn-secondary btn-sm" id="apptRefreshSlotsBtn" type="button">Refresh</button>
+                    <div class="stat-card" role="listitem">
+                        <div class="stat-icon rules" data-icon="trophy" aria-hidden="true"></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="valCrmWon">0</span>
+                            <span class="stat-label">Won</span>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="apptNotes">Notes (optional)</label>
-                        <textarea id="apptNotes" rows="2" placeholder="What's this appointment for?"></textarea>
+                    <div class="stat-card" role="listitem">
+                        <div class="stat-icon contacts" data-icon="calendar-clock" aria-hidden="true"></div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="valCrmFollowups">0</span>
+                            <span class="stat-label">Follow-ups Due</span>
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-primary">Book Appointment</button>
-                </form>
-            </div>
-
-            <div class="card">
-                <h2 class="card-title">Upcoming &amp; Past Appointments</h2>
-                <div class="table-container">
-                    <table class="data-table" aria-label="Appointments list">
-                        <thead>
-                            <tr>
-                                <th scope="col">Contact</th>
-                                <th scope="col">Date &amp; Time</th>
-                                <th scope="col">Booked Via</th>
-                                <th scope="col">Status</th>
-                                <th scope="col"><span class="sr-only">Actions</span></th>
-                            </tr>
-                        </thead>
-                        <tbody id="appointmentsBody">
-                            <tr><td colspan="5" class="empty-state">No appointments yet</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ── SETTINGS ── -->
-    <section class="section" id="section-settings" aria-labelledby="settings-heading">
-        <div class="page-inner">
-            <div class="section-header">
-                <h1 id="settings-heading">Settings</h1>
-                <p class="section-subtitle">Configure your WhatsApp automation</p>
-            </div>
-
-            <!-- Connection Status card (always visible) -->
-            <div class="card">
-                <h2 class="card-title">Connection Status</h2>
-                <div class="connection-info" id="connectionInfo" aria-live="polite">
-                    <p>Checking connection…</p>
-                </div>
-            </div>
-
-            <!-- Settings Tabs -->
-            <div class="settings-tabs" role="tablist" aria-label="Settings sections">
-                <button class="settings-tab active" role="tab" aria-selected="true"  aria-controls="stab-general"     id="tab-general"     data-tab="general"     type="button">General</button>
-                <button class="settings-tab"        role="tab" aria-selected="false" aria-controls="stab-business"    id="tab-business"    data-tab="business"    type="button">Business Setup</button>
-                <button class="settings-tab"        role="tab" aria-selected="false" aria-controls="stab-ai"          id="tab-ai"          data-tab="ai"          type="button">AI Behavior</button>
-                <button class="settings-tab"        role="tab" aria-selected="false" aria-controls="stab-qr"          id="tab-qr"          data-tab="qr"          type="button">WhatsApp QR</button>
-                <button class="settings-tab"        role="tab" aria-selected="false" aria-controls="stab-booking"     id="tab-booking"     data-tab="booking"     type="button">Booking</button>
-                <button class="settings-tab"        role="tab" aria-selected="false" aria-controls="stab-calendar"    id="tab-calendar"    data-tab="calendar"    type="button">Calendar</button>
-                <button class="settings-tab"        role="tab" aria-selected="false" aria-controls="stab-danger"      id="tab-danger"      data-tab="danger"      type="button">Danger Zone</button>
-            </div>
-
-            <!-- ── Tab: General ── -->
-            <div class="settings-panel active" id="stab-general" role="tabpanel" aria-labelledby="tab-general">
-                <div class="card">
-                    <h2 class="card-title">General</h2>
-                    <form id="settingsForm" novalidate>
-                        <div class="form-group">
-                            <label for="settBusinessName">Business Name</label>
-                            <input type="text" id="settBusinessName" placeholder="Your business name" autocomplete="organization">
-                        </div>
-
-                        <div class="toggle-group">
-                            <span>Chatbot Enabled</span>
-                            <label class="toggle" aria-label="Enable chatbot">
-                                <input type="checkbox" id="settChatbotEnabled" checked>
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-
-                        <div class="toggle-group">
-                            <span>Away Mode</span>
-                            <label class="toggle" aria-label="Enable away mode">
-                                <input type="checkbox" id="settAwayMode">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-
-                        <div class="form-group" style="margin-top:16px">
-                            <label for="settDefaultReply">Default Reply (when no rule matches)</label>
-                            <textarea id="settDefaultReply" rows="2" placeholder="Fallback auto-reply message…"></textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="settAwayMessage">Away Message</label>
-                            <textarea id="settAwayMessage" rows="2" placeholder="Sent when away mode is on…"></textarea>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- ── Tab: Business Setup ── -->
-            <div class="settings-panel" id="stab-business" role="tabpanel" aria-labelledby="tab-business">
-                <div class="card">
-                    <h2 class="card-title"><span data-icon="store" data-icon-class="icon-inline" aria-hidden="true"></span>Business Profile</h2>
-                    <p class="card-note">Everything you add here is used by the AI: the WhatsApp bot answers product & pricing questions from it, and the lead analyzer uses it to score chats from a sales point of view.</p>
-                    <form id="businessForm" novalidate>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="bizWebsite">Website</label>
-                                <input type="url" id="bizWebsite" placeholder="https://yourbusiness.com">
-                            </div>
-                            <div class="form-group">
-                                <label for="bizIndustry">Industry / Category</label>
-                                <input type="text" id="bizIndustry" placeholder="e.g. Clothing, SaaS, Coaching, Restaurant">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="bizDescription">About the Business</label>
-                            <textarea id="bizDescription" rows="3" placeholder="What you sell, how you work, delivery areas, timings, anything a customer might ask about…"></textarea>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="bizTarget">Target Customers</label>
-                                <input type="text" id="bizTarget" placeholder="Who buys from you? e.g. small business owners, students…">
-                            </div>
-                            <div class="form-group">
-                                <label for="bizCurrency">Currency Symbol</label>
-                                <input type="text" id="bizCurrency" placeholder="₹" maxlength="5">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="bizOffers">Current Offers / Promotions</label>
-                            <textarea id="bizOffers" rows="2" placeholder="e.g. 20% off this month, free delivery above ₹999…"></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary" id="saveBusinessBtn">Save Business Profile</button>
-                    </form>
                 </div>
 
-                <div class="card">
-                    <h2 class="card-title"><span data-icon="package" data-icon-class="icon-inline" aria-hidden="true"></span>Products &amp; Services Catalog</h2>
-                    <form id="addProductForm" novalidate>
+                <!-- Analytics charts -->
+                <div class="charts-grid" id="crmChartsGrid">
+                    <div class="card chart-card">
+                        <h2 class="card-title"><span data-icon="pie-chart" data-icon-class="icon-inline"
+                                aria-hidden="true"></span>Open Deals by Stage</h2>
+                        <div class="chart-flex">
+                            <div class="chart-canvas-wrap chart-donut"><canvas id="chartStageDeals" role="img"
+                                    aria-label="Donut chart of open deals per pipeline stage"></canvas></div>
+                            <div class="chart-legend" id="legendStageDeals"></div>
+                        </div>
+                    </div>
+                    <div class="card chart-card">
+                        <h2 class="card-title"><span data-icon="wallet" data-icon-class="icon-inline"
+                                aria-hidden="true"></span>Pipeline Value by Stage</h2>
+                        <div class="chart-canvas-wrap chart-bars"><canvas id="chartStageValue" role="img"
+                                aria-label="Bar chart of deal value per pipeline stage"></canvas></div>
+                    </div>
+                    <div class="card chart-card">
+                        <h2 class="card-title"><span data-icon="target" data-icon-class="icon-inline"
+                                aria-hidden="true"></span>Lead Interest Mix</h2>
+                        <div class="chart-flex">
+                            <div class="chart-canvas-wrap chart-donut"><canvas id="chartInterest" role="img"
+                                    aria-label="Donut chart of leads by interest level"></canvas></div>
+                            <div class="chart-legend" id="legendInterest"></div>
+                        </div>
+                    </div>
+                    <div class="card chart-card">
+                        <h2 class="card-title"><span data-icon="activity" data-icon-class="icon-inline"
+                                aria-hidden="true"></span>Message Activity — Last 7 Days</h2>
+                        <div class="chart-canvas-wrap chart-bars"><canvas id="chartActivity" role="img"
+                                aria-label="Line chart of incoming and outgoing messages over the last seven days"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="toolbar">
+                    <div class="filter-group">
+                        <button class="btn btn-secondary btn-sm" id="addDealBtn" type="button"><span class="btn-icon"
+                                data-icon="plus" aria-hidden="true"></span> Add Deal</button>
+                    </div>
+                    <div class="topbar-spacer"></div>
+                    <small style="color:var(--color-text-secondary)">Deals are auto-created when the AI analyzes a sales
+                        chat. Personal chats are skipped.</small>
+                </div>
+
+                <!-- Add deal form (hidden by default) -->
+                <div class="card" id="addDealCard" style="display:none">
+                    <h2 class="card-title">Add Deal Manually</h2>
+                    <form id="addDealForm" novalidate>
                         <div class="form-row-3">
                             <div class="form-group">
-                                <label for="prodName">Name</label>
-                                <input type="text" id="prodName" placeholder="Product / service name" required>
+                                <label for="dealPhone">Phone Number</label>
+                                <input type="tel" id="dealPhone" placeholder="e.g. 919876543210" required>
                             </div>
                             <div class="form-group">
-                                <label for="prodPrice">Price</label>
-                                <input type="text" id="prodPrice" placeholder="e.g. ₹1,499 or ₹500/month">
+                                <label for="dealName">Contact Name</label>
+                                <input type="text" id="dealName" placeholder="Name">
                             </div>
                             <div class="form-group">
-                                <label for="prodCategory">Category</label>
-                                <input type="text" id="prodCategory" placeholder="e.g. Services">
+                                <label for="dealValue">Deal Value</label>
+                                <input type="number" id="dealValue" placeholder="0" min="0" step="any">
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="prodDesc">Description</label>
-                                <input type="text" id="prodDesc" placeholder="Short description the AI can quote to customers">
+                                <label for="dealStage">Stage</label>
+                                <select id="dealStage">
+                                    <option value="new">New</option>
+                                    <option value="contacted">Contacted</option>
+                                    <option value="qualified">Qualified</option>
+                                    <option value="proposal">Proposal</option>
+                                    <option value="negotiation">Negotiation</option>
+                                    <option value="won">Won</option>
+                                    <option value="lost">Lost</option>
+                                </select>
                             </div>
                             <div class="form-group">
-                                <label for="prodUrl">Link (optional)</label>
-                                <input type="url" id="prodUrl" placeholder="https://…">
+                                <label for="dealProduct">Product / Service</label>
+                                <input type="text" id="dealProduct" placeholder="What are they interested in?">
                             </div>
                         </div>
-                        <!-- ── Product Image Upload (Enhanced UI) ── -->
-                        <div class="form-group product-media-section" style="margin-bottom:18px">
-                            <div class="product-media-header">
-                                <label class="product-media-label" for="prodImageFile">
-                                    <span class="product-media-icon-badge">
-                                        <span data-icon="image" aria-hidden="true"></span>
-                                    </span>
-                                    <span class="product-media-title">Product Image</span>
-                                    <span class="product-badge-optional">Optional</span>
-                                </label>
-                                <span class="product-media-specs">JPG, PNG, WEBP (Max 5MB)</span>
-                            </div>
-
-                            <div class="product-image-uploader-box">
-                                <input type="file" id="prodImageFile" accept="image/jpeg,image/png,image/webp" style="display:none">
-                                <input type="hidden" id="prodImagePath">
-
-                                <div class="product-dropzone" id="prodDropzone" tabindex="0" role="button" aria-label="Attach product image">
-                                    <div class="product-dropzone-icon-bubble">
-                                        <span data-icon="upload-cloud" class="product-cloud-icon" aria-hidden="true"></span>
-                                    </div>
-                                    <div class="product-dropzone-info">
-                                        <div class="product-dropzone-main-text">
-                                            <button type="button" class="btn btn-secondary product-browse-btn" id="prodBrowseBtn" tabindex="-1">
-                                                <span data-icon="image" aria-hidden="true"></span>
-                                                <span>Choose Image</span>
-                                            </button>
-                                            <span class="product-dropzone-divider">or drag &amp; drop</span>
-                                        </div>
-                                        <div class="product-dropzone-subtext" id="prodDropzoneText">Click anywhere to browse image from your device</div>
-                                    </div>
-                                </div>
-
-                                <div class="product-image-preview-bar product-preview-card" id="prodPreviewContainer" style="display:none">
-                                    <div class="preview-img-container product-thumb-wrap">
-                                        <img id="prodImagePreview" src="" alt="Product Image Preview" class="product-thumb-preview">
-                                    </div>
-                                    <div class="preview-meta product-preview-details">
-                                        <div class="product-preview-name-row">
-                                            <span id="prodImageFilename" class="preview-filename"></span>
-                                        </div>
-                                        <div class="product-preview-badge-row">
-                                            <span id="prodImageStatus" class="preview-status"></span>
-                                        </div>
-                                    </div>
-                                    <div class="preview-actions product-preview-actions">
-                                        <button type="button" class="btn btn-sm btn-secondary product-action-btn" id="prodImageChangeBtn" title="Choose another image">
-                                            <span data-icon="refresh-cw" aria-hidden="true"></span>
-                                            <span>Replace</span>
-                                        </button>
-                                        <button type="button" class="btn btn-sm btn-danger product-action-btn" id="prodImageRemoveBtn" title="Remove product image">
-                                            <span data-icon="trash-2" aria-hidden="true"></span>
-                                            <span>Remove</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-secondary" id="addProductBtn"><span class="btn-icon" data-icon="plus" aria-hidden="true"></span> Add to Catalog</button>
+                        <button type="submit" class="btn btn-primary">Add Deal</button>
                     </form>
-                    <div class="product-list" id="productList" aria-live="polite" style="margin-top:14px"></div>
                 </div>
 
-                <div class="card">
-                    <h2 class="card-title"><span data-icon="brain" data-icon-class="icon-inline" aria-hidden="true"></span>AI Business Analysis</h2>
-                    <p class="card-note">Let the AI study your business and generate a sales brief — positioning, selling points, a ready-to-send pitch, and objection handling. This brief also sharpens auto-replies and lead scoring.</p>
-                    <button class="btn btn-primary" id="analyzeBusinessBtn" type="button">
-                        <span class="btn-icon" data-icon="brain" aria-hidden="true"></span> Analyze My Business
-                    </button>
-                    <div id="businessProfileResult" style="margin-top:14px"></div>
+                <!-- Kanban board -->
+                <div class="kanban-board" id="kanbanBoard" aria-label="Sales pipeline board">
+                    <div class="empty-state">
+                        <span class="empty-state-icon icon" data-icon="trending-up" aria-hidden="true"></span>
+                        <div class="empty-state-title">Loading pipeline…</div>
+                    </div>
                 </div>
             </div>
+        </section>
 
-            <!-- ── Tab: AI Behavior ── -->
-            <div class="settings-panel" id="stab-ai" role="tabpanel" aria-labelledby="tab-ai">
+        <!-- ── CHATBOT RULES ── -->
+        <section class="section" id="section-chatbot" aria-labelledby="chatbot-heading">
+            <div class="page-inner">
+                <div class="section-header">
+                    <h1 id="chatbot-heading">Chatbot Rules</h1>
+                    <p class="section-subtitle">Configure auto-reply rules for incoming messages</p>
+                </div>
+
+                <div id="chatbotError" style="display:none"></div>
+
+                <!-- Test widget -->
+                <div class="card test-card">
+                    <h2 class="card-title">Test a Message</h2>
+                    <div class="test-form">
+                        <input type="text" id="testMessage" placeholder="e.g. hello, what are your prices?"
+                            aria-label="Test message input">
+                        <button class="btn btn-secondary" id="testChatbotBtn" type="button">Test</button>
+                    </div>
+                    <div class="test-result" id="testResult" style="display:none;" role="alert" aria-live="polite">
+                    </div>
+                </div>
+
+                <!-- Add Rule -->
                 <div class="card">
-                    <h2 class="card-title"><span data-icon="brain" data-icon-class="icon-inline" aria-hidden="true"></span>Personal AI Persona (Gemini)</h2>
-                    <p class="card-note">Configure your AI to converse authentically on your behalf on WhatsApp using Google Gemini.</p>
-                    <form id="aiSettingsForm" novalidate>
+                    <h2 class="card-title">Add New Rule</h2>
+                    <form id="addRuleForm" novalidate>
+                        <div class="form-row-3">
+                            <div class="form-group">
+                                <label for="ruleTrigger">Trigger Keyword</label>
+                                <input type="text" id="ruleTrigger" placeholder="e.g. price" required
+                                    autocomplete="off">
+                            </div>
+                            <div class="form-group">
+                                <label for="ruleMatchType">Match Type</label>
+                                <select id="ruleMatchType">
+                                    <option value="contains">Contains</option>
+                                    <option value="exact">Exact</option>
+                                    <option value="startswith">Starts With</option>
+                                    <option value="regex">Regex</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="rulePriority">Priority</label>
+                                <input type="number" id="rulePriority" value="5" min="0" max="100">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="ruleResponse">Auto-Reply Message</label>
+                            <textarea id="ruleResponse" rows="3"
+                                placeholder="The reply to send… (use {name} for contact name)" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Rule</button>
+                    </form>
+                </div>
+
+                <!-- Rules list -->
+                <div class="card">
+                    <h2 class="card-title">Active Rules</h2>
+                    <div class="rules-list" id="rulesList" aria-live="polite">
+                        <!-- Skeleton -->
+                        <div id="rulesSkeleton">
+                            <div class="skeleton-row">
+                                <div class="skeleton skeleton-circle"></div>
+                                <div class="skeleton-lines">
+                                    <div class="skeleton skeleton-line skeleton-line-short"></div>
+                                    <div class="skeleton skeleton-line skeleton-line-long"></div>
+                                </div>
+                            </div>
+                            <div class="skeleton-row">
+                                <div class="skeleton skeleton-circle"></div>
+                                <div class="skeleton-lines">
+                                    <div class="skeleton skeleton-line skeleton-line-short"></div>
+                                    <div class="skeleton skeleton-line skeleton-line-long"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── CONTACTS ── -->
+        <section class="section" id="section-contacts" aria-labelledby="contacts-heading">
+            <div class="page-inner">
+                <div class="section-header">
+                    <h1 id="contacts-heading">Contacts</h1>
+                    <p class="section-subtitle">Manage your WhatsApp contacts</p>
+                </div>
+
+                <div id="contactsError" style="display:none"></div>
+
+                <div class="card">
+                    <h2 class="card-title">Add Contact</h2>
+                    <form id="addContactForm" novalidate>
+                        <div class="form-row-3">
+                            <div class="form-group">
+                                <label for="contactPhone">Phone Number</label>
+                                <input type="tel" id="contactPhone" placeholder="e.g. 919876543210" required
+                                    autocomplete="tel">
+                            </div>
+                            <div class="form-group">
+                                <label for="contactName">Name</label>
+                                <input type="text" id="contactName" placeholder="Contact name" autocomplete="name">
+                            </div>
+                            <div class="form-group">
+                                <label for="contactLabel">Label</label>
+                                <input type="text" id="contactLabel" placeholder="e.g. Customer, Lead">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Contact</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Import from CSV</h2>
+                    <p class="card-note">Columns matched by name, so headers like "Mobile Number" or "WhatsApp #" work
+                        the same as "phone" — <code>phone</code> is the only required column.
+                        <a href="#" id="downloadCsvTemplate">Download a template</a> if you want the exact format.
+                    </p>
+                    <div class="csv-import-row">
+                        <input type="file" id="csvFileInput" accept=".csv,text/csv" class="sr-only">
+                        <label for="csvFileInput" class="btn btn-secondary" id="csvFileLabel" tabindex="0"
+                            role="button">
+                            <span data-icon="upload" aria-hidden="true"></span> Choose CSV file
+                        </label>
+                        <span id="csvFileName" style="color:var(--color-text-secondary);font-size:.85rem"></span>
+                    </div>
+                    <div id="csvImportResult" style="display:none;margin-top:var(--space-md)"></div>
+                </div>
+
+                <div class="toolbar">
+                    <div class="search-box">
+                        <input type="search" id="contactSearch" placeholder="Search contacts…"
+                            aria-label="Search contacts">
+                    </div>
+                </div>
+
+                <div class="card quick-select-card">
+                    <h2 class="card-title" style="font-size:.95rem">Quick-select for outreach</h2>
+                    <div class="quick-select-row">
+                        <label for="quickSelectCount" class="sr-only">Number to select</label>
+                        <input type="number" id="quickSelectCount" value="20" min="1" max="25" step="1">
+                        <div class="quick-select-presets">
+                            <button type="button" class="btn btn-sm btn-secondary quick-select-preset"
+                                data-n="10">10</button>
+                            <button type="button" class="btn btn-sm btn-secondary quick-select-preset"
+                                data-n="20">20</button>
+                            <button type="button" class="btn btn-sm btn-secondary quick-select-preset"
+                                data-n="25">25</button>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-primary" id="quickSelectBtn">Select next N</button>
+                        <label class="quick-select-checkbox">
+                            <input type="checkbox" id="quickSelectIncludeReached">
+                            Include already-reached contacts
+                        </label>
+                    </div>
+                    <p class="card-note" style="margin:8px 0 0">Picks from contacts <strong>not yet sent an outreach
+                            message</strong> first
+                        (top of the currently filtered/searched list), so repeated batches of 20 naturally work through
+                        your list without
+                        re-messaging the same people. Check the box above if you specifically want to re-reach people.
+                    </p>
+                </div>
+
+                <div class="selection-bar" id="contactsSelectionBar" style="display:none">
+                    <span id="contactsSelectionCount">0 selected</span>
+                    <div class="selection-bar-actions">
+                        <button type="button" class="btn btn-sm btn-secondary" id="clearSelectionBtn">Clear</button>
+                        <button type="button" class="btn btn-sm btn-primary" id="openOutreachBtn">
+                            <span data-icon="send" aria-hidden="true"></span> Send Outreach
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="table-container">
+                        <table class="data-table" id="contactsTable" aria-label="Contacts list">
+                            <thead>
+                                <tr>
+                                    <th scope="col" style="width:2.5rem"><input type="checkbox" id="contactsSelectAll"
+                                            aria-label="Select all contacts"></th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Phone</th>
+                                    <th scope="col">Label</th>
+                                    <th scope="col">Reached</th>
+                                    <th scope="col">Added</th>
+                                    <th scope="col"><span class="sr-only">Actions</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="contactsBody">
+                                <tr>
+                                    <td colspan="7" class="empty-state">Loading contacts…</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── SCHEDULED ── -->
+        <section class="section" id="section-scheduled" aria-labelledby="scheduled-heading">
+            <div class="page-inner">
+                <div class="section-header">
+                    <h1 id="scheduled-heading">Scheduled Messages</h1>
+                    <p class="section-subtitle">Schedule messages for future delivery</p>
+                </div>
+
+                <div id="scheduledError" style="display:none"></div>
+
+                <div class="card">
+                    <h2 class="card-title">Schedule a Message</h2>
+                    <form id="scheduleForm" novalidate>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="schedPhone">Phone Number</label>
+                                <input type="tel" id="schedPhone" placeholder="e.g. 919876543210" required
+                                    autocomplete="tel">
+                            </div>
+                            <div class="form-group">
+                                <label for="schedDate">Send At</label>
+                                <input type="datetime-local" id="schedDate" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="schedMessage">Message</label>
+                            <textarea id="schedMessage" rows="3" placeholder="Message to send at scheduled time…"
+                                required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Schedule Message</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Scheduled Messages</h2>
+                    <div class="table-container">
+                        <table class="data-table" aria-label="Scheduled messages list">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Phone</th>
+                                    <th scope="col">Message</th>
+                                    <th scope="col">Scheduled At</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col"><span class="sr-only">Actions</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="scheduledBody">
+                                <tr>
+                                    <td colspan="5" class="empty-state">No scheduled messages</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── APPOINTMENTS ── -->
+        <section class="section" id="section-appointments" aria-labelledby="appointments-heading">
+            <div class="page-inner">
+                <div class="section-header">
+                    <h1 id="appointments-heading">Appointments</h1>
+                    <p class="section-subtitle">Bookings made by your chatbot, plus anything you add manually</p>
+                </div>
+
+                <div id="appointmentsError" style="display:none"></div>
+
+                <div class="card" id="apptBookingDisabledNotice" style="display:none">
+                    <p class="card-note"><span data-icon="info" data-icon-class="icon-inline"
+                            aria-hidden="true"></span>Appointment booking isn't set up yet. Go to <strong>Settings
+                            &rarr; Booking</strong> to set your weekly hours and turn it on.</p>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Book an Appointment</h2>
+                    <p class="card-note">Add a booking manually (e.g. a walk-in or phone call) — it uses the same
+                        working hours and conflict checks as the chatbot.</p>
+                    <form id="apptBookForm" novalidate>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="apptPhone">Phone Number</label>
+                                <input type="tel" id="apptPhone" placeholder="e.g. 919876543210" required
+                                    autocomplete="tel">
+                            </div>
+                            <div class="form-group">
+                                <label for="apptContactName">Contact Name (optional)</label>
+                                <input type="text" id="apptContactName" placeholder="e.g. Priya Sharma">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="apptSlotSelect">Available Slot</label>
+                            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+                                <select id="apptSlotSelect" style="flex:1;min-width:220px">
+                                    <option value="">Loading available slots…</option>
+                                </select>
+                                <button class="btn btn-secondary btn-sm" id="apptRefreshSlotsBtn"
+                                    type="button">Refresh</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="apptNotes">Notes (optional)</label>
+                            <textarea id="apptNotes" rows="2" placeholder="What's this appointment for?"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Book Appointment</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Upcoming &amp; Past Appointments</h2>
+                    <div class="table-container">
+                        <table class="data-table" aria-label="Appointments list">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Contact</th>
+                                    <th scope="col">Date &amp; Time</th>
+                                    <th scope="col">Booked Via</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col"><span class="sr-only">Actions</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="appointmentsBody">
+                                <tr>
+                                    <td colspan="5" class="empty-state">No appointments yet</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── SETTINGS ── -->
+        <section class="section" id="section-settings" aria-labelledby="settings-heading">
+            <div class="page-inner">
+                <div class="section-header">
+                    <h1 id="settings-heading">Settings</h1>
+                    <p class="section-subtitle">Configure your WhatsApp automation</p>
+                </div>
+
+                <!-- Connection Status card (always visible) -->
+                <div class="card">
+                    <h2 class="card-title">Connection Status</h2>
+                    <div class="connection-info" id="connectionInfo" aria-live="polite">
+                        <p>Checking connection…</p>
+                    </div>
+                </div>
+
+                <!-- Settings Tabs -->
+                <div class="settings-tabs" role="tablist" aria-label="Settings sections">
+                    <button class="settings-tab active" role="tab" aria-selected="true" aria-controls="stab-general"
+                        id="tab-general" data-tab="general" type="button">General</button>
+                    <button class="settings-tab" role="tab" aria-selected="false" aria-controls="stab-business"
+                        id="tab-business" data-tab="business" type="button">Business Setup</button>
+                    <button class="settings-tab" role="tab" aria-selected="false" aria-controls="stab-ai" id="tab-ai"
+                        data-tab="ai" type="button">AI Behavior</button>
+                    <button class="settings-tab" role="tab" aria-selected="false" aria-controls="stab-qr" id="tab-qr"
+                        data-tab="qr" type="button">WhatsApp QR</button>
+                    <button class="settings-tab" role="tab" aria-selected="false" aria-controls="stab-booking"
+                        id="tab-booking" data-tab="booking" type="button">Booking</button>
+                    <button class="settings-tab" role="tab" aria-selected="false" aria-controls="stab-calendar"
+                        id="tab-calendar" data-tab="calendar" type="button">Calendar</button>
+                    <button class="settings-tab" role="tab" aria-selected="false" aria-controls="stab-danger"
+                        id="tab-danger" data-tab="danger" type="button">Danger Zone</button>
+                </div>
+
+                <!-- ── Tab: General ── -->
+                <div class="settings-panel active" id="stab-general" role="tabpanel" aria-labelledby="tab-general">
+                    <div class="card">
+                        <h2 class="card-title">General</h2>
+                        <form id="settingsForm" novalidate>
+                            <div class="form-group">
+                                <label for="settBusinessName">Business Name</label>
+                                <input type="text" id="settBusinessName" placeholder="Your business name"
+                                    autocomplete="organization">
+                            </div>
+
+                            <div class="toggle-group">
+                                <span>Chatbot Enabled</span>
+                                <label class="toggle" aria-label="Enable chatbot">
+                                    <input type="checkbox" id="settChatbotEnabled" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="toggle-group">
+                                <span>Away Mode</span>
+                                <label class="toggle" aria-label="Enable away mode">
+                                    <input type="checkbox" id="settAwayMode">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="form-group" style="margin-top:16px">
+                                <label for="settDefaultReply">Default Reply (when no rule matches)</label>
+                                <textarea id="settDefaultReply" rows="2"
+                                    placeholder="Fallback auto-reply message…"></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="settAwayMessage">Away Message</label>
+                                <textarea id="settAwayMessage" rows="2"
+                                    placeholder="Sent when away mode is on…"></textarea>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- ── Tab: Business Setup ── -->
+                <div class="settings-panel" id="stab-business" role="tabpanel" aria-labelledby="tab-business">
+                    <div class="card">
+                        <h2 class="card-title"><span data-icon="store" data-icon-class="icon-inline"
+                                aria-hidden="true"></span>Business Profile</h2>
+                        <p class="card-note">Everything you add here is used by the AI: the WhatsApp bot answers product
+                            & pricing questions from it, and the lead analyzer uses it to score chats from a sales point
+                            of view.</p>
+                        <form id="businessForm" novalidate>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="bizWebsite">Website</label>
+                                    <input type="url" id="bizWebsite" placeholder="https://yourbusiness.com">
+                                </div>
+                                <div class="form-group">
+                                    <label for="bizIndustry">Industry / Category</label>
+                                    <input type="text" id="bizIndustry"
+                                        placeholder="e.g. Clothing, SaaS, Coaching, Restaurant">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="bizDescription">About the Business</label>
+                                <textarea id="bizDescription" rows="3"
+                                    placeholder="What you sell, how you work, delivery areas, timings, anything a customer might ask about…"></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="bizTarget">Target Customers</label>
+                                    <input type="text" id="bizTarget"
+                                        placeholder="Who buys from you? e.g. small business owners, students…">
+                                </div>
+                                <div class="form-group">
+                                    <label for="bizCurrency">Currency Symbol</label>
+                                    <input type="text" id="bizCurrency" placeholder="₹" maxlength="5">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="bizOffers">Current Offers / Promotions</label>
+                                <textarea id="bizOffers" rows="2"
+                                    placeholder="e.g. 20% off this month, free delivery above ₹999…"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="saveBusinessBtn">Save Business
+                                Profile</button>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <h2 class="card-title"><span data-icon="package" data-icon-class="icon-inline"
+                                aria-hidden="true"></span>Products &amp; Services Catalog</h2>
+                        <form id="addProductForm" novalidate>
+                            <div class="form-row-3">
+                                <div class="form-group">
+                                    <label for="prodName">Name</label>
+                                    <input type="text" id="prodName" placeholder="Product / service name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="prodPrice">Price</label>
+                                    <input type="text" id="prodPrice" placeholder="e.g. ₹1,499 or ₹500/month">
+                                </div>
+                                <div class="form-group">
+                                    <label for="prodCategory">Category</label>
+                                    <input type="text" id="prodCategory" placeholder="e.g. Services">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="prodDesc">Description</label>
+                                    <input type="text" id="prodDesc"
+                                        placeholder="Short description the AI can quote to customers">
+                                </div>
+                                <div class="form-group">
+                                    <label for="prodUrl">Link (optional)</label>
+                                    <input type="url" id="prodUrl" placeholder="https://…">
+                                </div>
+                            </div>
+                            <!-- ── Product Image Upload (Enhanced UI) ── -->
+                            <div class="form-group product-media-section" style="margin-bottom:18px">
+                                <div class="product-media-header">
+                                    <label class="product-media-label" for="prodImageFile">
+                                        <span class="product-media-icon-badge">
+                                            <span data-icon="image" aria-hidden="true"></span>
+                                        </span>
+                                        <span class="product-media-title">Product Image</span>
+                                        <span class="product-badge-optional">Optional</span>
+                                    </label>
+                                    <span class="product-media-specs">JPG, PNG, WEBP (Max 5MB)</span>
+                                </div>
+
+                                <div class="product-image-uploader-box">
+                                    <input type="file" id="prodImageFile" accept="image/jpeg,image/png,image/webp"
+                                        style="display:none">
+                                    <input type="hidden" id="prodImagePath">
+
+                                    <div class="product-dropzone" id="prodDropzone" tabindex="0" role="button"
+                                        aria-label="Attach product image">
+                                        <div class="product-dropzone-icon-bubble">
+                                            <span data-icon="upload-cloud" class="product-cloud-icon"
+                                                aria-hidden="true"></span>
+                                        </div>
+                                        <div class="product-dropzone-info">
+                                            <div class="product-dropzone-main-text">
+                                                <button type="button" class="btn btn-secondary product-browse-btn"
+                                                    id="prodBrowseBtn" tabindex="-1">
+                                                    <span data-icon="image" aria-hidden="true"></span>
+                                                    <span>Choose Image</span>
+                                                </button>
+                                                <span class="product-dropzone-divider">or drag &amp; drop</span>
+                                            </div>
+                                            <div class="product-dropzone-subtext" id="prodDropzoneText">Click anywhere
+                                                to browse image from your device</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="product-image-preview-bar product-preview-card"
+                                        id="prodPreviewContainer" style="display:none">
+                                        <div class="preview-img-container product-thumb-wrap">
+                                            <img id="prodImagePreview" src="" alt="Product Image Preview"
+                                                class="product-thumb-preview">
+                                        </div>
+                                        <div class="preview-meta product-preview-details">
+                                            <div class="product-preview-name-row">
+                                                <span id="prodImageFilename" class="preview-filename"></span>
+                                            </div>
+                                            <div class="product-preview-badge-row">
+                                                <span id="prodImageStatus" class="preview-status"></span>
+                                            </div>
+                                        </div>
+                                        <div class="preview-actions product-preview-actions">
+                                            <button type="button" class="btn btn-sm btn-secondary product-action-btn"
+                                                id="prodImageChangeBtn" title="Choose another image">
+                                                <span data-icon="refresh-cw" aria-hidden="true"></span>
+                                                <span>Replace</span>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-danger product-action-btn"
+                                                id="prodImageRemoveBtn" title="Remove product image">
+                                                <span data-icon="trash-2" aria-hidden="true"></span>
+                                                <span>Remove</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-secondary" id="addProductBtn"><span class="btn-icon"
+                                    data-icon="plus" aria-hidden="true"></span> Add to Catalog</button>
+                        </form>
+                        <div class="product-list" id="productList" aria-live="polite" style="margin-top:14px"></div>
+                    </div>
+
+                    <div class="card">
+                        <h2 class="card-title"><span data-icon="brain" data-icon-class="icon-inline"
+                                aria-hidden="true"></span>AI Business Analysis</h2>
+                        <p class="card-note">Let the AI study your business and generate a sales brief — positioning,
+                            selling points, a ready-to-send pitch, and objection handling. This brief also sharpens
+                            auto-replies and lead scoring.</p>
+                        <button class="btn btn-primary" id="analyzeBusinessBtn" type="button">
+                            <span class="btn-icon" data-icon="brain" aria-hidden="true"></span> Analyze My Business
+                        </button>
+                        <div id="businessProfileResult" style="margin-top:14px"></div>
+                    </div>
+                </div>
+
+                <!-- ── Tab: AI Behavior ── -->
+                <div class="settings-panel" id="stab-ai" role="tabpanel" aria-labelledby="tab-ai">
+                    <div class="card">
+                        <h2 class="card-title"><span data-icon="brain" data-icon-class="icon-inline"
+                                aria-hidden="true"></span>Personal AI Persona (Gemini)</h2>
+                        <p class="card-note">Configure your AI to converse authentically on your behalf on WhatsApp
+                            using Google Gemini.</p>
+                        <form id="aiSettingsForm" novalidate>
+                            <div class="toggle-group">
+                                <span>Enable AI Persona Auto-Reply</span>
+                                <label class="toggle" aria-label="Enable AI persona auto-reply">
+                                    <input type="checkbox" id="settAiEnabled" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="form-row" style="margin-top:16px">
+                                <div class="form-group">
+                                    <label for="settOwnerName">Your Name / Identity</label>
+                                    <input type="text" id="settOwnerName" placeholder="e.g. Alex / My Name"
+                                        autocomplete="name">
+                                    <p class="form-text">The AI knows it is replying on your behalf.</p>
+                                </div>
+                                <div class="form-group">
+                                    <label for="settAiMode">AI Priority Mode</label>
+                                    <select id="settAiMode">
+                                        <option value="ai_first">AI Persona First (Conversational &amp; Natural)
+                                        </option>
+                                        <option value="rules_first">Keyword Rules First (Fallback to AI)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Quick Persona Presets</label>
+                                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+                                    <button type="button" class="btn btn-sm btn-secondary preset-btn"
+                                        data-preset="casual"><span class="btn-icon" data-icon="message-circle"
+                                            aria-hidden="true"></span> Casual &amp; Friendly</button>
+                                    <button type="button" class="btn btn-sm btn-secondary preset-btn"
+                                        data-preset="assistant"><span class="btn-icon" data-icon="bot"
+                                            aria-hidden="true"></span> Personal Assistant</button>
+                                    <button type="button" class="btn btn-sm btn-secondary preset-btn"
+                                        data-preset="professional"><span class="btn-icon" data-icon="briefcase"
+                                            aria-hidden="true"></span> Professional</button>
+                                    <button type="button" class="btn btn-sm btn-secondary preset-btn"
+                                        data-preset="short"><span class="btn-icon" data-icon="zap"
+                                            aria-hidden="true"></span> Short &amp; Direct</button>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="settAiSystemPrompt">AI Personality &amp; Custom Instructions</label>
+                                <textarea id="settAiSystemPrompt" rows="5"
+                                    placeholder="Tell the AI how to talk, what you do, how to answer common questions..."></textarea>
+                                <p class="form-text">You can mention what you're busy with, how you prefer to be
+                                    reached, or custom details.</p>
+                            </div>
+
+                            <div class="form-group">
+                                <div
+                                    style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                                    <label for="settGeminiApiKey" style="margin-bottom:0">Google Gemini API Key</label>
+                                    <span id="settGeminiApiKeyStatus" class="badge"
+                                        style="display:none;font-size:0.75rem;padding:2px 8px;border-radius:12px;"></span>
+                                </div>
+                                <div style="display:flex;gap:8px;align-items:center;">
+                                    <input type="password" id="settGeminiApiKey" placeholder="Enter your Gemini API Key"
+                                        autocomplete="new-password" style="flex:1;">
+                                    <button type="button" class="btn btn-sm btn-secondary" id="testGeminiApiKeyBtn"
+                                        style="white-space:nowrap;">Test Key</button>
+                                    <button type="button" class="btn btn-sm btn-danger" id="removeGeminiApiKeyBtn"
+                                        style="white-space:nowrap;display:none;">Remove</button>
+                                </div>
+                                <p class="form-text" id="settGeminiApiKeyHelp">Get a free key from <a
+                                        href="https://aistudio.google.com/" target="_blank"
+                                        rel="noopener noreferrer">Google AI Studio</a>.</p>
+                            </div>
+
+                            <div class="form-group" style="margin-top:12px;">
+                                <div
+                                    style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                                    <label for="settGeminiModel" style="margin-bottom:0">Gemini AI Model</label>
+                                    <span class="badge"
+                                        style="background:rgba(16,185,129,0.15);color:#10b981;font-size:0.75rem;padding:2px 8px;border-radius:12px;">Auto-Fallback
+                                        Protected</span>
+                                </div>
+                                <select id="settGeminiModel" style="width:100%;">
+                                    <option value="auto">Auto (Recommended — Best Speed &amp; Automatic Fallback)
+                                    </option>
+                                    <optgroup label="Fast &amp; High-Throughput (WhatsApp Recommended)">
+                                        <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash Lite (Ultra-low Latency
+                                            ~700ms &amp; High Quota)</option>
+                                        <option value="gemini-3.8-flash">Gemini 3.8 Flash (Latest Flagship Fast &amp;
+                                            Agentic)</option>
+                                        <option value="gemini-3.6-flash">Gemini 3.6 Flash (Fast Reasoning &amp; Complex
+                                            Workflows)</option>
+                                        <option value="gemini-3.7-flash">Gemini 3.7 Flash (High Performance)</option>
+                                        <option value="gemini-3.5-flash">Gemini 3.5 Flash (Fast &amp; Capable)</option>
+                                        <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite (Cost-efficient Fast
+                                            Fallback)</option>
+                                    </optgroup>
+                                    <optgroup label="Future-Proof / Custom">
+                                        <option value="custom">Custom Model Name...</option>
+                                    </optgroup>
+                                </select>
+                                <div id="customModelWrapper" style="display:none;margin-top:8px;">
+                                    <input type="text" id="settGeminiCustomModel"
+                                        placeholder="e.g. gemini-3.0-flash or gemini-3.5-pro" style="width:100%;">
+                                    <p class="form-text">Type any future model name from Google AI Studio. It will be
+                                        prioritized first.</p>
+                                </div>
+                                <p class="form-text">If a model is busy, rate-limited, or unavailable, the system
+                                    automatically falls back down the list to maintain service availability for WhatsApp
+                                    replies.</p>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary" id="saveAiBtn">Save AI Persona
+                                Settings</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- ── Tab: WhatsApp QR ── -->
+                <div class="settings-panel" id="stab-qr" role="tabpanel" aria-labelledby="tab-qr">
+                    <div class="card">
+                        <h2 class="card-title">WhatsApp Web QR Code</h2>
+                        <p class="card-note">Scan this QR code with your personal WhatsApp to connect the bot.</p>
+                        <div class="qr-container" id="qrContainer" aria-live="polite">
+                            <div class="qr-loading" id="qrLoading">Waiting for QR Code… (This may take up to 30 seconds)
+                            </div>
+                            <img id="qrImage" src="" alt="WhatsApp QR Code — scan with your phone" class="qr-image">
+                            <div class="qr-success" id="qrSuccess" style="display:none;">
+                                <span data-icon="check-circle" data-icon-class="icon-inline"
+                                    aria-hidden="true"></span>WhatsApp is Connected!
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ── Tab: Booking ── -->
+                <div class="settings-panel" id="stab-booking" role="tabpanel" aria-labelledby="tab-booking">
+                    <div class="card">
+                        <h2 class="card-title"><span data-icon="calendar-clock" data-icon-class="icon-inline"
+                                aria-hidden="true"></span>Appointment Booking</h2>
+                        <p class="card-note">Set your weekly working hours so customers can book real appointments right
+                            from WhatsApp. The chatbot checks these hours (and your Google Calendar, if connected)
+                            before offering or confirming any slot.</p>
+
                         <div class="toggle-group">
-                            <span>Enable AI Persona Auto-Reply</span>
-                            <label class="toggle" aria-label="Enable AI persona auto-reply">
-                                <input type="checkbox" id="settAiEnabled" checked>
+                            <span>Let the chatbot check availability and book appointments in chat</span>
+                            <label class="toggle" aria-label="Enable chatbot appointment booking">
+                                <input type="checkbox" id="bookingEnabled">
                                 <span class="toggle-slider"></span>
                             </label>
                         </div>
 
-                        <div class="form-row" style="margin-top:16px">
+                        <form id="bookingSettingsForm" novalidate style="margin-top:16px">
                             <div class="form-group">
-                                <label for="settOwnerName">Your Name / Identity</label>
-                                <input type="text" id="settOwnerName" placeholder="e.g. Alex / My Name" autocomplete="name">
-                                <p class="form-text">The AI knows it is replying on your behalf.</p>
+                                <label>Working Days</label>
+                                <div id="bookingWorkingDays" style="display:flex;gap:8px;flex-wrap:wrap">
+                                    <label
+                                        style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--color-border);border-radius:20px;font-size:0.85rem;color:var(--color-text-secondary);cursor:pointer"><input
+                                            type="checkbox" value="1" class="bookingDay" style="margin:0"> Mon</label>
+                                    <label
+                                        style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--color-border);border-radius:20px;font-size:0.85rem;color:var(--color-text-secondary);cursor:pointer"><input
+                                            type="checkbox" value="2" class="bookingDay" style="margin:0"> Tue</label>
+                                    <label
+                                        style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--color-border);border-radius:20px;font-size:0.85rem;color:var(--color-text-secondary);cursor:pointer"><input
+                                            type="checkbox" value="3" class="bookingDay" style="margin:0"> Wed</label>
+                                    <label
+                                        style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--color-border);border-radius:20px;font-size:0.85rem;color:var(--color-text-secondary);cursor:pointer"><input
+                                            type="checkbox" value="4" class="bookingDay" style="margin:0"> Thu</label>
+                                    <label
+                                        style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--color-border);border-radius:20px;font-size:0.85rem;color:var(--color-text-secondary);cursor:pointer"><input
+                                            type="checkbox" value="5" class="bookingDay" style="margin:0"> Fri</label>
+                                    <label
+                                        style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--color-border);border-radius:20px;font-size:0.85rem;color:var(--color-text-secondary);cursor:pointer"><input
+                                            type="checkbox" value="6" class="bookingDay" style="margin:0"> Sat</label>
+                                    <label
+                                        style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--color-border);border-radius:20px;font-size:0.85rem;color:var(--color-text-secondary);cursor:pointer"><input
+                                            type="checkbox" value="0" class="bookingDay" style="margin:0"> Sun</label>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="bookingStartTime">Opens At</label>
+                                    <input type="time" id="bookingStartTime" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="bookingEndTime">Closes At</label>
+                                    <input type="time" id="bookingEndTime" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="bookingSlotDuration">Appointment Length</label>
+                                    <select id="bookingSlotDuration">
+                                        <option value="15">15 minutes</option>
+                                        <option value="30">30 minutes</option>
+                                        <option value="45">45 minutes</option>
+                                        <option value="60">60 minutes</option>
+                                        <option value="90">90 minutes</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="bookingBufferMinutes">Buffer Between Appointments</label>
+                                    <select id="bookingBufferMinutes">
+                                        <option value="0">No buffer</option>
+                                        <option value="5">5 minutes</option>
+                                        <option value="10">10 minutes</option>
+                                        <option value="15">15 minutes</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="form-group">
-                                <label for="settAiMode">AI Priority Mode</label>
-                                <select id="settAiMode">
-                                    <option value="ai_first">AI Persona First (Conversational &amp; Natural)</option>
-                                    <option value="rules_first">Keyword Rules First (Fallback to AI)</option>
+                                <label for="bookingTimezone">Timezone</label>
+                                <select id="bookingTimezone">
+                                    <option value="Asia/Kolkata">India (Asia/Kolkata)</option>
+                                    <option value="Asia/Dubai">Dubai (Asia/Dubai)</option>
+                                    <option value="Asia/Dhaka">Dhaka (Asia/Dhaka)</option>
+                                    <option value="Asia/Karachi">Karachi (Asia/Karachi)</option>
+                                    <option value="Asia/Singapore">Singapore (Asia/Singapore)</option>
+                                    <option value="Europe/London">London (Europe/London)</option>
+                                    <option value="America/New_York">New York (America/New_York)</option>
+                                    <option value="America/Los_Angeles">Los Angeles (America/Los_Angeles)</option>
+                                    <option value="UTC">UTC</option>
                                 </select>
                             </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label>Quick Persona Presets</label>
-                            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
-                                <button type="button" class="btn btn-sm btn-secondary preset-btn" data-preset="casual"><span class="btn-icon" data-icon="message-circle" aria-hidden="true"></span> Casual &amp; Friendly</button>
-                                <button type="button" class="btn btn-sm btn-secondary preset-btn" data-preset="assistant"><span class="btn-icon" data-icon="bot" aria-hidden="true"></span> Personal Assistant</button>
-                                <button type="button" class="btn btn-sm btn-secondary preset-btn" data-preset="professional"><span class="btn-icon" data-icon="briefcase" aria-hidden="true"></span> Professional</button>
-                                <button type="button" class="btn btn-sm btn-secondary preset-btn" data-preset="short"><span class="btn-icon" data-icon="zap" aria-hidden="true"></span> Short &amp; Direct</button>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="settAiSystemPrompt">AI Personality &amp; Custom Instructions</label>
-                            <textarea id="settAiSystemPrompt" rows="5" placeholder="Tell the AI how to talk, what you do, how to answer common questions..."></textarea>
-                            <p class="form-text">You can mention what you're busy with, how you prefer to be reached, or custom details.</p>
-                        </div>
-
-                        <div class="form-group">
-                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                                <label for="settGeminiApiKey" style="margin-bottom:0">Google Gemini API Key</label>
-                                <span id="settGeminiApiKeyStatus" class="badge" style="display:none;font-size:0.75rem;padding:2px 8px;border-radius:12px;"></span>
-                            </div>
-                            <div style="display:flex;gap:8px;align-items:center;">
-                                <input type="password" id="settGeminiApiKey" placeholder="Enter your Gemini API Key" autocomplete="new-password" style="flex:1;">
-                                <button type="button" class="btn btn-sm btn-secondary" id="testGeminiApiKeyBtn" style="white-space:nowrap;">Test Key</button>
-                                <button type="button" class="btn btn-sm btn-danger" id="removeGeminiApiKeyBtn" style="white-space:nowrap;display:none;">Remove</button>
-                            </div>
-                            <p class="form-text" id="settGeminiApiKeyHelp">Get a free key from <a href="https://aistudio.google.com/" target="_blank" rel="noopener noreferrer">Google AI Studio</a>.</p>
-                        </div>
-
-                        <div class="form-group" style="margin-top:12px;">
-                            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                                <label for="settGeminiModel" style="margin-bottom:0">Gemini AI Model</label>
-                                <span class="badge" style="background:rgba(16,185,129,0.15);color:#10b981;font-size:0.75rem;padding:2px 8px;border-radius:12px;">Auto-Fallback Protected</span>
-                            </div>
-                            <select id="settGeminiModel" style="width:100%;">
-                                <option value="auto">Auto (Recommended — Best Speed &amp; Automatic Fallback)</option>
-                                <optgroup label="Fast &amp; High-Throughput (WhatsApp Recommended)">
-                                    <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash Lite (Ultra-low Latency ~700ms &amp; High Quota)</option>
-                                    <option value="gemini-3.8-flash">Gemini 3.8 Flash (Latest Flagship Fast &amp; Agentic)</option>
-                                    <option value="gemini-3.6-flash">Gemini 3.6 Flash (Fast Reasoning &amp; Complex Workflows)</option>
-                                    <option value="gemini-3.7-flash">Gemini 3.7 Flash (High Performance)</option>
-                                    <option value="gemini-3.5-flash">Gemini 3.5 Flash (Fast &amp; Capable)</option>
-                                    <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite (Cost-efficient Fast Fallback)</option>
-                                </optgroup>
-                                <optgroup label="Future-Proof / Custom">
-                                    <option value="custom">Custom Model Name...</option>
-                                </optgroup>
-                            </select>
-                            <div id="customModelWrapper" style="display:none;margin-top:8px;">
-                                <input type="text" id="settGeminiCustomModel" placeholder="e.g. gemini-3.0-flash or gemini-3.5-pro" style="width:100%;">
-                                <p class="form-text">Type any future model name from Google AI Studio. It will be prioritized first.</p>
-                            </div>
-                            <p class="form-text">If a model is busy, rate-limited, or unavailable, the system automatically falls back down the list to maintain service availability for WhatsApp replies.</p>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary" id="saveAiBtn">Save AI Persona Settings</button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- ── Tab: WhatsApp QR ── -->
-            <div class="settings-panel" id="stab-qr" role="tabpanel" aria-labelledby="tab-qr">
-                <div class="card">
-                    <h2 class="card-title">WhatsApp Web QR Code</h2>
-                    <p class="card-note">Scan this QR code with your personal WhatsApp to connect the bot.</p>
-                    <div class="qr-container" id="qrContainer" aria-live="polite">
-                        <div class="qr-loading" id="qrLoading">Waiting for QR Code… (This may take up to 30 seconds)</div>
-                        <img id="qrImage" src="" alt="WhatsApp QR Code — scan with your phone" class="qr-image">
-                        <div class="qr-success" id="qrSuccess" style="display:none;">
-                            <span data-icon="check-circle" data-icon-class="icon-inline" aria-hidden="true"></span>WhatsApp is Connected!
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ── Tab: Booking ── -->
-            <div class="settings-panel" id="stab-booking" role="tabpanel" aria-labelledby="tab-booking">
-                <div class="card">
-                    <h2 class="card-title"><span data-icon="calendar-clock" data-icon-class="icon-inline" aria-hidden="true"></span>Appointment Booking</h2>
-                    <p class="card-note">Set your weekly working hours so customers can book real appointments right from WhatsApp. The chatbot checks these hours (and your Google Calendar, if connected) before offering or confirming any slot.</p>
-
-                    <div class="toggle-group">
-                        <span>Let the chatbot check availability and book appointments in chat</span>
-                        <label class="toggle" aria-label="Enable chatbot appointment booking">
-                            <input type="checkbox" id="bookingEnabled">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-
-                    <form id="bookingSettingsForm" novalidate style="margin-top:16px">
-                        <div class="form-group">
-                            <label>Working Days</label>
-<div id="bookingWorkingDays" style="display:flex;gap:8px;flex-wrap:wrap">
-                                <label style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--color-border);border-radius:20px;font-size:0.85rem;color:var(--color-text-secondary);cursor:pointer"><input type="checkbox" value="1" class="bookingDay" style="margin:0"> Mon</label>
-                                <label style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--color-border);border-radius:20px;font-size:0.85rem;color:var(--color-text-secondary);cursor:pointer"><input type="checkbox" value="2" class="bookingDay" style="margin:0"> Tue</label>
-                                <label style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--color-border);border-radius:20px;font-size:0.85rem;color:var(--color-text-secondary);cursor:pointer"><input type="checkbox" value="3" class="bookingDay" style="margin:0"> Wed</label>
-                                <label style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--color-border);border-radius:20px;font-size:0.85rem;color:var(--color-text-secondary);cursor:pointer"><input type="checkbox" value="4" class="bookingDay" style="margin:0"> Thu</label>
-                                <label style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--color-border);border-radius:20px;font-size:0.85rem;color:var(--color-text-secondary);cursor:pointer"><input type="checkbox" value="5" class="bookingDay" style="margin:0"> Fri</label>
-                                <label style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--color-border);border-radius:20px;font-size:0.85rem;color:var(--color-text-secondary);cursor:pointer"><input type="checkbox" value="6" class="bookingDay" style="margin:0"> Sat</label>
-                                <label style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--color-border);border-radius:20px;font-size:0.85rem;color:var(--color-text-secondary);cursor:pointer"><input type="checkbox" value="0" class="bookingDay" style="margin:0"> Sun</label>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="bookingStartTime">Opens At</label>
-                                <input type="time" id="bookingStartTime" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="bookingEndTime">Closes At</label>
-                                <input type="time" id="bookingEndTime" required>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="bookingSlotDuration">Appointment Length</label>
-                                <select id="bookingSlotDuration">
-                                    <option value="15">15 minutes</option>
-                                    <option value="30">30 minutes</option>
-                                    <option value="45">45 minutes</option>
-                                    <option value="60">60 minutes</option>
-                                    <option value="90">90 minutes</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="bookingBufferMinutes">Buffer Between Appointments</label>
-                                <select id="bookingBufferMinutes">
-                                    <option value="0">No buffer</option>
-                                    <option value="5">5 minutes</option>
-                                    <option value="10">10 minutes</option>
-                                    <option value="15">15 minutes</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="bookingTimezone">Timezone</label>
-                            <select id="bookingTimezone">
-                                <option value="Asia/Kolkata">India (Asia/Kolkata)</option>
-                                <option value="Asia/Dubai">Dubai (Asia/Dubai)</option>
-                                <option value="Asia/Dhaka">Dhaka (Asia/Dhaka)</option>
-                                <option value="Asia/Karachi">Karachi (Asia/Karachi)</option>
-                                <option value="Asia/Singapore">Singapore (Asia/Singapore)</option>
-                                <option value="Europe/London">London (Europe/London)</option>
-                                <option value="America/New_York">New York (America/New_York)</option>
-                                <option value="America/Los_Angeles">Los Angeles (America/Los_Angeles)</option>
-                                <option value="UTC">UTC</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Save Booking Settings</button>
-                    </form>
-                </div>
-            </div>
-
-            <!-- ── Tab: Calendar ── -->
-            <div class="settings-panel" id="stab-calendar" role="tabpanel" aria-labelledby="tab-calendar">
-                <div class="card">
-                    <h2 class="card-title"><span data-icon="calendar-clock" data-icon-class="icon-inline" aria-hidden="true"></span>Google Calendar</h2>
-                    <p class="card-note">Connect your Google Calendar to log every outreach send as an event, schedule WhatsApp messages by creating an event titled <code>WhatsApp: &lt;phone number&gt;</code> with the message in the description, and optionally skip sends while your calendar shows you're busy.</p>
-                    <div id="calendarNotConfigured" style="display:none">
-                        <p style="color:var(--color-text-secondary)">Google Calendar isn't set up on this server yet. An administrator needs to add <code>GOOGLE_CALENDAR_CLIENT_ID</code>, <code>GOOGLE_CALENDAR_CLIENT_SECRET</code> and <code>GOOGLE_CALENDAR_REDIRECT_URI</code> to the server's environment.</p>
-                    </div>
-                    <div id="calendarStatus" aria-live="polite">
-                        <p>Checking connection…</p>
-                    </div>
-                    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
-                        <button class="btn btn-primary" id="calendarConnectBtn" type="button" style="display:none">
-                            <span class="btn-icon" data-icon="calendar-clock" aria-hidden="true"></span> Connect Google Calendar
-                        </button>
-                        <button class="btn btn-secondary" id="calendarSyncBtn" type="button" style="display:none">Sync Now</button>
-                        <button class="btn btn-secondary" id="calendarDisconnectBtn" type="button" style="display:none">Disconnect</button>
-                    </div>
-                    <div class="toggle-group" id="calendarAvailabilityRow" style="display:none;margin-top:16px">
-                        <span>Skip outreach sends while I'm busy on my calendar</span>
-                        <label class="toggle" aria-label="Check calendar availability before sending">
-                            <input type="checkbox" id="settCalendarCheckAvailability">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ── Tab: Danger Zone ── -->
-            <div class="settings-panel" id="stab-danger" role="tabpanel" aria-labelledby="tab-danger">
-                <div class="danger-zone-card">
-                    <h2 class="card-title"><span data-icon="triangle-alert" data-icon-class="icon-inline" aria-hidden="true"></span>Danger Zone</h2>
-                    <p class="card-note">These actions are irreversible. Please be certain before proceeding.</p>
-
-                    <div style="display:flex;flex-direction:column;gap:12px;">
-                        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--color-border);">
-                            <div>
-                                <div style="font-weight:600;font-size:0.9rem;color:var(--color-text-primary);">Pause Chatbot</div>
-                                <div style="font-size:0.8rem;color:var(--color-text-secondary);margin-top:2px;">Temporarily stop all auto-replies without losing configuration.</div>
-                            </div>
-                            <button class="btn btn-danger btn-sm" id="pauseChatbotBtn" type="button">Pause</button>
-                        </div>
-
-                        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--color-border);">
-                            <div>
-                                <div style="font-weight:600;font-size:0.9rem;color:var(--color-text-primary);">Clear Message History</div>
-                                <div style="font-size:0.8rem;color:var(--color-text-secondary);margin-top:2px;">Delete all stored messages from the database permanently.</div>
-                            </div>
-                            <button class="btn btn-danger btn-sm" id="clearMessagesBtn" type="button">Clear All</button>
-                        </div>
-
-                        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;">
-                            <div>
-                                <div style="font-weight:600;font-size:0.9rem;color:var(--color-text-primary);">Disconnect WhatsApp</div>
-                                <div style="font-size:0.8rem;color:var(--color-text-secondary);margin-top:2px;">Log out of the current WhatsApp session. You will need to re-scan the QR code.</div>
-                            </div>
-                            <button class="btn btn-danger btn-sm" id="disconnectBtn" type="button">Disconnect</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-</main>
-
-<!-- ── Screen-reader only utility ── -->
-<style>.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}</style>
-
-<!-- ── Deal Detail Modal ── -->
-<div class="modal-backdrop" id="dealModalBackdrop" style="display:none" role="dialog" aria-modal="true" aria-labelledby="dealModalTitle">
-    <div class="modal" id="dealModal">
-        <div class="modal-header">
-            <h2 id="dealModalTitle">Deal</h2>
-            <button class="modal-close" id="dealModalClose" aria-label="Close" type="button">×</button>
-        </div>
-        <div class="modal-body" id="dealModalBody">
-            <!-- filled by JS -->
-        </div>
-    </div>
-</div>
-
-<!-- ── Outreach Modal ── -->
-<div class="modal-backdrop" id="outreachModalBackdrop" style="display:none" role="dialog" aria-modal="true" aria-labelledby="outreachModalTitle">
-    <div class="modal" id="outreachModal">
-        <div class="modal-header">
-            <h2 id="outreachModalTitle">Send Outreach</h2>
-            <button class="modal-close" id="outreachModalClose" aria-label="Close" type="button">×</button>
-        </div>
-        <div class="modal-body">
-            <div class="outreach-warning">
-                <span data-icon="triangle-alert" aria-hidden="true"></span>
-                <span>WhatsApp's own terms prohibit bulk/automated messaging, and accounts that message many
-                    people in a short window risk being flagged or banned — this includes numbers connected
-                    through this dashboard. Only message contacts who've messaged you first or clearly opted
-                    in. Sends go out with a randomized delay between each; there's no way to make bulk
-                    outreach fully risk-free.</span>
-            </div>
-
-            <p id="outreachRecipientCount" style="font-weight:600;margin-bottom:var(--space-sm)"></p>
-
-            <div id="outreachComposeView">
-                <div class="form-group">
-                    <label for="outreachMessage">Message</label>
-                    <textarea id="outreachMessage" rows="5" placeholder="Hi {{name}}, ..."></textarea>
-                    <div style="font-size:.78rem;color:var(--color-text-secondary);margin-top:4px">
-                        Use <code>{{name}}</code> to personalize with each contact's saved name. If an image is attached, this text will be sent as the image caption.
+                            <button type="submit" class="btn btn-primary">Save Booking Settings</button>
+                        </form>
                     </div>
                 </div>
 
-                <!-- ── Outreach Media Attachment ── -->
-                <div class="form-group outreach-media-section">
-                    <div class="outreach-media-header">
-                        <label class="outreach-media-label" for="outreachImageInput">
-                            <span class="outreach-media-icon-badge">
-                                <span data-icon="paperclip" aria-hidden="true"></span>
-                            </span>
-                            <span class="outreach-media-title">Image Attachment</span>
-                            <span class="outreach-badge-optional">Optional</span>
-                        </label>
-                        <span class="outreach-media-specs">JPG, PNG, WEBP (Max 5MB)</span>
-                    </div>
-
-                    <input type="file" id="outreachImageInput" accept="image/jpeg,image/png,image/webp" style="display:none">
-
-                    <!-- Modern Enhanced Dropzone / Attach Card -->
-                    <div class="outreach-attach-card" id="outreachAttachCard" tabindex="0" role="button" aria-label="Attach an image for outreach">
-                        <div class="outreach-attach-icon-bubble">
-                            <span data-icon="upload-cloud" class="outreach-cloud-icon" aria-hidden="true"></span>
+                <!-- ── Tab: Calendar ── -->
+                <div class="settings-panel" id="stab-calendar" role="tabpanel" aria-labelledby="tab-calendar">
+                    <div class="card">
+                        <h2 class="card-title"><span data-icon="calendar-clock" data-icon-class="icon-inline"
+                                aria-hidden="true"></span>Google Calendar</h2>
+                        <p class="card-note">Connect your Google Calendar to log every outreach send as an event,
+                            schedule WhatsApp messages by creating an event titled
+                            <code>WhatsApp: &lt;phone number&gt;</code> with the message in the description, and
+                            optionally skip sends while your calendar shows you're busy.</p>
+                        <div id="calendarNotConfigured" style="display:none">
+                            <p style="color:var(--color-text-secondary)">Google Calendar isn't set up on this server
+                                yet. An administrator needs to add <code>GOOGLE_CALENDAR_CLIENT_ID</code>,
+                                <code>GOOGLE_CALENDAR_CLIENT_SECRET</code> and <code>GOOGLE_CALENDAR_REDIRECT_URI</code>
+                                to the server's environment.</p>
                         </div>
-                        <div class="outreach-attach-info">
-                            <div class="outreach-attach-main-text">
-                                <button type="button" class="btn btn-secondary outreach-attach-btn" id="outreachAttachBtn">
-                                    <span data-icon="image" aria-hidden="true"></span>
-                                    <span>Attach Image</span>
-                                </button>
-                                <span class="outreach-attach-divider">or drag &amp; drop</span>
-                            </div>
-                            <div class="outreach-attach-subtext">Click anywhere in this box to browse from your device</div>
+                        <div id="calendarStatus" aria-live="polite">
+                            <p>Checking connection…</p>
                         </div>
-                    </div>
-
-                    <!-- Modern Progress bar (during upload) -->
-                    <div id="outreachUploadProgressBar" class="outreach-upload-progress" style="display:none">
-                        <div class="outreach-progress-header">
-                            <span id="outreachUploadProgressText" class="outreach-progress-title">Uploading image...</span>
-                            <span id="outreachUploadProgressPercent" class="outreach-progress-pct">0%</span>
-                        </div>
-                        <div class="outreach-progress-track">
-                            <div id="outreachUploadProgressFill" class="outreach-progress-fill"></div>
-                        </div>
-                    </div>
-
-                    <!-- Validation / upload error banner -->
-                    <div id="outreachMediaError" class="outreach-media-error" style="display:none"></div>
-
-                    <!-- Premium Preview Card (when image is selected/uploaded) -->
-                    <div class="product-image-preview-bar outreach-preview-card" id="outreachPreviewBar" style="display:none">
-                        <div class="preview-img-container outreach-thumb-wrap">
-                            <img id="outreachImagePreview" src="" alt="Image Attachment Preview" class="product-thumb-preview">
-                        </div>
-                        <div class="preview-meta outreach-preview-details">
-                            <div class="outreach-preview-name-row">
-                                <span id="outreachImageFilename" class="preview-filename"></span>
-                            </div>
-                            <div class="outreach-preview-badge-row">
-                                <span id="outreachImageMeta" class="preview-status"></span>
-                            </div>
-                        </div>
-                        <div class="preview-actions outreach-preview-actions">
-                            <button type="button" class="btn btn-sm btn-secondary outreach-action-btn" id="outreachReplaceBtn" title="Choose another image">
-                                <span data-icon="refresh-cw" aria-hidden="true"></span>
-                                <span>Replace</span>
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+                            <button class="btn btn-primary" id="calendarConnectBtn" type="button" style="display:none">
+                                <span class="btn-icon" data-icon="calendar-clock" aria-hidden="true"></span> Connect
+                                Google Calendar
                             </button>
-                            <button type="button" class="btn btn-sm btn-danger outreach-action-btn" id="outreachRemoveBtn" title="Remove attached image">
-                                <span data-icon="trash-2" aria-hidden="true"></span>
-                                <span>Remove</span>
-                            </button>
+                            <button class="btn btn-secondary" id="calendarSyncBtn" type="button"
+                                style="display:none">Sync Now</button>
+                            <button class="btn btn-secondary" id="calendarDisconnectBtn" type="button"
+                                style="display:none">Disconnect</button>
+                        </div>
+                        <div class="toggle-group" id="calendarAvailabilityRow" style="display:none;margin-top:16px">
+                            <span>Skip outreach sends while I'm busy on my calendar</span>
+                            <label class="toggle" aria-label="Check calendar availability before sending">
+                                <input type="checkbox" id="settCalendarCheckAvailability">
+                                <span class="toggle-slider"></span>
+                            </label>
                         </div>
                     </div>
                 </div>
 
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-secondary" id="outreachCancelBtn">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="outreachSendBtn">
-                        <span data-icon="send" aria-hidden="true"></span> Send Outreach
-                    </button>
-                </div>
-            </div>
+                <!-- ── Tab: Danger Zone ── -->
+                <div class="settings-panel" id="stab-danger" role="tabpanel" aria-labelledby="tab-danger">
+                    <div class="danger-zone-card">
+                        <h2 class="card-title"><span data-icon="triangle-alert" data-icon-class="icon-inline"
+                                aria-hidden="true"></span>Danger Zone</h2>
+                        <p class="card-note">These actions are irreversible. Please be certain before proceeding.</p>
 
-            <div id="outreachProgressView" style="display:none">
-                <p id="outreachProgressSummary" style="margin-bottom:var(--space-sm)"></p>
-                <div class="outreach-progress-list" id="outreachProgressList"></div>
-                <div class="modal-actions">
-                    <button type="button" class="btn btn-primary" id="outreachDoneBtn" style="display:none">Done</button>
+                        <div style="display:flex;flex-direction:column;gap:12px;">
+                            <div
+                                style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--color-border);">
+                                <div>
+                                    <div style="font-weight:600;font-size:0.9rem;color:var(--color-text-primary);">Pause
+                                        Chatbot</div>
+                                    <div style="font-size:0.8rem;color:var(--color-text-secondary);margin-top:2px;">
+                                        Temporarily stop all auto-replies without losing configuration.</div>
+                                </div>
+                                <button class="btn btn-danger btn-sm" id="pauseChatbotBtn" type="button">Pause</button>
+                            </div>
+
+                            <div
+                                style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--color-border);">
+                                <div>
+                                    <div style="font-weight:600;font-size:0.9rem;color:var(--color-text-primary);">Clear
+                                        Message History</div>
+                                    <div style="font-size:0.8rem;color:var(--color-text-secondary);margin-top:2px;">
+                                        Delete all stored messages from the database permanently.</div>
+                                </div>
+                                <button class="btn btn-danger btn-sm" id="clearMessagesBtn" type="button">Clear
+                                    All</button>
+                            </div>
+
+                            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;">
+                                <div>
+                                    <div style="font-weight:600;font-size:0.9rem;color:var(--color-text-primary);">
+                                        Disconnect WhatsApp</div>
+                                    <div style="font-size:0.8rem;color:var(--color-text-secondary);margin-top:2px;">Log
+                                        out of the current WhatsApp session. You will need to re-scan the QR code.</div>
+                                </div>
+                                <button class="btn btn-danger btn-sm" id="disconnectBtn"
+                                    type="button">Disconnect</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ── Screen-reader only utility ── -->
+    <style>
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0
+        }
+    </style>
+
+    <!-- ── Deal Detail Modal ── -->
+    <div class="modal-backdrop" id="dealModalBackdrop" style="display:none" role="dialog" aria-modal="true"
+        aria-labelledby="dealModalTitle">
+        <div class="modal" id="dealModal">
+            <div class="modal-header">
+                <h2 id="dealModalTitle">Deal</h2>
+                <button class="modal-close" id="dealModalClose" aria-label="Close" type="button">×</button>
+            </div>
+            <div class="modal-body" id="dealModalBody">
+                <!-- filled by JS -->
             </div>
         </div>
     </div>
-</div>
 
-<!-- ── Edit Product Modal ── -->
-<div class="modal-backdrop" id="editProductModalBackdrop" style="display:none" role="dialog" aria-modal="true" aria-labelledby="editProductModalTitle">
-    <div class="modal" id="editProductModal" style="max-width:560px">
-        <div class="modal-header">
-            <h2 id="editProductModalTitle">Edit Product / Service</h2>
-            <button class="modal-close" id="editProductModalClose" aria-label="Close" type="button">×</button>
-        </div>
-        <div class="modal-body">
-            <form id="editProductForm" novalidate>
-                <input type="hidden" id="editProdId">
-                <input type="hidden" id="editProdImagePath">
-                <div class="form-row-3">
-                    <div class="form-group">
-                        <label for="editProdName">Name</label>
-                        <input type="text" id="editProdName" placeholder="Product name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editProdPrice">Price</label>
-                        <input type="text" id="editProdPrice" placeholder="e.g. ₹1,499">
-                    </div>
-                    <div class="form-group">
-                        <label for="editProdCategory">Category</label>
-                        <input type="text" id="editProdCategory" placeholder="e.g. Services">
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="editProdDesc">Description</label>
-                        <input type="text" id="editProdDesc" placeholder="Description for WhatsApp chatbot">
-                    </div>
-                    <div class="form-group">
-                        <label for="editProdUrl">Link (optional)</label>
-                        <input type="url" id="editProdUrl" placeholder="https://…">
-                    </div>
+    <!-- ── Outreach Modal ── -->
+    <div class="modal-backdrop" id="outreachModalBackdrop" style="display:none" role="dialog" aria-modal="true"
+        aria-labelledby="outreachModalTitle">
+        <div class="modal" id="outreachModal">
+            <div class="modal-header">
+                <h2 id="outreachModalTitle">Send Outreach</h2>
+                <button class="modal-close" id="outreachModalClose" aria-label="Close" type="button">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="outreach-warning">
+                    <span data-icon="triangle-alert" aria-hidden="true"></span>
+                    <span>WhatsApp's own terms prohibit bulk/automated messaging, and accounts that message many
+                        people in a short window risk being flagged or banned — this includes numbers connected
+                        through this dashboard. Only message contacts who've messaged you first or clearly opted
+                        in. Sends go out with a randomized delay between each; there's no way to make bulk
+                        outreach fully risk-free.</span>
                 </div>
 
-                <div class="form-group product-media-section" style="margin-top:14px;margin-bottom:18px">
-                    <div class="product-media-header">
-                        <label class="product-media-label" for="editProdImageFile">
-                            <span class="product-media-icon-badge">
-                                <span data-icon="image" aria-hidden="true"></span>
-                            </span>
-                            <span class="product-media-title">Product Image</span>
-                            <span class="product-badge-optional">Optional</span>
-                        </label>
-                        <span class="product-media-specs">JPG, PNG, WEBP (Max 5MB)</span>
+                <p id="outreachRecipientCount" style="font-weight:600;margin-bottom:var(--space-sm)"></p>
+
+                <div id="outreachComposeView">
+                    <div class="form-group">
+                        <label for="outreachMessage">Message</label>
+                        <textarea id="outreachMessage" rows="5" placeholder="Hi {{name}}, ..."></textarea>
+                        <div style="font-size:.78rem;color:var(--color-text-secondary);margin-top:4px">
+                            Use <code>{{name}}</code> to personalize with each contact's saved name. If an image is
+                            attached, this text will be sent as the image caption.
+                        </div>
                     </div>
 
-                    <div class="product-image-uploader-box">
-                        <input type="file" id="editProdImageFile" accept="image/jpeg,image/png,image/webp" style="display:none">
+                    <!-- ── Outreach Media Attachment ── -->
+                    <div class="form-group outreach-media-section">
+                        <div class="outreach-media-header">
+                            <label class="outreach-media-label" for="outreachImageInput">
+                                <span class="outreach-media-icon-badge">
+                                    <span data-icon="paperclip" aria-hidden="true"></span>
+                                </span>
+                                <span class="outreach-media-title">Image Attachment</span>
+                                <span class="outreach-badge-optional">Optional</span>
+                            </label>
+                            <span class="outreach-media-specs">JPG, PNG, WEBP (Max 5MB)</span>
+                        </div>
 
-                        <div class="product-dropzone" id="editProdDropzone" tabindex="0" role="button" aria-label="Attach or replace product image">
-                            <div class="product-dropzone-icon-bubble">
-                                <span data-icon="upload-cloud" class="product-cloud-icon" aria-hidden="true"></span>
+                        <input type="file" id="outreachImageInput" accept="image/jpeg,image/png,image/webp"
+                            style="display:none">
+
+                        <!-- Modern Enhanced Dropzone / Attach Card -->
+                        <div class="outreach-attach-card" id="outreachAttachCard" tabindex="0" role="button"
+                            aria-label="Attach an image for outreach">
+                            <div class="outreach-attach-icon-bubble">
+                                <span data-icon="upload-cloud" class="outreach-cloud-icon" aria-hidden="true"></span>
                             </div>
-                            <div class="product-dropzone-info">
-                                <div class="product-dropzone-main-text">
-                                    <button type="button" class="btn btn-secondary product-browse-btn" id="editProdBrowseBtn" tabindex="-1">
+                            <div class="outreach-attach-info">
+                                <div class="outreach-attach-main-text">
+                                    <button type="button" class="btn btn-secondary outreach-attach-btn"
+                                        id="outreachAttachBtn">
                                         <span data-icon="image" aria-hidden="true"></span>
-                                        <span>Choose Image</span>
+                                        <span>Attach Image</span>
                                     </button>
-                                    <span class="product-dropzone-divider">or drag &amp; drop</span>
+                                    <span class="outreach-attach-divider">or drag &amp; drop</span>
                                 </div>
-                                <div class="product-dropzone-subtext" id="editProdDropzoneText">Click anywhere to attach or replace image</div>
+                                <div class="outreach-attach-subtext">Click anywhere in this box to browse from your
+                                    device</div>
                             </div>
                         </div>
 
-                        <div class="product-image-preview-bar product-preview-card" id="editProdPreviewContainer" style="display:none">
-                            <div class="preview-img-container product-thumb-wrap">
-                                <img id="editProdImagePreview" src="" alt="Product Image Preview" class="product-thumb-preview">
+                        <!-- Modern Progress bar (during upload) -->
+                        <div id="outreachUploadProgressBar" class="outreach-upload-progress" style="display:none">
+                            <div class="outreach-progress-header">
+                                <span id="outreachUploadProgressText" class="outreach-progress-title">Uploading
+                                    image...</span>
+                                <span id="outreachUploadProgressPercent" class="outreach-progress-pct">0%</span>
                             </div>
-                            <div class="preview-meta product-preview-details">
-                                <div class="product-preview-name-row">
-                                    <span id="editProdImageFilename" class="preview-filename"></span>
+                            <div class="outreach-progress-track">
+                                <div id="outreachUploadProgressFill" class="outreach-progress-fill"></div>
+                            </div>
+                        </div>
+
+                        <!-- Validation / upload error banner -->
+                        <div id="outreachMediaError" class="outreach-media-error" style="display:none"></div>
+
+                        <!-- Premium Preview Card (when image is selected/uploaded) -->
+                        <div class="product-image-preview-bar outreach-preview-card" id="outreachPreviewBar"
+                            style="display:none">
+                            <div class="preview-img-container outreach-thumb-wrap">
+                                <img id="outreachImagePreview" src="" alt="Image Attachment Preview"
+                                    class="product-thumb-preview">
+                            </div>
+                            <div class="preview-meta outreach-preview-details">
+                                <div class="outreach-preview-name-row">
+                                    <span id="outreachImageFilename" class="preview-filename"></span>
                                 </div>
-                                <div class="product-preview-badge-row">
-                                    <span id="editProdImageStatus" class="preview-status"></span>
+                                <div class="outreach-preview-badge-row">
+                                    <span id="outreachImageMeta" class="preview-status"></span>
                                 </div>
                             </div>
-                            <div class="preview-actions product-preview-actions">
-                                <button type="button" class="btn btn-sm btn-secondary product-action-btn" id="editProdImageReplaceBtn" title="Choose another image">
+                            <div class="preview-actions outreach-preview-actions">
+                                <button type="button" class="btn btn-sm btn-secondary outreach-action-btn"
+                                    id="outreachReplaceBtn" title="Choose another image">
                                     <span data-icon="refresh-cw" aria-hidden="true"></span>
                                     <span>Replace</span>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-danger product-action-btn" id="editProdImageRemoveBtn" title="Remove product image">
+                                <button type="button" class="btn btn-sm btn-danger outreach-action-btn"
+                                    id="outreachRemoveBtn" title="Remove attached image">
                                     <span data-icon="trash-2" aria-hidden="true"></span>
-                                    <span>Remove Image</span>
+                                    <span>Remove</span>
                                 </button>
                             </div>
                         </div>
                     </div>
+
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" id="outreachCancelBtn">Cancel</button>
+                        <button type="button" class="btn btn-primary" id="outreachSendBtn">
+                            <span data-icon="send" aria-hidden="true"></span> Send Outreach
+                        </button>
+                    </div>
                 </div>
 
-                <div class="modal-actions" style="display:flex;justify-content:flex-end;gap:10px">
-                    <button type="button" class="btn btn-secondary" id="editProductCancelBtn">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="editProductSaveBtn">Save Changes</button>
+                <div id="outreachProgressView" style="display:none">
+                    <p id="outreachProgressSummary" style="margin-bottom:var(--space-sm)"></p>
+                    <div class="outreach-progress-list" id="outreachProgressList"></div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-primary" id="outreachDoneBtn"
+                            style="display:none">Done</button>
+                    </div>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- ── Product Image Lightbox Modal ── -->
-<div class="modal-backdrop" id="imageLightboxBackdrop" style="display:none" role="dialog" aria-modal="true" aria-labelledby="imageLightboxTitle">
-    <div class="modal image-lightbox-modal" id="imageLightboxModal">
-        <div class="modal-header">
-            <h2 id="imageLightboxTitle">Product Image</h2>
-            <button class="modal-close" id="imageLightboxClose" aria-label="Close" type="button">×</button>
-        </div>
-        <div class="modal-body" style="padding:16px;display:flex;justify-content:center;align-items:center">
-            <img id="imageLightboxImg" src="" alt="Product Large View" style="max-width:100%;max-height:75vh;border-radius:var(--radius-md)" />
+    <!-- ── Edit Product Modal ── -->
+    <div class="modal-backdrop" id="editProductModalBackdrop" style="display:none" role="dialog" aria-modal="true"
+        aria-labelledby="editProductModalTitle">
+        <div class="modal" id="editProductModal" style="max-width:560px">
+            <div class="modal-header">
+                <h2 id="editProductModalTitle">Edit Product / Service</h2>
+                <button class="modal-close" id="editProductModalClose" aria-label="Close" type="button">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="editProductForm" novalidate>
+                    <input type="hidden" id="editProdId">
+                    <input type="hidden" id="editProdImagePath">
+                    <div class="form-row-3">
+                        <div class="form-group">
+                            <label for="editProdName">Name</label>
+                            <input type="text" id="editProdName" placeholder="Product name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editProdPrice">Price</label>
+                            <input type="text" id="editProdPrice" placeholder="e.g. ₹1,499">
+                        </div>
+                        <div class="form-group">
+                            <label for="editProdCategory">Category</label>
+                            <input type="text" id="editProdCategory" placeholder="e.g. Services">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editProdDesc">Description</label>
+                            <input type="text" id="editProdDesc" placeholder="Description for WhatsApp chatbot">
+                        </div>
+                        <div class="form-group">
+                            <label for="editProdUrl">Link (optional)</label>
+                            <input type="url" id="editProdUrl" placeholder="https://…">
+                        </div>
+                    </div>
+
+                    <div class="form-group product-media-section" style="margin-top:14px;margin-bottom:18px">
+                        <div class="product-media-header">
+                            <label class="product-media-label" for="editProdImageFile">
+                                <span class="product-media-icon-badge">
+                                    <span data-icon="image" aria-hidden="true"></span>
+                                </span>
+                                <span class="product-media-title">Product Image</span>
+                                <span class="product-badge-optional">Optional</span>
+                            </label>
+                            <span class="product-media-specs">JPG, PNG, WEBP (Max 5MB)</span>
+                        </div>
+
+                        <div class="product-image-uploader-box">
+                            <input type="file" id="editProdImageFile" accept="image/jpeg,image/png,image/webp"
+                                style="display:none">
+
+                            <div class="product-dropzone" id="editProdDropzone" tabindex="0" role="button"
+                                aria-label="Attach or replace product image">
+                                <div class="product-dropzone-icon-bubble">
+                                    <span data-icon="upload-cloud" class="product-cloud-icon" aria-hidden="true"></span>
+                                </div>
+                                <div class="product-dropzone-info">
+                                    <div class="product-dropzone-main-text">
+                                        <button type="button" class="btn btn-secondary product-browse-btn"
+                                            id="editProdBrowseBtn" tabindex="-1">
+                                            <span data-icon="image" aria-hidden="true"></span>
+                                            <span>Choose Image</span>
+                                        </button>
+                                        <span class="product-dropzone-divider">or drag &amp; drop</span>
+                                    </div>
+                                    <div class="product-dropzone-subtext" id="editProdDropzoneText">Click anywhere to
+                                        attach or replace image</div>
+                                </div>
+                            </div>
+
+                            <div class="product-image-preview-bar product-preview-card" id="editProdPreviewContainer"
+                                style="display:none">
+                                <div class="preview-img-container product-thumb-wrap">
+                                    <img id="editProdImagePreview" src="" alt="Product Image Preview"
+                                        class="product-thumb-preview">
+                                </div>
+                                <div class="preview-meta product-preview-details">
+                                    <div class="product-preview-name-row">
+                                        <span id="editProdImageFilename" class="preview-filename"></span>
+                                    </div>
+                                    <div class="product-preview-badge-row">
+                                        <span id="editProdImageStatus" class="preview-status"></span>
+                                    </div>
+                                </div>
+                                <div class="preview-actions product-preview-actions">
+                                    <button type="button" class="btn btn-sm btn-secondary product-action-btn"
+                                        id="editProdImageReplaceBtn" title="Choose another image">
+                                        <span data-icon="refresh-cw" aria-hidden="true"></span>
+                                        <span>Replace</span>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-danger product-action-btn"
+                                        id="editProdImageRemoveBtn" title="Remove product image">
+                                        <span data-icon="trash-2" aria-hidden="true"></span>
+                                        <span>Remove Image</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-actions" style="display:flex;justify-content:flex-end;gap:10px">
+                        <button type="button" class="btn btn-secondary" id="editProductCancelBtn">Cancel</button>
+                        <button type="submit" class="btn btn-primary" id="editProductSaveBtn">Save Changes</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Toast container -->
-<div class="toast-container" id="toastContainer" role="status" aria-live="polite" aria-atomic="true"></div>
+    <!-- ── Product Image Lightbox Modal ── -->
+    <div class="modal-backdrop" id="imageLightboxBackdrop" style="display:none" role="dialog" aria-modal="true"
+        aria-labelledby="imageLightboxTitle">
+        <div class="modal image-lightbox-modal" id="imageLightboxModal">
+            <div class="modal-header">
+                <h2 id="imageLightboxTitle">Product Image</h2>
+                <button class="modal-close" id="imageLightboxClose" aria-label="Close" type="button">×</button>
+            </div>
+            <div class="modal-body" style="padding:16px;display:flex;justify-content:center;align-items:center">
+                <img id="imageLightboxImg" src="" alt="Product Large View"
+                    style="max-width:100%;max-height:75vh;border-radius:var(--radius-md)" />
+            </div>
+        </div>
+    </div>
 
-<script src="js/chart.umd.min.js"></script>
-<script src="js/icons.js"></script>
-<script src="js/app.js?v=20261015_5"></script>
+    <!-- Toast container -->
+    <div class="toast-container" id="toastContainer" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <script src="js/chart.umd.min.js"></script>
+    <script src="js/icons.js"></script>
+    <script src="js/app.js?v=20261015_5"></script>
 </body>
+
 </html>

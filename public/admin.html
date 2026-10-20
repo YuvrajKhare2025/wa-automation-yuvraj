@@ -1,133 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin — DIVYORA AI</title>
-<meta name="theme-color" content="#0A3325">
-<link rel="icon" type="image/png" href="/images/favicon.png">
-<link rel="stylesheet" href="css/landing.css?v=20261020_divyora1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — DIVYORA AI</title>
+    <meta name="theme-color" content="#0A3325">
+    <link rel="icon" type="image/png" href="/images/favicon.png">
+    <link rel="stylesheet" href="css/landing.css?v=20261020_divyora1">
 </head>
+
 <body>
 
-<div class="admin-shell">
-    <header class="admin-topbar">
-        <span class="brand">
-            <img src="/images/divyora-icon-transparent.png" alt="DIVYORA AI Logo" class="brand-logo-img" width="32" height="32">
-            <span>DIVYORA AI</span>
-            <span class="admin-badge"><span data-icon="crown" aria-hidden="true"></span> Admin</span>
-        </span>
-        <div class="admin-topbar-actions">
-            <span id="adminWhoami"></span>
-            <a href="/app" class="btn btn-ghost"><span data-icon="layout-dashboard" aria-hidden="true"></span> <span class="topbar-btn-text">Dashboard</span></a>
-            <button class="btn btn-ghost" id="logoutBtn"><span data-icon="log-out" aria-hidden="true"></span> <span class="topbar-btn-text">Log Out</span></button>
-        </div>
-    </header>
-
-    <main class="admin-main">
-        <div class="admin-stats-grid" id="platformStats">
-            <!-- filled by admin.js -->
-        </div>
-
-        <div class="approval-alert-banner" id="approvalAlertBanner" style="display:none">
-            <div class="banner-content">
-                <span data-icon="alert-circle" class="icon" aria-hidden="true"></span>
-                <span><strong id="pendingAlertCount">0</strong> new account registration(s) waiting for your approval.</span>
+    <div class="admin-shell">
+        <header class="admin-topbar">
+            <span class="brand">
+                <img src="/images/divyora-icon.png" alt="DIVYORA AI Logo" class="brand-logo-img" width="32" height="32">
+                <span>DIVYORA AI</span>
+                <span class="admin-badge"><span data-icon="crown" aria-hidden="true"></span> Admin</span>
+            </span>
+            <div class="admin-topbar-actions">
+                <span id="adminWhoami"></span>
+                <a href="/app" class="btn btn-ghost"><span data-icon="layout-dashboard" aria-hidden="true"></span> <span
+                        class="topbar-btn-text">Dashboard</span></a>
+                <button class="btn btn-ghost" id="logoutBtn"><span data-icon="log-out" aria-hidden="true"></span> <span
+                        class="topbar-btn-text">Log Out</span></button>
             </div>
-            <button class="btn btn-warning-sm" id="viewPendingBtn" type="button">Review Pending Requests</button>
-        </div>
+        </header>
 
-        <div class="admin-panel">
-            <div class="admin-panel-head">
-                <h2><span data-icon="users" aria-hidden="true"></span> Accounts Management</h2>
-                <div class="admin-search">
-                    <span data-icon="search" aria-hidden="true"></span>
-                    <input type="search" id="userSearch" placeholder="Search by business or email…">
+        <main class="admin-main">
+            <div class="admin-stats-grid" id="platformStats">
+                <!-- filled by admin.js -->
+            </div>
+
+            <div class="approval-alert-banner" id="approvalAlertBanner" style="display:none">
+                <div class="banner-content">
+                    <span data-icon="alert-circle" class="icon" aria-hidden="true"></span>
+                    <span><strong id="pendingAlertCount">0</strong> new account registration(s) waiting for your
+                        approval.</span>
+                </div>
+                <button class="btn btn-warning-sm" id="viewPendingBtn" type="button">Review Pending Requests</button>
+            </div>
+
+            <div class="admin-panel">
+                <div class="admin-panel-head">
+                    <h2><span data-icon="users" aria-hidden="true"></span> Accounts Management</h2>
+                    <div class="admin-search">
+                        <span data-icon="search" aria-hidden="true"></span>
+                        <input type="search" id="userSearch" placeholder="Search by business or email…">
+                    </div>
+                </div>
+                <div class="admin-filter-bar" id="adminFilterBar">
+                    <button type="button" class="filter-btn active" data-filter="all">All Accounts <span
+                            class="filter-badge" id="filterAllCount">0</span></button>
+                    <button type="button" class="filter-btn filter-btn-pending" data-filter="pending">⏳ Pending Approval
+                        <span class="filter-badge" id="filterPendingCount">0</span></button>
+                    <button type="button" class="filter-btn" data-filter="active">Active <span class="filter-badge"
+                            id="filterActiveCount">0</span></button>
+                    <button type="button" class="filter-btn" data-filter="suspended">Suspended <span
+                            class="filter-badge" id="filterSuspendedCount">0</span></button>
+                </div>
+                <div class="admin-table-wrap" id="usersTableWrap">
+                    <table class="admin-table" id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>Account</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>WhatsApp</th>
+                                <th style="text-align:center">WA Access</th>
+                                <th>Usage</th>
+                                <th>Plan / Limits</th>
+                                <th>Joined</th>
+                                <th class="th-actions">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersBody"></tbody>
+                    </table>
+                </div>
+                <div class="admin-empty" id="usersEmpty" style="display:none">
+                    <span data-icon="users" aria-hidden="true"></span>
+                    <div>No accounts match your search.</div>
                 </div>
             </div>
-            <div class="admin-filter-bar" id="adminFilterBar">
-                <button type="button" class="filter-btn active" data-filter="all">All Accounts <span class="filter-badge" id="filterAllCount">0</span></button>
-                <button type="button" class="filter-btn filter-btn-pending" data-filter="pending">⏳ Pending Approval <span class="filter-badge" id="filterPendingCount">0</span></button>
-                <button type="button" class="filter-btn" data-filter="active">Active <span class="filter-badge" id="filterActiveCount">0</span></button>
-                <button type="button" class="filter-btn" data-filter="suspended">Suspended <span class="filter-badge" id="filterSuspendedCount">0</span></button>
-            </div>
-            <div class="admin-table-wrap" id="usersTableWrap">
-                <table class="admin-table" id="usersTable">
-                    <thead>
-                        <tr>
-                            <th>Account</th>
-                            <th>Role</th>
-                            <th>Status</th>
-                            <th>WhatsApp</th>
-                            <th style="text-align:center">WA Access</th>
-                            <th>Usage</th>
-                            <th>Plan / Limits</th>
-                            <th>Joined</th>
-                            <th class="th-actions">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="usersBody"></tbody>
-                </table>
-            </div>
-            <div class="admin-empty" id="usersEmpty" style="display:none">
-                <span data-icon="users" aria-hidden="true"></span>
-                <div>No accounts match your search.</div>
-            </div>
-        </div>
-    </main>
-</div>
+        </main>
+    </div>
 
-<!-- Edit account modal -->
-<div class="modal-backdrop" id="editModalBackdrop" style="display:none">
-    <div class="modal-box">
-        <h3><span data-icon="settings" class="icon-inline" aria-hidden="true"></span>Edit Account</h3>
-        <input type="hidden" id="editUserId">
-        <div class="form-field">
-            <label>Business Name</label>
-            <input type="text" id="editBusinessName">
-        </div>
-        <div class="form-field">
-            <label>Owner Name</label>
-            <input type="text" id="editOwnerName">
-        </div>
-        <div class="form-field">
-            <label>Status</label>
-            <select id="editStatus">
-                <option value="pending">Pending Approval</option>
-                <option value="active">Active</option>
-                <option value="suspended">Suspended</option>
-                <option value="rejected">Rejected</option>
-            </select>
-        </div>
-        <div class="form-field">
-            <label>Role</label>
-            <select id="editRole">
-                <option value="user">User</option>
-                <option value="admin">Admin</option>
-            </select>
-        </div>
-        <div class="form-field">
-            <label>Plan</label>
-            <input type="text" id="editPlan" placeholder="free">
-        </div>
-        <div class="form-field">
-            <label>Monthly Message Limit <small style="color:var(--text-secondary);font-weight:400">(0 = unlimited)</small></label>
-            <input type="number" id="editMessageLimit" min="0" step="1">
-        </div>
-        <div class="form-field">
-            <label>Chatbot Rule Limit <small style="color:var(--text-secondary);font-weight:400">(0 = unlimited)</small></label>
-            <input type="number" id="editRuleLimit" min="0" step="1">
-        </div>
-        <div class="modal-actions">
-            <button class="btn btn-tiny" id="editCancelBtn" type="button">Cancel</button>
-            <button class="btn btn-primary" id="editSaveBtn" type="button"><span data-icon="save" class="icon-inline" aria-hidden="true"></span>Save Changes</button>
+    <!-- Edit account modal -->
+    <div class="modal-backdrop" id="editModalBackdrop" style="display:none">
+        <div class="modal-box">
+            <h3><span data-icon="settings" class="icon-inline" aria-hidden="true"></span>Edit Account</h3>
+            <input type="hidden" id="editUserId">
+            <div class="form-field">
+                <label>Business Name</label>
+                <input type="text" id="editBusinessName">
+            </div>
+            <div class="form-field">
+                <label>Owner Name</label>
+                <input type="text" id="editOwnerName">
+            </div>
+            <div class="form-field">
+                <label>Status</label>
+                <select id="editStatus">
+                    <option value="pending">Pending Approval</option>
+                    <option value="active">Active</option>
+                    <option value="suspended">Suspended</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+            </div>
+            <div class="form-field">
+                <label>Role</label>
+                <select id="editRole">
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+            <div class="form-field">
+                <label>Plan</label>
+                <input type="text" id="editPlan" placeholder="free">
+            </div>
+            <div class="form-field">
+                <label>Monthly Message Limit <small style="color:var(--text-secondary);font-weight:400">(0 =
+                        unlimited)</small></label>
+                <input type="number" id="editMessageLimit" min="0" step="1">
+            </div>
+            <div class="form-field">
+                <label>Chatbot Rule Limit <small style="color:var(--text-secondary);font-weight:400">(0 =
+                        unlimited)</small></label>
+                <input type="number" id="editRuleLimit" min="0" step="1">
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-tiny" id="editCancelBtn" type="button">Cancel</button>
+                <button class="btn btn-primary" id="editSaveBtn" type="button"><span data-icon="save"
+                        class="icon-inline" aria-hidden="true"></span>Save Changes</button>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="toast-host" id="toastHost"></div>
+    <div class="toast-host" id="toastHost"></div>
 
-<script src="js/icons.js?v=20260919_1"></script>
-<script src="js/admin.js?v=20260919_1"></script>
+    <script src="js/icons.js?v=20260919_1"></script>
+    <script src="js/admin.js?v=20260919_1"></script>
 </body>
+
 </html>

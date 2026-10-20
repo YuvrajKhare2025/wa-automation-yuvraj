@@ -1,222 +1,245 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DIVYORA AI — Where Vision Meets Intelligence</title>
-<meta name="description" content="Turn WhatsApp into your sales engine — AI auto-replies, lead scoring, a built-in CRM pipeline, and a business catalog your AI can sell from.">
-<meta name="theme-color" content="#0A3325">
-<link rel="icon" type="image/png" href="/images/favicon.png">
-<link rel="stylesheet" href="css/landing.css?v=20261020_divyora1">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIVYORA AI — Where Vision Meets Intelligence</title>
+    <meta name="description"
+        content="Turn WhatsApp into your sales engine — AI auto-replies, lead scoring, a built-in CRM pipeline, and a business catalog your AI can sell from.">
+    <meta name="theme-color" content="#0A3325">
+    <link rel="icon" type="image/png" href="/images/favicon.png">
+    <link rel="stylesheet" href="css/landing.css?v=20261020_divyora1">
 </head>
+
 <body>
 
-<!-- ═══ Nav ═══ -->
-<nav class="landing-nav" id="landingNav">
-    <div class="container">
-        <div class="brand">
-            <img src="/images/divyora-icon-transparent.png" alt="DIVYORA AI Logo" class="brand-logo-img" width="34" height="34">
-            <span>DIVYORA AI</span>
+    <!-- ═══ Nav ═══ -->
+    <nav class="landing-nav" id="landingNav">
+        <div class="container">
+            <div class="brand">
+                <img src="/images/divyora-icon.png" alt="DIVYORA AI Logo" class="brand-logo-img" width="34" height="34">
+                <span>DIVYORA AI</span>
+            </div>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#how-it-works">How it works</a>
+                <a href="#crm-preview">CRM &amp; Analytics</a>
+            </div>
+            <div class="nav-cta">
+                <a href="/login" class="btn btn-ghost">Log In</a>
+                <a href="/signup" class="btn btn-primary">Get Started Free</a>
+            </div>
         </div>
-        <div class="nav-links">
-            <a href="#features">Features</a>
-            <a href="#how-it-works">How it works</a>
-            <a href="#crm-preview">CRM &amp; Analytics</a>
-        </div>
-        <div class="nav-cta">
-            <a href="/login" class="btn btn-ghost">Log In</a>
-            <a href="/signup" class="btn btn-primary">Get Started Free</a>
-        </div>
-    </div>
-</nav>
+    </nav>
 
-<!-- ═══ Hero ═══ -->
-<header class="hero" id="hero">
-    <canvas class="hero-canvas" id="heroCanvas" aria-hidden="true"></canvas>
-    <div class="container">
-        <div class="hero-copy">
-            <span class="hero-eyebrow"><span data-icon="sparkles" aria-hidden="true"></span> AI-Powered WhatsApp Business Suite</span>
-            <h1>Turn every WhatsApp chat into a <span class="accent">closed deal</span>, automatically.</h1>
-            <p class="lead">Your AI answers instantly on your real WhatsApp number, scores every lead by buying intent, and moves them through a built-in sales pipeline — while you sleep.</p>
-            <div class="hero-cta">
-                <a href="/signup" class="btn btn-primary btn-lg"><span data-icon="rocket" aria-hidden="true"></span> Start Free — Own Your WhatsApp</a>
-                <a href="/login" class="btn btn-ghost btn-lg"><span data-icon="arrow-right" aria-hidden="true"></span> Log In</a>
-            </div>
-            <div class="hero-points">
-                <span class="hero-point"><span data-icon="check-circle" aria-hidden="true"></span> Your own WhatsApp login</span>
-                <span class="hero-point"><span data-icon="check-circle" aria-hidden="true"></span> AI lead scoring &amp; CRM</span>
-                <span class="hero-point"><span data-icon="check-circle" aria-hidden="true"></span> No credit card required</span>
-            </div>
-        </div>
-
-        <div class="hero-scene" id="heroScene">
-            <div class="float-card fc-1" id="fc1">
-                <span class="fc-icon"><span data-icon="flame" aria-hidden="true"></span></span>
-                <span>Hot Lead Detected<small>Ravi Sharma · 88/100</small></span>
-            </div>
-            <div class="float-card fc-2" id="fc2">
-                <span class="fc-icon"><span data-icon="trophy" aria-hidden="true"></span></span>
-                <span>Deal Won<small>₹15,000 · Website Package</small></span>
-            </div>
-            <div class="float-card fc-3" id="fc3">
-                <span class="fc-icon"><span data-icon="brain" aria-hidden="true"></span></span>
-                <span>AI Replied Instantly<small>1.8s response time</small></span>
+    <!-- ═══ Hero ═══ -->
+    <header class="hero" id="hero">
+        <canvas class="hero-canvas" id="heroCanvas" aria-hidden="true"></canvas>
+        <div class="container">
+            <div class="hero-copy">
+                <span class="hero-eyebrow"><span data-icon="sparkles" aria-hidden="true"></span> AI-Powered WhatsApp
+                    Business Suite</span>
+                <h1>Turn every WhatsApp chat into a <span class="accent">closed deal</span>, automatically.</h1>
+                <p class="lead">Your AI answers instantly on your real WhatsApp number, scores every lead by buying
+                    intent, and moves them through a built-in sales pipeline — while you sleep.</p>
+                <div class="hero-cta">
+                    <a href="/signup" class="btn btn-primary btn-lg"><span data-icon="rocket" aria-hidden="true"></span>
+                        Start Free — Own Your WhatsApp</a>
+                    <a href="/login" class="btn btn-ghost btn-lg"><span data-icon="arrow-right"
+                            aria-hidden="true"></span> Log In</a>
+                </div>
+                <div class="hero-points">
+                    <span class="hero-point"><span data-icon="check-circle" aria-hidden="true"></span> Your own WhatsApp
+                        login</span>
+                    <span class="hero-point"><span data-icon="check-circle" aria-hidden="true"></span> AI lead scoring
+                        &amp; CRM</span>
+                    <span class="hero-point"><span data-icon="check-circle" aria-hidden="true"></span> No credit card
+                        required</span>
+                </div>
             </div>
 
-            <div class="phone-mock" id="phoneMock">
-                <div class="phone-screen">
-                    <div class="phone-topbar">
-                        <span class="avatar">RS</span>
-                        <span>
-                            <span class="who">Ravi Sharma</span><br>
-                            <span class="status">online</span>
-                        </span>
+            <div class="hero-scene" id="heroScene">
+                <div class="float-card fc-1" id="fc1">
+                    <span class="fc-icon"><span data-icon="flame" aria-hidden="true"></span></span>
+                    <span>Hot Lead Detected<small>Ravi Sharma · 88/100</small></span>
+                </div>
+                <div class="float-card fc-2" id="fc2">
+                    <span class="fc-icon"><span data-icon="trophy" aria-hidden="true"></span></span>
+                    <span>Deal Won<small>₹15,000 · Website Package</small></span>
+                </div>
+                <div class="float-card fc-3" id="fc3">
+                    <span class="fc-icon"><span data-icon="brain" aria-hidden="true"></span></span>
+                    <span>AI Replied Instantly<small>1.8s response time</small></span>
+                </div>
+
+                <div class="phone-mock" id="phoneMock">
+                    <div class="phone-screen">
+                        <div class="phone-topbar">
+                            <span class="avatar">RS</span>
+                            <span>
+                                <span class="who">Ravi Sharma</span><br>
+                                <span class="status">online</span>
+                            </span>
+                        </div>
+                        <div class="phone-chat" id="phoneChat"></div>
                     </div>
-                    <div class="phone-chat" id="phoneChat"></div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="hero-scroll-cue"><span data-icon="chevron-down" aria-hidden="true"></span> Scroll to explore</div>
-</header>
+        <div class="hero-scroll-cue"><span data-icon="chevron-down" aria-hidden="true"></span> Scroll to explore</div>
+    </header>
 
-<!-- ═══ Features ═══ -->
-<section class="section" id="features">
-    <div class="container">
-        <div class="section-head reveal">
-            <span class="section-eyebrow">Everything included</span>
-            <h2>One platform, your whole WhatsApp business</h2>
-            <p>From the first reply to the closed deal — no plugins, no spreadsheets, no missed follow-ups.</p>
+    <!-- ═══ Features ═══ -->
+    <section class="section" id="features">
+        <div class="container">
+            <div class="section-head reveal">
+                <span class="section-eyebrow">Everything included</span>
+                <h2>One platform, your whole WhatsApp business</h2>
+                <p>From the first reply to the closed deal — no plugins, no spreadsheets, no missed follow-ups.</p>
+            </div>
+            <div class="feature-grid">
+                <div class="feature-card reveal">
+                    <span class="feature-icon a"><span data-icon="brain" aria-hidden="true"></span></span>
+                    <h3>AI Auto-Replies</h3>
+                    <p>Gemini-powered AI chats naturally on your behalf, knows your catalog and pricing, and never
+                        leaves a customer waiting.</p>
+                </div>
+                <div class="feature-card reveal">
+                    <span class="feature-icon b"><span data-icon="target" aria-hidden="true"></span></span>
+                    <h3>AI Lead Analysis</h3>
+                    <p>Every conversation is summarized and scored — interest level, priority, sentiment, and the exact
+                        next action to take.</p>
+                </div>
+                <div class="feature-card reveal">
+                    <span class="feature-icon c"><span data-icon="trending-up" aria-hidden="true"></span></span>
+                    <h3>Built-in CRM Pipeline</h3>
+                    <p>Deals move automatically through New → Qualified → Won as your AI reads the conversation — plus
+                        pie charts and trend lines.</p>
+                </div>
+                <div class="feature-card reveal">
+                    <span class="feature-icon d"><span data-icon="store" aria-hidden="true"></span></span>
+                    <h3>Business &amp; Product Catalog</h3>
+                    <p>Add your products, services, and offers once — your AI quotes prices and pitches accurately,
+                        every time.</p>
+                </div>
+                <div class="feature-card reveal">
+                    <span class="feature-icon a"><span data-icon="bot" aria-hidden="true"></span></span>
+                    <h3>Keyword Chatbot Rules</h3>
+                    <p>Set exact-match, contains, or regex rules for instant, predictable replies alongside your AI
+                        persona.</p>
+                </div>
+                <div class="feature-card reveal">
+                    <span class="feature-icon b"><span data-icon="shield-check" aria-hidden="true"></span></span>
+                    <h3>Your Own WhatsApp Login</h3>
+                    <p>Every account connects its own WhatsApp number by QR code. Your number, your data, fully isolated
+                        from every other account.</p>
+                </div>
+            </div>
         </div>
-        <div class="feature-grid">
-            <div class="feature-card reveal">
-                <span class="feature-icon a"><span data-icon="brain" aria-hidden="true"></span></span>
-                <h3>AI Auto-Replies</h3>
-                <p>Gemini-powered AI chats naturally on your behalf, knows your catalog and pricing, and never leaves a customer waiting.</p>
-            </div>
-            <div class="feature-card reveal">
-                <span class="feature-icon b"><span data-icon="target" aria-hidden="true"></span></span>
-                <h3>AI Lead Analysis</h3>
-                <p>Every conversation is summarized and scored — interest level, priority, sentiment, and the exact next action to take.</p>
-            </div>
-            <div class="feature-card reveal">
-                <span class="feature-icon c"><span data-icon="trending-up" aria-hidden="true"></span></span>
-                <h3>Built-in CRM Pipeline</h3>
-                <p>Deals move automatically through New → Qualified → Won as your AI reads the conversation — plus pie charts and trend lines.</p>
-            </div>
-            <div class="feature-card reveal">
-                <span class="feature-icon d"><span data-icon="store" aria-hidden="true"></span></span>
-                <h3>Business &amp; Product Catalog</h3>
-                <p>Add your products, services, and offers once — your AI quotes prices and pitches accurately, every time.</p>
-            </div>
-            <div class="feature-card reveal">
-                <span class="feature-icon a"><span data-icon="bot" aria-hidden="true"></span></span>
-                <h3>Keyword Chatbot Rules</h3>
-                <p>Set exact-match, contains, or regex rules for instant, predictable replies alongside your AI persona.</p>
-            </div>
-            <div class="feature-card reveal">
-                <span class="feature-icon b"><span data-icon="shield-check" aria-hidden="true"></span></span>
-                <h3>Your Own WhatsApp Login</h3>
-                <p>Every account connects its own WhatsApp number by QR code. Your number, your data, fully isolated from every other account.</p>
-            </div>
-        </div>
-    </div>
-</section>
+    </section>
 
-<!-- ═══ How it works ═══ -->
-<section class="section section-tint" id="how-it-works">
-    <div class="container">
-        <div class="section-head reveal">
-            <span class="section-eyebrow">Getting started</span>
-            <h2>Live on WhatsApp in three steps</h2>
-            <p>No developers, no complicated setup — most accounts are fully running in under ten minutes.</p>
+    <!-- ═══ How it works ═══ -->
+    <section class="section section-tint" id="how-it-works">
+        <div class="container">
+            <div class="section-head reveal">
+                <span class="section-eyebrow">Getting started</span>
+                <h2>Live on WhatsApp in three steps</h2>
+                <p>No developers, no complicated setup — most accounts are fully running in under ten minutes.</p>
+            </div>
+            <div class="steps">
+                <div class="step reveal">
+                    <div class="step-num">1</div>
+                    <h3>Create your free account</h3>
+                    <p>Sign up with your email, tell us your business name — you're straight into your own private
+                        dashboard.</p>
+                </div>
+                <div class="step reveal">
+                    <div class="step-num">2</div>
+                    <h3>Scan the QR with WhatsApp</h3>
+                    <p>Connect your own WhatsApp number in seconds, exactly like WhatsApp Web. Nothing shared with any
+                        other account.</p>
+                </div>
+                <div class="step reveal">
+                    <div class="step-num">3</div>
+                    <h3>Add your business &amp; go live</h3>
+                    <p>Drop in your products and a short description — your AI takes it from there, replying and
+                        qualifying leads for you.</p>
+                </div>
+            </div>
         </div>
-        <div class="steps">
-            <div class="step reveal">
-                <div class="step-num">1</div>
-                <h3>Create your free account</h3>
-                <p>Sign up with your email, tell us your business name — you're straight into your own private dashboard.</p>
-            </div>
-            <div class="step reveal">
-                <div class="step-num">2</div>
-                <h3>Scan the QR with WhatsApp</h3>
-                <p>Connect your own WhatsApp number in seconds, exactly like WhatsApp Web. Nothing shared with any other account.</p>
-            </div>
-            <div class="step reveal">
-                <div class="step-num">3</div>
-                <h3>Add your business &amp; go live</h3>
-                <p>Drop in your products and a short description — your AI takes it from there, replying and qualifying leads for you.</p>
-            </div>
-        </div>
-    </div>
-</section>
+    </section>
 
-<!-- ═══ CRM preview ═══ -->
-<section class="section" id="crm-preview">
-    <div class="container">
-        <div class="section-head reveal">
-            <span class="section-eyebrow">See it in action</span>
-            <h2>A sales dashboard that fills itself in</h2>
-            <p>Every chat becomes a tracked deal — no manual data entry.</p>
+    <!-- ═══ CRM preview ═══ -->
+    <section class="section" id="crm-preview">
+        <div class="container">
+            <div class="section-head reveal">
+                <span class="section-eyebrow">See it in action</span>
+                <h2>A sales dashboard that fills itself in</h2>
+                <p>Every chat becomes a tracked deal — no manual data entry.</p>
+            </div>
+            <div class="preview-panel reveal">
+                <div class="preview-stat">
+                    <div class="num">₹45,000</div>
+                    <div class="lbl">Pipeline Value</div>
+                </div>
+                <div class="preview-stat">
+                    <div class="num">88/100</div>
+                    <div class="lbl">Top Lead Score</div>
+                </div>
+                <div class="preview-stat">
+                    <div class="num">1.8s</div>
+                    <div class="lbl">Avg. AI Response Time</div>
+                </div>
+                <div class="preview-stat">
+                    <div class="num">24/7</div>
+                    <div class="lbl">Always Replying</div>
+                </div>
+            </div>
         </div>
-        <div class="preview-panel reveal">
-            <div class="preview-stat">
-                <div class="num">₹45,000</div>
-                <div class="lbl">Pipeline Value</div>
-            </div>
-            <div class="preview-stat">
-                <div class="num">88/100</div>
-                <div class="lbl">Top Lead Score</div>
-            </div>
-            <div class="preview-stat">
-                <div class="num">1.8s</div>
-                <div class="lbl">Avg. AI Response Time</div>
-            </div>
-            <div class="preview-stat">
-                <div class="num">24/7</div>
-                <div class="lbl">Always Replying</div>
-            </div>
-        </div>
-    </div>
-</section>
+    </section>
 
-<!-- ═══ Final CTA ═══ -->
-<section class="section">
-    <div class="container">
-        <div class="cta-band reveal">
-            <h2>Ready to let AI run your WhatsApp?</h2>
-            <p>Create your free account and connect your WhatsApp number in minutes.</p>
-            <div class="hero-cta">
-                <a href="/signup" class="btn btn-primary btn-lg"><span data-icon="rocket" aria-hidden="true"></span> Get Started Free</a>
+    <!-- ═══ Final CTA ═══ -->
+    <section class="section">
+        <div class="container">
+            <div class="cta-band reveal">
+                <h2>Ready to let AI run your WhatsApp?</h2>
+                <p>Create your free account and connect your WhatsApp number in minutes.</p>
+                <div class="hero-cta">
+                    <a href="/signup" class="btn btn-primary btn-lg"><span data-icon="rocket" aria-hidden="true"></span>
+                        Get Started Free</a>
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<!-- ═══ Footer ═══ -->
-<footer class="landing-footer">
-    <div class="container">
-        <div class="footer-top">
-            <div class="footer-brand">
-                <img src="/images/divyora-icon-transparent.png" alt="DIVYORA AI Logo" class="brand-logo-img" width="34" height="34">
-                <span>DIVYORA AI</span>
+    <!-- ═══ Footer ═══ -->
+    <footer class="landing-footer">
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <img src="/images/divyora-icon.png" alt="DIVYORA AI Logo" class="brand-logo-img" width="34"
+                        height="34">
+                    <span>DIVYORA AI</span>
+                </div>
+                <div class="footer-links">
+                    <a href="#features">Features</a>
+                    <a href="#how-it-works">How it works</a>
+                    <a href="/login">Log In</a>
+                    <a href="/signup">Sign Up</a>
+                </div>
             </div>
-            <div class="footer-links">
-                <a href="#features">Features</a>
-                <a href="#how-it-works">How it works</a>
-                <a href="/login">Log In</a>
-                <a href="/signup">Sign Up</a>
+            <div class="footer-bottom">
+                <span>© <span id="year"></span> DIVYORA AI. Where Vision Meets Intelligence.</span>
+                <span>WhatsApp is a trademark of its respective owner. This product is not affiliated with WhatsApp
+                    Inc.</span>
             </div>
         </div>
-        <div class="footer-bottom">
-            <span>© <span id="year"></span> DIVYORA AI. Where Vision Meets Intelligence.</span>
-            <span>WhatsApp is a trademark of its respective owner. This product is not affiliated with WhatsApp Inc.</span>
-        </div>
-    </div>
-</footer>
+    </footer>
 
-<script src="js/icons.js"></script>
-<script src="js/landing.js"></script>
+    <script src="js/icons.js"></script>
+    <script src="js/landing.js"></script>
 </body>
+
 </html>
