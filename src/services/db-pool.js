@@ -99,8 +99,9 @@ function getPoolConfig() {
 
     // Determine TLS settings
     const sslMode = (process.env.PGSSLMODE || '').toLowerCase();
+    const isInternalHost = connectionString.includes('@postgres:') || connectionString.includes('@localhost:') || connectionString.includes('@127.0.0.1:') || connectionString.includes('@postgres/') || connectionString.includes('@localhost/');
     let ssl = false;
-    if (sslMode === 'require' || sslMode === 'verify-full' || (isProd && sslMode !== 'disable')) {
+    if (sslMode === 'require' || sslMode === 'verify-full' || (isProd && sslMode !== 'disable' && !isInternalHost)) {
         ssl = {
             rejectUnauthorized: process.env.PGSSL_REJECT_UNAUTHORIZED !== 'false'
         };
