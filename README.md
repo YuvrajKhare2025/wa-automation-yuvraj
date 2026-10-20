@@ -1,4 +1,7 @@
-# WhatsApp Automation & AI Assistant 🤖
+# DIVYORA AI 🤖
+> *Where Vision Meets Intelligence.*
+
+![DIVYORA AI](public/images/divyora-logo.png)
 
 A self-hosted, multi-tenant WhatsApp automation platform with its own landing page, signup/login, a per-account dashboard, and an admin panel to manage every account. Powered by **Node.js**, **Google Gemini AI**, and **whatsapp-web.js**.
 

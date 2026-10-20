@@ -1,4 +1,4 @@
-# Deploying WA Automation
+# Deploying DIVYORA AI
 
 Two stages, same app both times — the Docker image built in Stage 2 is the
 exact same code you're demoing locally in Stage 1, so moving from "showing
