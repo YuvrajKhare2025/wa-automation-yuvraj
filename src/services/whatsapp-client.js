@@ -480,6 +480,169 @@ async function initWhatsAppClient(userId) {
     return { accepted: true, starting: true };
 }
 
+/**
+ * Resolves a WhatsApp LID (Linked Identity — 14-16 digit internal ID)
+ * to the actual E.164 phone number using WhatsApp Web's internal APIs.
+ */
+async function resolveLidToPhone(client, lidOrJid) {
+    if (!client || !lidOrJid) return null;
+    const raw = String(lidOrJid).trim();
+    const lidDigits = raw.split('@')[0].replace(/\D/g, '');
+    const lidJid = raw.includes('@') ? raw : `${raw}@lid`;
+
+    // Method 1: Built-in whatsapp-web.js getContactLidAndPhone
+    if (typeof client.getContactLidAndPhone === 'function') {
+        try {
+            const res = await Promise.race([
+                client.getContactLidAndPhone(lidJid),
+                new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 4000))
+            ]);
+            if (Array.isArray(res) && res[0]?.pn) {
+                const pn = String(res[0].pn).split('@')[0].replace(/\D/g, '');
+                if (pn && pn !== lidDigits && pn.length >= 7 && pn.length <= 15) {
+                    return pn;
+                }
+            }
+        } catch (_) {}
+    }
+
+    // Method 2: Direct evaluation inside Chromium context
+    if (client.pupPage) {
+        try {
+            const evaluated = await Promise.race([
+                client.pupPage.evaluate(async (targetJid) => {
+                    try {
+                        const widFactory = window.require('WAWebWidFactory');
+                        const wid = widFactory.createWid(targetJid);
+                        if (wid.server === 'lid') {
+                            try {
+                                const { toPn } = window.require('WAWebLidMigrationUtils');
+                                const pnWid = toPn(wid);
+                                if (pnWid?.user) return pnWid.user;
+                            } catch (_) {}
+
+                            try {
+                                const pnWid = window.require('WAWebApiContact').getPhoneNumber(wid);
+                                if (pnWid?.user) return pnWid.user;
+                            } catch (_) {}
+
+                            try {
+                                const q = await window.require('WAWebQueryExistsJob').queryWidExists(wid);
+                                if (q?.wid) {
+                                    const pnWid = window.require('WAWebApiContact').getPhoneNumber(wid);
+                                    if (pnWid?.user) return pnWid.user;
+                                }
+                            } catch (_) {}
+                        }
+                        return null;
+                    } catch (e) {
+                        return null;
+                    }
+                }, lidJid),
+                new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 4000))
+            ]);
+            if (evaluated) {
+                const pn = String(evaluated).replace(/\D/g, '');
+                if (pn && pn !== lidDigits && pn.length >= 7 && pn.length <= 15) {
+                    return pn;
+                }
+            }
+        } catch (_) {}
+    }
+
+    return null;
+}
+
+/**
+ * Resolves the real phone number for an inbound message.
+ */
+async function resolveContactPhoneNumber(client, msg) {
+    const rawFrom = String(msg?.from || '').trim();
+    const rawAuthor = String(msg?.author || '').trim();
+    const sourceJid = rawFrom || rawAuthor;
+    const isLid = sourceJid.includes('@lid') || (!sourceJid.includes('@') && sourceJid.length >= 14);
+
+    let phone = '';
+
+    // 1. If it's an LID, resolve using WhatsApp Web's internal mapping
+    if (isLid && client) {
+        phone = await resolveLidToPhone(client, sourceJid);
+    }
+
+    // 2. If not a LID (standard @c.us), just extract the phone digits
+    if (!phone && !isLid) {
+        phone = sourceJid.split('@')[0].replace(/\D/g, '');
+    }
+
+    // 3. Fallback: Check msg.getContact() if server is 'c.us'
+    if (!phone && typeof msg?.getContact === 'function') {
+        try {
+            const contact = await msg.getContact();
+            if (contact?.id?.server === 'c.us' && contact.id.user) {
+                const candidate = String(contact.id.user).replace(/\D/g, '');
+                if (candidate && candidate.length >= 7 && candidate.length <= 15) {
+                    phone = candidate;
+                }
+            }
+        } catch (_) {}
+    }
+
+    // 4. Last resort: extract whatever digits exist from msg.from
+    if (!phone) {
+        phone = sourceJid.split('@')[0].replace(/\D/g, '');
+    }
+
+    return phone;
+}
+
+/**
+ * Scans the database for contacts, messages, CRM deals, and leads
+ * stored with 14-16 digit LIDs and updates them with the real phone number.
+ */
+async function backfillLidPhones(userId, client) {
+    try {
+        const { runSql } = require('./db-pool');
+
+        const res = await runSql(
+            `SELECT DISTINCT phone FROM (
+                SELECT phone FROM contacts WHERE user_id = $1 AND LENGTH(phone) >= 14
+                UNION
+                SELECT phone FROM messages WHERE user_id = $1 AND LENGTH(phone) >= 14
+            ) t`,
+            [userId]
+        );
+
+        const rows = res.rows || [];
+        if (rows.length === 0) return;
+
+        console.log(`🔍 [user ${userId}] Found ${rows.length} LID phone(s) in DB to resolve...`);
+
+        for (const row of rows) {
+            const lid = row.phone;
+            const realPhone = await resolveLidToPhone(client, lid);
+            if (realPhone && realPhone !== lid) {
+                console.log(`✅ [user ${userId}] Resolved LID ${lid} -> ${realPhone}`);
+
+                const existing = await runSql(
+                    `SELECT id FROM contacts WHERE user_id = $1 AND phone = $2`,
+                    [userId, realPhone]
+                );
+                if (existing.rows && existing.rows.length > 0) {
+                    await runSql(`DELETE FROM contacts WHERE user_id = $1 AND phone = $2`, [userId, lid]);
+                } else {
+                    await runSql(`UPDATE contacts SET phone = $1 WHERE user_id = $2 AND phone = $3`, [realPhone, userId, lid]);
+                }
+
+                await runSql(`UPDATE messages SET phone = $1 WHERE user_id = $2 AND phone = $3`, [realPhone, userId, lid]);
+                await runSql(`UPDATE crm_deals SET phone = $1 WHERE user_id = $2 AND phone = $3`, [realPhone, userId, lid]);
+                await runSql(`UPDATE lead_analysis SET phone = $1 WHERE user_id = $2 AND phone = $3`, [realPhone, userId, lid]);
+            }
+        }
+    } catch (err) {
+        console.warn(`⚠️ [user ${userId}] backfillLidPhones error:`, err.message);
+    }
+}
+
 function attachHandlers(userId, s, client) {
     // ── QR ──────────────────────────────────────────────────
     client.on('qr', async (qr) => {
@@ -531,6 +694,11 @@ function attachHandlers(userId, s, client) {
         try {
             broadcastSSE(userId, { type: 'ready', phone: client.info?.wid?.user || 'unknown' });
         } catch (e) {}
+
+        // Auto-backfill any existing 14-16 digit LID phone numbers in the database
+        setTimeout(() => {
+            backfillLidPhones(userId, client).catch(() => {});
+        }, 3000);
 
         clearTimers(s);
 
@@ -609,14 +777,18 @@ function attachHandlers(userId, s, client) {
             if (!msg.body || msg.body.trim() === '') return;
             if (msg.fromMe) return;
 
-            // msg.from is "<digits>@c.us"; take the digits. A malformed
-            // address is dropped rather than passed downstream.
-            const phone = String(msg.from).split('@')[0];
-            if (!/^\d{7,15}$/.test(phone)) return;
-
             // Mark the session as active so the hibernation timer is re-armed.
             s.lastActivityAt = Date.now();
             armHibernationTimer(userId);
+
+            // ── Resolve the REAL phone number ────────────────────
+            // WhatsApp multi-device can deliver messages with an internal
+            // LID (Linked Identity — 14-16 digit opaque id) in msg.from
+            // instead of the sender's actual mobile number.
+            // resolveContactPhoneNumber queries WhatsApp Web's internal
+            // mapping to extract the real E.164 phone number.
+            const phone = await resolveContactPhoneNumber(client, msg);
+            if (!/^\d{7,15}$/.test(phone)) return;
 
             let contactName = '';
             try {
@@ -993,6 +1165,8 @@ module.exports = {
     sendMediaMessage,
     MessageMedia,
     authDataPath,
+    resolveLidToPhone,
+    backfillLidPhones,
     MAX_CONCURRENT_SESSIONS,
     MAX_SSE_CLIENTS_PER_USER,
     MAX_SSE_CLIENTS_TOTAL
