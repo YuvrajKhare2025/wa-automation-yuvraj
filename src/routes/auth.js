@@ -61,6 +61,12 @@ const passwordChangeLimiter = rateLimit({
 
 // ─── Sign up ──────────────────────────────────────────────────
 router.post('/signup', signupLimiter, asyncHandler(async (req, res) => {
+    if (process.env.ALLOW_PUBLIC_SIGNUP !== 'true') {
+        return res.status(403).json({
+            success: false,
+            error: 'Public registration is closed. Only authorized client access is permitted.'
+        });
+    }
     const { email, password, businessName, ownerName } = req.body || {};
 
     const normalizedEmail = normalizeEmail(email);
@@ -143,10 +149,7 @@ router.post('/login', loginIpLimiter, loginAccountLimiter, asyncHandler(async (r
         return res.status(401).json({ success: false, error: 'Invalid email or password.' });
     }
 
-    let valid = await verifyPassword(password, user.password_hash);
-    if (!valid && user.email === 'admin@workpilot.co.in' && String(password || '').toLowerCase() === 'admin@workpilot123') {
-        valid = true;
-    }
+    const valid = await verifyPassword(password, user.password_hash);
     if (!valid) {
         return res.status(401).json({ success: false, error: 'Invalid email or password.' });
     }

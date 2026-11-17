@@ -1044,6 +1044,78 @@ function getSessionMetrics() {
  * and outreach also reach this function with data read back out of the
  * database.
  */
+/**
+ * Resolves destination phone number, 10-digit number, or WhatsApp LID to canonical JID.
+ * Handles Indian national 10-digit format (appends 91), leading zero, and LIDs.
+ */
+async function resolveTargetChatId(client, phone) {
+    if (!phone) {
+        const err = new Error('Destination phone number is required');
+        err.status = 400;
+        throw err;
+    }
+    let raw = String(phone).trim();
+
+    if (raw.endsWith('@c.us') || raw.endsWith('@lid') || raw.endsWith('@g.us')) {
+        return raw;
+    }
+
+    let digits = raw.replace(/\D/g, '');
+    if (!digits || digits.length < 7 || digits.length > 25) {
+        const err = new Error('Invalid destination phone number');
+        err.status = 400;
+        throw err;
+    }
+
+    // Check if this is an internal WhatsApp LID (14-16 digits)
+    if (digits.length >= 14 && client) {
+        try {
+            const resolvedPhone = await resolveLidToPhone(client, `${digits}@lid`);
+            if (resolvedPhone && resolvedPhone !== digits) {
+                return `${resolvedPhone}@c.us`;
+            }
+        } catch (_) {}
+        return `${digits}@lid`;
+    }
+
+    // Candidate variants to check with getNumberId
+    const candidates = [];
+    if (digits.length === 10 && /^[6-9]/.test(digits)) {
+        candidates.push(`91${digits}`);
+        candidates.push(digits);
+    } else if (digits.length === 11 && digits.startsWith('0') && /^[6-9]/.test(digits.slice(1))) {
+        candidates.push(`91${digits.slice(1)}`);
+        candidates.push(digits.slice(1));
+    } else {
+        candidates.push(digits);
+        if (digits.length === 10 && /^[6-9]/.test(digits)) {
+            candidates.push(`91${digits}`);
+        }
+    }
+
+    if (client && typeof client.getNumberId === 'function') {
+        for (const candidate of candidates) {
+            try {
+                const id = await client.getNumberId(candidate);
+                if (id && id._serialized) {
+                    return id._serialized;
+                }
+            } catch (_) {}
+        }
+    }
+
+    // Default canonical format: prefix 91 if 10-digit Indian number
+    const best = (digits.length === 10 && /^[6-9]/.test(digits)) ? `91${digits}` : digits;
+    return `${best}@c.us`;
+}
+
+/**
+ * Sends a plain-text message on behalf of an account. Validates connection
+ * state, phone format, and that the account is currently active.
+ *
+ * The chat id is built here using resolveTargetChatId, so 10-digit Indian
+ * numbers, LIDs, and international numbers are all resolved to proper WhatsApp JIDs.
+ */
 async function sendTextMessage(userId, phone, text) {
     const s = getSession(Number(userId), false);
     if (!s || !s.isConnected || !s.client) {
@@ -1052,13 +1124,8 @@ async function sendTextMessage(userId, phone, text) {
         err.status = 409;
         throw err;
     }
-    const digits = String(phone).replace(/\D/g, '');
-    if (digits.length < 7 || digits.length > 15) {
-        const err = new Error('Invalid destination phone number');
-        err.status = 400;
-        throw err;
-    }
-    return await s.client.sendMessage(`${digits}@c.us`, String(text));
+    const chatId = await resolveTargetChatId(s.client, phone);
+    return await s.client.sendMessage(chatId, String(text));
 }
 
 /**
@@ -1071,12 +1138,6 @@ async function sendProductMediaMessage(userId, phone, productIdOrData, caption =
         const err = new Error('WhatsApp client is not connected');
         err.code = 'WA_NOT_CONNECTED';
         err.status = 409;
-        throw err;
-    }
-    const digits = String(phone).replace(/\D/g, '');
-    if (digits.length < 7 || digits.length > 15) {
-        const err = new Error('Invalid destination phone number');
-        err.status = 400;
         throw err;
     }
 
@@ -1104,7 +1165,7 @@ async function sendProductMediaMessage(userId, phone, productIdOrData, caption =
     }
 
     const media = MessageMedia.fromFilePath(filePath);
-    const chatId = `${digits}@c.us`;
+    const chatId = await resolveTargetChatId(s.client, phone);
     return await s.client.sendMessage(chatId, media, { caption: String(caption || '') });
 }
 
@@ -1119,12 +1180,6 @@ async function sendMediaMessage(userId, phone, mediaInput, caption = '') {
         const err = new Error('WhatsApp client is not connected');
         err.code = 'WA_NOT_CONNECTED';
         err.status = 409;
-        throw err;
-    }
-    const digits = String(phone).replace(/\D/g, '');
-    if (digits.length < 7 || digits.length > 15) {
-        const err = new Error('Invalid destination phone number');
-        err.status = 400;
         throw err;
     }
 
@@ -1144,7 +1199,7 @@ async function sendMediaMessage(userId, phone, mediaInput, caption = '') {
         throw err;
     }
 
-    const chatId = `${digits}@c.us`;
+    const chatId = await resolveTargetChatId(s.client, phone);
     const options = {};
     if (caption && String(caption).trim().length > 0) {
         options.caption = String(caption);
@@ -1163,6 +1218,7 @@ module.exports = {
     sendTextMessage,
     sendProductMediaMessage,
     sendMediaMessage,
+    resolveTargetChatId,
     MessageMedia,
     authDataPath,
     resolveLidToPhone,

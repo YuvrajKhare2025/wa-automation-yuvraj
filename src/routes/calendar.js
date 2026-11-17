@@ -34,8 +34,10 @@ function sweepExpiredStates() {
 }
 
 router.get('/status', asyncHandler(async (req, res) => {
+    const { getSetting } = require('../services/database');
+    const calendarLink = (await getSetting(req.user.id, 'calendar_link')) || '';
     if (!isConfigured()) {
-        return res.json({ success: true, data: { configured: false, connected: false } });
+        return res.json({ success: true, data: { configured: false, connected: false, calendarLink } });
     }
     const account = await getGoogleCalendarAccount(req.user.id);
     res.json({
@@ -45,9 +47,27 @@ router.get('/status', asyncHandler(async (req, res) => {
             connected: !!account,
             checkAvailability: account ? !!account.check_availability : false,
             connectedAt: account ? account.connected_at : null,
-            lastSyncAt: account ? account.last_sync_at : null
+            lastSyncAt: account ? account.last_sync_at : null,
+            calendarLink
         }
     });
+}));
+
+router.get('/link', asyncHandler(async (req, res) => {
+    const { getSetting } = require('../services/database');
+    const calendarLink = (await getSetting(req.user.id, 'calendar_link')) || '';
+    res.json({ success: true, data: { calendarLink } });
+}));
+
+router.put('/link', asyncHandler(async (req, res) => {
+    const { setSetting } = require('../services/database');
+    const body = req.body || {};
+    let link = typeof body.calendarLink === 'string' ? body.calendarLink.trim() : '';
+    if (link && !/^https?:\/\//i.test(link)) {
+        link = 'https://' + link;
+    }
+    await setSetting(req.user.id, 'calendar_link', link);
+    res.json({ success: true, data: { calendarLink: link } });
 }));
 
 router.get('/connect', (req, res) => {

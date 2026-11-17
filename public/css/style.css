@@ -2469,6 +2469,11 @@ h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.015em; }
     transition: box-shadow 0.2s var(--ease), transform 0.2s var(--ease), border-color 0.2s var(--ease);
 }
 
+.deal-card.deal-card-due {
+    border-left: 4px solid #f59e0b;
+    background: #fffdfa;
+}
+
 .deal-card:hover {
     box-shadow: var(--shadow-md);
     border-color: var(--green-300);

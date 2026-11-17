@@ -314,7 +314,10 @@ app.get('/health', (req, res) => {
     };
     app.get('/', page('landing.html'));
     app.get(['/login', '/login.html'], page('login.html'));
-    app.get(['/signup', '/signup.html'], page('signup.html'));
+    app.get(['/signup', '/signup.html'], (req, res, next) => {
+        if (process.env.ALLOW_PUBLIC_SIGNUP !== 'true') return res.redirect('/login');
+        page('signup.html')(req, res, next);
+    });
     // The dashboard shell is public HTML; every byte of data in it comes from
     // /api/* calls that enforce auth server-side. Client-side redirects here
     // are UX, not a security boundary.

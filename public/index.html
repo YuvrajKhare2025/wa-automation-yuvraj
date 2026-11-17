@@ -1362,6 +1362,23 @@
                             </label>
                         </div>
                     </div>
+
+                    <!-- ── Custom Calendar & Booking Link Card ── -->
+                    <div class="card" style="margin-top:16px">
+                        <h2 class="card-title"><span data-icon="calendar-clock" data-icon-class="icon-inline"
+                                aria-hidden="true"></span>Calendar &amp; Meeting Booking Link</h2>
+                        <p class="card-note">Add your Google Calendar appointment scheduling link, Calendly, or Cal.com URL. Your chatbot and team can share this link directly with customers to book meetings or appointments.</p>
+                        <form id="customCalendarLinkForm" novalidate style="margin-top:12px">
+                            <div class="form-group">
+                                <label for="settCalendarLinkInput">Calendar / Booking URL</label>
+                                <input type="url" id="settCalendarLinkInput" placeholder="https://calendar.google.com/calendar/appointments/schedules/... or https://calendly.com/your-business">
+                            </div>
+                            <div style="display:flex;gap:10px;align-items:center;">
+                                <button type="submit" class="btn btn-primary" id="saveCalendarLinkBtn">Save Calendar Link</button>
+                                <a id="testCalendarLinkBtn" href="#" target="_blank" rel="noopener" class="btn btn-secondary" style="display:none">Open Link</a>
+                            </div>
+                        </form>
+                    </div>
                 </div>
 
                 <!-- ── Tab: Danger Zone ── -->

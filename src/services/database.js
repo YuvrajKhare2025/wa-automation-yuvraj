@@ -929,9 +929,11 @@ const CRM_STAGES = ['new', 'contacted', 'qualified', 'proposal', 'negotiation', 
 async function getCrmDeals(userId, { stage = '' } = {}) {
     let sql = `
         SELECT cd.*,
+               COALESCE(NULLIF(c.name, ''), NULLIF(cd.contact_name, '')) as contact_name,
                la.interest_status, la.interest_score, la.priority, la.summary,
                la.issue_category, la.next_action, la.sentiment
         FROM crm_deals cd
+        LEFT JOIN contacts c ON c.phone = cd.phone AND c.user_id = cd.user_id
         LEFT JOIN lead_analysis la ON la.phone = cd.phone AND la.user_id = cd.user_id
         WHERE cd.user_id = $1`;
     const params = [userId];
@@ -944,11 +946,23 @@ async function getCrmDeals(userId, { stage = '' } = {}) {
 }
 
 async function getCrmDealByPhone(userId, phone) {
-    return queryGet('SELECT * FROM crm_deals WHERE user_id = $1 AND phone = $2', [userId, phone]);
+    return queryGet(`
+        SELECT cd.*,
+               COALESCE(NULLIF(c.name, ''), NULLIF(cd.contact_name, '')) as contact_name
+        FROM crm_deals cd
+        LEFT JOIN contacts c ON c.phone = cd.phone AND c.user_id = cd.user_id
+        WHERE cd.user_id = $1 AND cd.phone = $2
+    `, [userId, phone]);
 }
 
 async function getCrmDealById(userId, id) {
-    return queryGet('SELECT * FROM crm_deals WHERE user_id = $1 AND id = $2', [userId, id]);
+    return queryGet(`
+        SELECT cd.*,
+               COALESCE(NULLIF(c.name, ''), NULLIF(cd.contact_name, '')) as contact_name
+        FROM crm_deals cd
+        LEFT JOIN contacts c ON c.phone = cd.phone AND c.user_id = cd.user_id
+        WHERE cd.user_id = $1 AND cd.id = $2
+    `, [userId, id]);
 }
 
 async function createCrmDeal(userId, { phone, contactName = '', stage = 'new', dealValue = 0, productInterest = '', source = 'whatsapp', notes = '', nextFollowupAt = null }) {
@@ -1127,10 +1141,12 @@ async function getLeadAnalysis(userId, phone) {
 async function getLeadAnalyses(userId, { interestStatus = '', priority = '' } = {}) {
     let sql = `
         SELECT la.*,
+               COALESCE(NULLIF(c.name, ''), NULLIF(cd.contact_name, ''), NULLIF(la.contact_name, '')) as contact_name,
                cd.stage as crm_stage,
                cd.deal_value as crm_value,
                cd.product_interest as crm_product
         FROM lead_analysis la
+        LEFT JOIN contacts c ON c.phone = la.phone AND c.user_id = la.user_id
         LEFT JOIN crm_deals cd ON cd.phone = la.phone AND cd.user_id = la.user_id
         WHERE la.user_id = $1`;
     const params = [userId];
@@ -1157,15 +1173,17 @@ async function deleteLeadAnalysis(userId, id) {
 
 async function getConversationPhones(userId) {
     return queryAll(`
-        SELECT phone,
-               MAX(contact_name) as contact_name,
+        SELECT m.phone,
+               COALESCE(NULLIF(MAX(c.name), ''), NULLIF(MAX(cd.contact_name), ''), NULLIF(MAX(m.contact_name), '')) as contact_name,
                COUNT(*) as message_count,
-               SUM(CASE WHEN direction = 'incoming' THEN 1 ELSE 0 END) as incoming_count,
-               MAX(created_at) as last_message_at
-        FROM messages
-        WHERE user_id = $1
-        GROUP BY phone
-        HAVING SUM(CASE WHEN direction = 'incoming' THEN 1 ELSE 0 END) > 0
+               SUM(CASE WHEN m.direction = 'incoming' THEN 1 ELSE 0 END) as incoming_count,
+               MAX(m.created_at) as last_message_at
+        FROM messages m
+        LEFT JOIN contacts c ON c.phone = m.phone AND c.user_id = m.user_id
+        LEFT JOIN crm_deals cd ON cd.phone = m.phone AND cd.user_id = m.user_id
+        WHERE m.user_id = $1
+        GROUP BY m.phone
+        HAVING SUM(CASE WHEN m.direction = 'incoming' THEN 1 ELSE 0 END) > 0
         ORDER BY last_message_at DESC
     `, [userId]);
 }

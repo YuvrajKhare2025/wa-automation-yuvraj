@@ -44,7 +44,7 @@ FINDING CLASSIFICATION MATRIX:
 #### [SEC-01] Committed SSH Private Key (`keys/id_rsa.pem`)
 * **Category:** Confirmed Credential Material (Private Key).
 * **Severity:** **CRITICAL** | **Confidence:** VERIFIED (100%).
-* **Location:** `keys/id_rsa.pem` (3,247 bytes, 51 lines beginning with `-----BEGIN RSA PRIVATE KEY-----`).
+* **Location:** `keys/id_rsa.pem` (3,247 bytes, 51 lines beginning with `[REDACTED-RSA-KEY-HEADER]`).
 * **Git Tracking Status:** Was actively tracked in the Git index (`git ls-files keys` confirmed tracking).
 * **Git History Exposure:** Committed in commit `b045021cfb164698734cdda052badca1d6dc4178` ("feat: admin-controlled WhatsApp access (wa_enabled flag)").
 * **Remote Propagation:** Verified present on remote GitHub tracking branches: `origin/main`, `origin/final-delivary`, `origin/final-delivery`, `origin/updated-WA` at `https://github.com/vedicagrawal12/whatsapp-automation.git`.

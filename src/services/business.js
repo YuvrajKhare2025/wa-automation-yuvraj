@@ -16,12 +16,13 @@ async function getBusinessInfo(userId) {
         targetCustomers: (await getSetting(userId, 'business_target_customers')) || '',
         offers:          (await getSetting(userId, 'business_offers')) || '',
         currency:        (await getSetting(userId, 'business_currency')) || '₹',
+        calendarLink:    (await getSetting(userId, 'calendar_link')) || '',
         products:        await getProducts(userId, true)
     };
 }
 
 function hasBusinessInfo(info) {
-    return !!(info.description || info.industry || info.website || info.offers || info.products.length);
+    return !!(info.description || info.industry || info.website || info.offers || info.calendarLink || info.products.length);
 }
 
 /**
@@ -47,6 +48,7 @@ async function getBusinessContext(userId) {
     if (info.description)     lines.push(`About: ${flat(info.description)}`);
     if (info.targetCustomers) lines.push(`Target customers: ${flat(info.targetCustomers)}`);
     if (info.offers)          lines.push(`Current offers/promotions: ${flat(info.offers)}`);
+    if (info.calendarLink)    lines.push(`Calendar / Meeting Booking Link: ${flat(info.calendarLink)}`);
 
     if (info.products.length) {
         lines.push('Products / Services catalog:');

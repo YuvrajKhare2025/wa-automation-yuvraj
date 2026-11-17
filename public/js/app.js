@@ -466,6 +466,55 @@ const PRIORITY_META = {
     low:    { label: () => Icon('circle-dashed') + ' Low',     cls: 'lead-priority-low' }
 };
 
+function formatDisplayPhone(phone) {
+    if (!phone) return '';
+    const digits = String(phone).replace(/\D/g, '');
+    if (digits.length === 12 && digits.startsWith('91')) {
+        return `+91 ${digits.slice(2, 7)} ${digits.slice(7)}`;
+    }
+    if (digits.length === 10) {
+        return `+91 ${digits.slice(0, 5)} ${digits.slice(5)}`;
+    }
+    if (digits.length === 11 && digits.startsWith('0')) {
+        return `+91 ${digits.slice(1, 6)} ${digits.slice(6)}`;
+    }
+    if (digits.length > 10 && digits.length <= 15) {
+        const countryDigits = digits.length - 10;
+        return `+${digits.slice(0, countryDigits)} ${digits.slice(countryDigits, countryDigits + 5)} ${digits.slice(countryDigits + 5)}`;
+    }
+    return phone;
+}
+
+function getLeadTitle(name, phone) {
+    const raw = (name || '').trim();
+    const digits = raw.replace(/\D/g, '');
+    const isUseless = !raw || /^[,\s._-]+$/.test(raw) || (digits.length >= 7 && digits === raw.replace(/[\s+()-]/g, ''));
+    if (isUseless) {
+        const formatted = formatDisplayPhone(phone);
+        return `Lead (${formatted || phone})`;
+    }
+    return raw;
+}
+
+function parseFollowupDate(val) {
+    if (!val) return null;
+    const str = String(val).trim();
+    if (!str) return null;
+    if (/[Zz]$|[+-]\d\d:?\d\d$/.test(str)) {
+        const d = new Date(str);
+        return isNaN(d.getTime()) ? null : d;
+    }
+    const d = new Date(str.replace(' ', 'T') + 'Z');
+    return isNaN(d.getTime()) ? null : d;
+}
+
+function formatFollowupInputVal(val) {
+    const d = parseFollowupDate(val);
+    if (!d) return '';
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 async function loadLeads() {
     clearErrorBanner('leadsError');
     try {
@@ -498,8 +547,8 @@ async function loadLeads() {
                         ${pending.map(p => `
                             <div class="pending-lead-row">
                                 <div>
-                                    <strong>${escapeHtml(p.contact_name || p.phone)}</strong>
-                                    <small style="color:var(--color-text-secondary);margin-left:8px">${escapeHtml(p.phone)} · ${p.message_count} msgs</small>
+                                    <strong>${escapeHtml(getLeadTitle(p.contact_name, p.phone))}</strong>
+                                    <small style="color:var(--color-text-secondary);margin-left:8px">${escapeHtml(formatDisplayPhone(p.phone))} · ${p.message_count} msgs</small>
                                 </div>
                                 <button class="btn btn-sm btn-secondary" data-action="analyze-lead" data-phone="${escapeHtml(p.phone)}" type="button">${Icon('brain', 'icon-inline')}Analyze</button>
                             </div>
@@ -537,8 +586,8 @@ function renderLeadCard(lead) {
         <div class="card lead-card" data-phone="${escapeHtml(lead.phone)}">
             <div class="lead-card-header">
                 <div class="lead-identity">
-                    <strong>${escapeHtml(lead.contact_name || lead.phone)}</strong>
-                    <small style="color:var(--color-text-secondary)">${escapeHtml(lead.phone)}</small>
+                    <strong>${escapeHtml(getLeadTitle(lead.contact_name, lead.phone))}</strong>
+                    <small style="color:var(--color-text-secondary)">${escapeHtml(formatDisplayPhone(lead.phone))}</small>
                 </div>
                 <div class="lead-badges">
                     <span class="lead-badge ${interest.cls}">${interest.label()}</span>
@@ -896,23 +945,25 @@ async function loadCrm() {
 }
 
 function renderDealCard(deal) {
-    const followupDue = deal.next_followup_at && new Date(deal.next_followup_at + 'Z') <= new Date()
-        && !['won', 'lost'].includes(deal.stage);
+    const fDate = parseFollowupDate(deal.next_followup_at);
+    const followupDue = fDate && fDate <= new Date() && !['won', 'lost'].includes(deal.stage);
     const priorityBadge = deal.priority
         ? `<span class="lead-badge ${(PRIORITY_META[deal.priority] || PRIORITY_META.low).cls}">${(PRIORITY_META[deal.priority] || PRIORITY_META.low).label()}</span>`
         : '';
+    const cardTitle = getLeadTitle(deal.contact_name, deal.phone);
 
     return `
-        <div class="deal-card" data-action="open-deal" data-phone="${escapeHtml(deal.phone)}" role="button" tabindex="0">
+        <div class="deal-card ${followupDue ? 'deal-card-due' : ''}" data-action="open-deal" data-phone="${escapeHtml(deal.phone)}" role="button" tabindex="0">
             <div class="deal-card-top">
-                <strong>${escapeHtml(deal.contact_name || deal.phone)}</strong>
+                <strong>${escapeHtml(cardTitle)}</strong>
                 ${deal.deal_value ? `<span class="deal-value">${fmtMoney(deal.deal_value)}</span>` : ''}
             </div>
+            <div style="font-size:0.75rem;color:var(--color-text-secondary);margin-bottom:4px;">${escapeHtml(formatDisplayPhone(deal.phone))}</div>
             ${deal.product_interest ? `<div class="deal-product">${Icon('package', 'icon-inline')}${escapeHtml(deal.product_interest)}</div>` : ''}
             <div class="deal-card-badges">
                 ${priorityBadge}
                 ${deal.interest_score ? `<span class="lead-badge lead-badge-score">${deal.interest_score}/100</span>` : ''}
-                ${followupDue ? `<span class="lead-badge lead-priority-high">${Icon('clock')} Follow up!</span>` : ''}
+                ${followupDue ? `<span class="lead-badge lead-priority-high">${Icon('clock')} Follow up due</span>` : ''}
             </div>
         </div>`;
 }
@@ -931,9 +982,10 @@ async function openDealModal(phone) {
 
     try {
         const { deal, analysis, activities } = await api(`/api/crm/deals/phone/${encodeURIComponent(phone)}`);
-        title.textContent = deal.contact_name || deal.phone;
+        const modalTitle = getLeadTitle(deal.contact_name, deal.phone);
+        title.textContent = modalTitle;
 
-        const followupVal = deal.next_followup_at ? deal.next_followup_at.replace(' ', 'T').slice(0, 16) : '';
+        const followupVal = formatFollowupInputVal(deal.next_followup_at);
 
         body.innerHTML = `
             <div class="deal-detail-grid">
@@ -970,7 +1022,24 @@ async function openDealModal(phone) {
             <div class="modal-actions">
                 <button class="btn btn-primary btn-sm" data-action="save-deal" data-id="${deal.id}" type="button">${Icon('save', 'icon-inline')}Save Changes</button>
                 <button class="btn btn-danger btn-sm" data-action="delete-deal" data-id="${deal.id}" type="button">${Icon('trash-2', 'icon-inline')}Delete Deal</button>
-                <small style="color:var(--color-text-secondary)">${escapeHtml(deal.phone)} · Source: ${escapeHtml(deal.source || 'whatsapp')}</small>
+                <small style="color:var(--color-text-secondary)">${escapeHtml(formatDisplayPhone(deal.phone))} · Source: ${escapeHtml(deal.source || 'whatsapp')}</small>
+            </div>
+
+            <!-- Send WhatsApp Message Section -->
+            <div class="modal-section" style="background:var(--color-bg-secondary, #f8fafc);padding:14px;border-radius:8px;border:1px solid var(--color-border);margin-top:14px;">
+                <h3 style="margin-top:0;display:flex;align-items:center;gap:6px;font-size:0.95rem;color:var(--color-text-primary);">
+                    ${Icon('send', 'icon-inline')}Send WhatsApp Message
+                </h3>
+                <p style="font-size:0.8rem;color:var(--color-text-secondary);margin:4px 0 8px;">Directly text ${escapeHtml(modalTitle)} on WhatsApp.</p>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                    <textarea id="modalDealMessage" rows="2" placeholder="Type WhatsApp message here… e.g. Hi ${escapeHtml(deal.contact_name || '')}, following up on your request..." style="width:100%;resize:vertical;"></textarea>
+                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                        <small style="color:var(--color-text-secondary)">To: <strong>${escapeHtml(formatDisplayPhone(deal.phone))}</strong></small>
+                        <button class="btn btn-primary btn-sm" id="modalDealSendBtn" data-action="send-deal-msg" data-phone="${escapeHtml(deal.phone)}" type="button">
+                            ${Icon('send', 'icon-inline')} Send Message
+                        </button>
+                    </div>
+                </div>
             </div>
 
             ${analysis ? `
@@ -1018,14 +1087,16 @@ function closeDealModal() {
 
 async function saveDealFromModal(dealId) {
     try {
+        const val = document.getElementById('modalDealFollowup').value;
+        const next_followup_at = val ? new Date(val).toISOString() : null;
+
         await api(`/api/crm/deals/${dealId}`, {
             method: 'PUT',
             body: JSON.stringify({
                 stage:            document.getElementById('modalDealStage').value,
                 deal_value:       document.getElementById('modalDealValue').value,
                 product_interest: document.getElementById('modalDealProduct').value,
-                next_followup_at: document.getElementById('modalDealFollowup').value
-                                    ? document.getElementById('modalDealFollowup').value.replace('T', ' ') : null,
+                next_followup_at: next_followup_at,
                 notes:            document.getElementById('modalDealNotes').value
             })
         });
@@ -1034,6 +1105,49 @@ async function saveDealFromModal(dealId) {
         loadCrm();
     } catch (err) {
         showToast(err.message || 'Failed to update deal', 'error');
+    }
+}
+
+async function sendDealMessage(phone) {
+    if (!phone) return;
+    const msgInput = document.getElementById('modalDealMessage');
+    const sendBtn = document.getElementById('modalDealSendBtn');
+    const text = msgInput ? msgInput.value.trim() : '';
+    if (!text) {
+        showToast('Please type a message first', 'error');
+        return;
+    }
+
+    if (sendBtn) {
+        sendBtn.disabled = true;
+        sendBtn.textContent = 'Sending…';
+    }
+
+    try {
+        await api('/api/messages/send', {
+            method: 'POST',
+            body: JSON.stringify({ phone, body: text })
+        });
+        showToast(`WhatsApp sent to ${formatDisplayPhone(phone)}!`, 'success');
+
+        // Log outgoing message as an activity note on the deal
+        try {
+            await api(`/api/crm/deals/phone/${encodeURIComponent(phone)}/notes`, {
+                method: 'POST',
+                body: JSON.stringify({ content: `💬 Sent WhatsApp: ${text}` })
+            });
+        } catch (_) {}
+
+        if (msgInput) msgInput.value = '';
+        // Refresh deal modal to display new activity
+        openDealModal(phone);
+    } catch (err) {
+        showToast(err.message || 'Failed to send WhatsApp message', 'error');
+    } finally {
+        if (sendBtn) {
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = `${Icon('send', 'icon-inline')} Send Message`;
+        }
     }
 }
 
@@ -2443,10 +2557,26 @@ async function loadCalendarStatus() {
     const syncBtn = document.getElementById('calendarSyncBtn');
     const disconnectBtn = document.getElementById('calendarDisconnectBtn');
     const availabilityRow = document.getElementById('calendarAvailabilityRow');
+    const linkInput = document.getElementById('settCalendarLinkInput');
+    const testLinkBtn = document.getElementById('testCalendarLinkBtn');
     if (!statusEl) return; // calendar tab not on this page
 
     try {
         const data = await api('/api/calendar/status');
+
+        // Populate custom calendar booking link
+        if (linkInput && data.calendarLink !== undefined) {
+            linkInput.value = data.calendarLink || '';
+            if (testLinkBtn) {
+                if (data.calendarLink) {
+                    testLinkBtn.href = data.calendarLink;
+                    testLinkBtn.style.display = 'inline-flex';
+                } else {
+                    testLinkBtn.style.display = 'none';
+                }
+            }
+        }
+
         if (!data.configured) {
             notConfiguredEl.style.display = '';
             statusEl.innerHTML = '';
@@ -2534,6 +2664,42 @@ function initCalendarSettings() {
             }
         });
     }
+
+    const calendarLinkForm = document.getElementById('customCalendarLinkForm');
+    calendarLinkForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const input = document.getElementById('settCalendarLinkInput');
+        const btn = document.getElementById('saveCalendarLinkBtn');
+        const testBtn = document.getElementById('testCalendarLinkBtn');
+        const calendarLink = input ? input.value.trim() : '';
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = 'Saving…';
+        }
+        try {
+            const res = await api('/api/calendar/link', {
+                method: 'PUT',
+                body: JSON.stringify({ calendarLink })
+            });
+            showToast('Calendar link saved successfully!', 'success');
+            if (res && res.calendarLink) {
+                if (input) input.value = res.calendarLink;
+                if (testBtn) {
+                    testBtn.href = res.calendarLink;
+                    testBtn.style.display = 'inline-flex';
+                }
+            } else if (testBtn) {
+                testBtn.style.display = 'none';
+            }
+        } catch (err) {
+            showToast(err.message || 'Failed to save calendar link', 'error');
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = 'Save Calendar Link';
+            }
+        }
+    });
 
     window.addEventListener('message', (event) => {
         if (event.origin !== window.location.origin) return;
@@ -2868,6 +3034,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             deleteDealFromModal(id);
         } else if (action === 'add-note') {
             addNoteFromModal();
+        } else if (action === 'send-deal-msg') {
+            sendDealMessage(target.dataset.phone);
         }
     });
 
