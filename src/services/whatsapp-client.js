@@ -1104,8 +1104,16 @@ async function resolveTargetChatId(client, phone) {
         }
     }
 
-    // Default canonical format: prefix 91 if 10-digit Indian number
-    const best = (digits.length === 10 && /^[6-9]/.test(digits)) ? `91${digits}` : digits;
+    // Default canonical format
+    if (digits.length >= 14) {
+        return `${digits}@lid`;
+    }
+    let best = digits;
+    if (digits.length === 11 && digits.startsWith('0') && /^[6-9]/.test(digits.slice(1))) {
+        best = `91${digits.slice(1)}`;
+    } else if (digits.length === 10 && /^[6-9]/.test(digits)) {
+        best = `91${digits}`;
+    }
     return `${best}@c.us`;
 }
 
